@@ -1,0 +1,6 @@
+1.	Sections in order (DEVICES, CONNECTIONS, MONITOR)
+2.	0 or more rules in each section
+3.	"uname"s in CONNECTIONS of MONITOR must be defined in DEVICES
+4.	"outname" and "inname" must be valid for specified DEVICE
+5.	"uname" must be unique
+6.	in CONNECTIONS, each input must be connected to exactly 1 output

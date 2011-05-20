@@ -1,0 +1,23 @@
+LogicDefinitionGrammar = { section }
+section                = ( 'DEVICES' '{' {devrule} '}' ) |
+                         ( 'CONNECTIONS' '{' {connrule} '}' ) |
+                         ( 'MONITOR' '{' {monrule} '}' )
+devrule                = device '=' uname ';'
+connrule               = uname [ '.' outname ] '>' uname '.' inname ';'
+monrule                = uname [ '.' outname ] ';'
+uname                  = ''' alphachar { alnumchar } '''
+device                 = ( 'CLOCK' '-period' uint ) |
+                         ( 'SWITCH' '-initialvalue' bool ) |
+                         ( 'AND' '-numinputs' uint ) |
+                         ( 'NAND' '-numinputs' uint ) |
+                         ( 'OR' '-numinputs' uint ) |
+                         ( 'NOR' '-numinputs' uint ) |
+                         ( 'DTYPE' ) |
+                         ( 'XOR' )
+outname                = 'Q' | 'QBAR'
+inname                 = ( 'I' { uint } ) |
+                         'DATA' |
+                         'SET' |
+                         'CLEAR' |
+                         'CLK'
+bool                   = '0' | '1'
