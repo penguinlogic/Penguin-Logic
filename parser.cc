@@ -9,6 +9,8 @@ using namespace std;
 bool parser::readin (void)
 {
   /* over to you */
+	// return false to allow program to compile
+	return false;
 }
 
 parser::parser (network* network_mod, devices* devices_mod,
