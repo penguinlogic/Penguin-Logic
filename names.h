@@ -2,7 +2,7 @@
 #define names_h
 
 #include <string>
-
+#include <vector>
 using namespace std;
 
 const int maxnames  = 200;  /* max number of distinct names */
@@ -15,7 +15,8 @@ typedef string namestring;
 class names{
 
   /* put stuff that the class uses internally here */
-
+private:
+  vector<namestring> nametable;
 
 public:
   name lookup (namestring str);
