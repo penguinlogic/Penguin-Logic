@@ -31,7 +31,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   // trace is displayed.
 {
   float y;
-  unsigned int i;
+  int i;
   asignal s;
 
   if (cycles >= 0) cyclesdisplayed = cycles;
@@ -74,7 +74,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   // Example of how to use GLUT to draw text on the canvas
   glColor3f(0.0, 0.0, 1.0);
   glRasterPos2f(10, 100);
-  for (i = 0; i < example_text.Len(); i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);
+  for (unsigned int i = 0; i < example_text.Len(); i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);
 
   // We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
   glFlush();

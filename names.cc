@@ -19,7 +19,7 @@ name names::lookup (namestring str) 	/* Returns the internal representation of t
     					/* form.  If the name is not already in the name table, it is          */
     					/* automatically inserted.      */
  {
-for (int i=0; i<nametable.size(); i++)
+for (unsigned int i=0; i<nametable.size(); i++)
 	{
 	if (!str.compare(nametable[i])) return i;
 	}
@@ -32,7 +32,7 @@ name names::cvtname (namestring str)	/* Returns the internal representation of t
     					/* form.  If the name is not in the name table then 'blankname' is     */
     					/* returned. */
  {
-for (int i=0; i<nametable.size(); i++)
+for (unsigned int i=0; i<nametable.size(); i++)
 	{
 	if (!str.compare(nametable[i])) return i;
 	}
