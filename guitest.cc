@@ -15,7 +15,8 @@ bool MyApp::OnInit()
 
   // glutInit cannot cope with Unicode command line arguments, so we pass
   // it some fake ASCII ones instead
-  char **tmp1; int tmp2 = 0; glutInit(&tmp2, tmp1);
+  char *a[2]={"dummy","dummy"};
+  char **tmp1=(char**)a; int tmp2 = 0; glutInit(&tmp2, tmp1);
   // Construct the GUI
   MyFrame *frame = new MyFrame(NULL, wxT("Logic simulator"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz);
   frame->Show(true);
