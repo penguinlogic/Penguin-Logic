@@ -1,0 +1,25 @@
+/ This is a second example of how the grammar can be used /
+
+DEVICES
+{
+	CLOCK -period 5 = clock;
+	SWITCH -initialvalue 0 = switch1;
+	SWITCH -initialvalue 1 = switch2;
+	SWITCH -intialvalue 0 = switch3;
+	DTYPE = dtype;
+}
+
+CONNECTIONS
+{
+	switch3 > dtype.DATA;
+	switch1 > dtype.SET;
+	switch2 > dtype.CLEAR;
+	clock > dtype.CLOCK;
+}
+
+MONITOR
+{
+	dtype.Q;
+	dtype.QBAR;
+	clock;
+}
