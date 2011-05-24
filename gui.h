@@ -20,25 +20,29 @@ class MyGLCanvas;
 
 class MyFrame: public wxFrame
 {
- public:
-  MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, 
-	  names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, 
-	  long style = wxDEFAULT_FRAME_STYLE); // constructor
- private:
-  MyGLCanvas *canvas;                     // GL drawing area widget to draw traces
-  wxSpinCtrl *spin;                       // control widget to select the number of cycles
-  names *nmz;                             // pointer to names class
-  devices *dmz;                           // pointer to devices class
-  monitor *mmz;                           // pointer to monitor class
-  int cyclescompleted;                    // how many simulation cycles have been completed
-  void runnetwork(int ncycles);           // function to run the logic network
-  void OnExit(wxCommandEvent& event);     // callback for exit menu item
-  void OnAbout(wxCommandEvent& event);    // callback for about menu item
-  void OnRunButton(wxCommandEvent& event);   // callback for push button (run)
-  void OnContButton(wxCommandEvent& event);   // callback for push button (cont)
-  void OnSpin(wxSpinEvent& event);        // callback for spin control
-  void OnText(wxCommandEvent& event);     // callback for text entry field
-  DECLARE_EVENT_TABLE()
+	public:
+		MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, 
+			names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL,
+			long style = wxDEFAULT_FRAME_STYLE); // constructor
+	private:
+		MyGLCanvas *canvas;							// GL drawing area widget to draw traces
+		wxSpinCtrl *spin;							// control widget to select the number of cycles
+		names *nmz;									// pointer to names class
+		devices *dmz;								// pointer to devices class
+		monitor *mmz;								// pointer to monitor class
+		int cyclescompleted;						// how many simulation cycles have been completed
+		void runnetwork(int ncycles);				// function to run the logic network
+		void OnDevelopment(wxCommandEvent& event);	// callback for functions under development
+		void OnOpen(wxCommandEvent& event);			// callback for [File | Open] menu item
+		void OnSave(wxCommandEvent& event);			// callback for [File | Save] menu item
+		void OnExit(wxCommandEvent& event);			// callback for [File | Exit] menu item
+		void OnHelp(wxCommandEvent& event);			// callback for [Help | View help] menu item
+		void OnAbout(wxCommandEvent& event);		// callback for [Help | About] menu item
+		void OnRunButton(wxCommandEvent& event);	// callback for push button (run)
+		void OnContButton(wxCommandEvent& event);	// callback for push button (cont)
+		void OnSpin(wxSpinEvent& event);			// callback for spin control
+		void OnText(wxCommandEvent& event);			// callback for text entry field
+		DECLARE_EVENT_TABLE()
 };
     
 class MyGLCanvas: public wxGLCanvas
