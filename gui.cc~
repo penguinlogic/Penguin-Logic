@@ -206,23 +206,19 @@ void MyFrame::OnButton(wxCommandEvent &event)
   switch(event)
   {
   case RUN_BUTTON_ID:
-  {
     int n, ncycles;
     cyclescompleted = 0;
     mmz->resetmonitor ();
     runnetwork(spin->GetValue());
     canvas->Render(wxT("Run button pressed"), cyclescompleted);
     break;
-  }
   case CONT_BUTTON_ID:
-  {
     int n, ncycles;
     cyclescompleted = 0;
     mmz->resetmonitor ();
     runnetwork(spin->GetValue());
     canvas->Render(wxT("Continue button pressed"), cyclescompleted);
     break;
-  }
   }
 }
 
