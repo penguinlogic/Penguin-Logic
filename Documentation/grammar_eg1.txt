@@ -1,8 +1,10 @@
+/ This is an example of how the grammar can be used /
+
 DEVICES
 {
 	SWITCH -initialvalue 0 = switch1;
 	SWITCH -initialvalue 1 = switch2;
-	SWITCH -intialvalue true = switch3;
+	SWITCH -intialvalue 1 = switch3;
 	AND -numinputs 2 = and1;
 	OR -numinputs 2 = or1;
 }

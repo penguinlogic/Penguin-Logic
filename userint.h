@@ -54,13 +54,3 @@ class userint {
 };
 
 #endif /* userint_h */
-
-
-
-
-
-
-
-
-
-

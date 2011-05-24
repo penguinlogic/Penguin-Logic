@@ -140,8 +140,8 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
   EVT_MENU(wxID_EXIT, MyFrame::OnExit)
   EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
-  EVT_BUTTON(RUN_BUTTON_ID, MyFrame::OnButton)
-  EVT_BUTTON(CONT_BUTTON_ID, MyFrame::OnButton)
+  EVT_BUTTON(RUN_BUTTON_ID, MyFrame::OnRunButton)
+  EVT_BUTTON(CONT_BUTTON_ID, MyFrame::OnContButton)
   EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
   EVT_TEXT_ENTER(MY_TEXTCTRL_ID, MyFrame::OnText)
 END_EVENT_TABLE()
@@ -200,31 +200,46 @@ void MyFrame::OnAbout(wxCommandEvent &event)
   about.ShowModal();                  
 }
 
-void MyFrame::OnButton(wxCommandEvent &event)
+void MyFrame::OnRunButton(wxCommandEvent &event)
   // Callback for the push button
 {
-  switch(event)
-  {
-  case RUN_BUTTON_ID:
-  {
     int n, ncycles;
     cyclescompleted = 0;
     mmz->resetmonitor ();
     runnetwork(spin->GetValue());
-    canvas->Render(wxT("Run button pressed"), cyclescompleted);
-    break;
-  }
-  case CONT_BUTTON_ID:
-  {
-    int n, ncycles;
-    cyclescompleted = 0;
-    mmz->resetmonitor ();
-    runnetwork(spin->GetValue());
-    canvas->Render(wxT("Continue button pressed"), cyclescompleted);
-    break;
-  }
-  }
+	canvas->Render(wxT("Run button pressed"), cyclescompleted);
+	/*
+	rdnumber (ncycles, 1, maxcycles);
+    if (cmdok)
+	{
+      mmz->resetmonitor ();
+      cout << "Running for " << ncycles << " cycles" << endl;
+      runnetwork(ncycles);
+	}*/
 }
+
+void MyFrame::OnContButton(wxCommandEvent &event)
+  // Callback for the push button
+{
+    int ncycles;
+    mmz->resetmonitor ();
+    runnetwork(spin->GetValue());
+	canvas->Render(wxT("Continue button pressed"), cyclescompleted);
+	/*
+	if (cmdok)
+	{
+      if (cyclescompleted > 0)
+	  {
+        if ((ncycles + cyclescompleted) > maxcycles)
+	      ncycles = maxcycles - cyclescompleted;
+        cout << "Continuing for " << ncycles << " cycles" << endl;
+        runnetwork (ncycles);
+      }
+	  else
+        cout << "Error: nothing to continue!" << endl;
+	}*/
+}
+
 
 void MyFrame::OnSpin(wxSpinEvent &event)
   // Callback for the spin control

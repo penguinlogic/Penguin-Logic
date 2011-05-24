@@ -34,7 +34,8 @@ class MyFrame: public wxFrame
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // callback for exit menu item
   void OnAbout(wxCommandEvent& event);    // callback for about menu item
-  void OnButton(wxCommandEvent& event);   // callback for push button
+  void OnRunButton(wxCommandEvent& event);   // callback for push button (run)
+  void OnContButton(wxCommandEvent& event);   // callback for push button (cont)
   void OnSpin(wxSpinEvent& event);        // callback for spin control
   void OnText(wxCommandEvent& event);     // callback for text entry field
   DECLARE_EVENT_TABLE()
