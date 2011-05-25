@@ -23,5 +23,3 @@ inname                 = 'I1' | 'I2' | 'I3' | 'I4' |
                          'SET' |
                          'CLEAR' |
                          'CLK'
-//bool                   = '0' | '1'
-//uint                   = //unsigned int

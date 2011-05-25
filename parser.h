@@ -19,17 +19,7 @@ class parser {
 
   /* put other stuff that the class uses internally here */
   /* also declare internal functions                     */
-  symbol cursym
-
- public:
-  bool readin ();
-    /* Reads the definition of the logic system and builds the             */
-    /* corresponding internal representation via calls to the 'Network'    */
-    /* module and the 'Devices' module.                                    */
-
-  parser (network* network_mod, devices* devices_mod,
-	  monitor* monitor_mod, scanner* scanner_mod);
-    /* the constructor takes pointers to various other classes as parameters */
+  symbol cursym;
 
   void uint (void); // throws uintex if not given a valid uint
   void boolrule (void); // throws boolruleex if not given a valid bool
@@ -42,6 +32,16 @@ class parser {
   void devrule (void); // throws devruleex if finds invalid devrule
   void section (void); // throws sectionex if finds invalid section
   void parsedeffile (void);
+
+ public:
+  bool readin ();
+    /* Reads the definition of the logic system and builds the             */
+    /* corresponding internal representation via calls to the 'Network'    */
+    /* module and the 'Devices' module.                                    */
+
+  parser (network* network_mod, devices* devices_mod,
+	  monitor* monitor_mod, scanner* scanner_mod);
+    /* the constructor takes pointers to various other classes as parameters */
 };
 
 #endif /* parser_h */
