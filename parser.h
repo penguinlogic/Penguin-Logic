@@ -6,6 +6,7 @@
 #include "network.h"
 #include "devices.h"
 #include "monitor.h"
+#include "symbol.h"
 
 
 using namespace std;
@@ -18,7 +19,19 @@ class parser {
 
   /* put other stuff that the class uses internally here */
   /* also declare internal functions                     */
+  symbol cursym;
 
+  void uint (void); // throws uintex if not given a valid uint
+  void boolrule (void); // throws boolruleex if not given a valid bool
+  void inname (void); // throws innameex if not given a valid inname
+  void outname (void); // throws outnameex if not given a valid outname
+  void device (void); // throws deviceex if finds invalid device
+  void uname (void); // throws unameex if not given a valid uname
+  void monrule (void); // throws monruleex if finds invalid monrule
+  void connrule (void); // throws connruleex if finds invalid connrule
+  void devrule (void); // throws devruleex if finds invalid devrule
+  void section (void); // throws sectionex if finds invalid section
+  void parsedeffile (void);
 
  public:
   bool readin ();
