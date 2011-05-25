@@ -15,9 +15,13 @@ device                 = ( 'CLOCK' '-period' uint ) |
                          ( 'DTYPE' ) |
                          ( 'XOR' )
 outname                = 'Q' | 'QBAR'
-inname                 = ( 'I' { uint } ) |
+inname                 = 'I1' | 'I2' | 'I3' | 'I4' |
+                         'I5' | 'I6' | 'I7' | 'I8' |
+                         'I9' | 'I10' | 'I11' | 'I12' |
+                         'I13' | 'I14' | 'I15' | 'I16' |
                          'DATA' |
                          'SET' |
                          'CLEAR' |
                          'CLK'
-bool                   = '0' | '1'
+//bool                   = '0' | '1'
+//uint                   = //unsigned int

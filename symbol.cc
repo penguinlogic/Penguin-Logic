@@ -10,6 +10,14 @@ class symbolconstructorexception : public exception {
   }
 }
 
+/* Exception for uname conditions failure */
+class symbolconstructorunameexception : public symbolconstructorexception {
+  virtual const char* what () const throw ()
+  {
+    return "Exception: Invalid 'uname' found by symbol constructor";
+  }
+}
+
 /*  Constructor assigns type_var (an enum describing the
 type of symbol contained by the object) and one variable
 (e.g. uint_var, bl_var, section_var, etc.) containing the
@@ -62,7 +70,7 @@ symbol::symbol (int symtype, int num) {
 
     } else if (symtype == 7) { // symtype is 'charsym'
       type_var = symtype;
-      if (num > -1 && num < 5) {
+      if (num > -1 && num < 7) {
 	inname_var = num;
       }
     } else throw symbolconstructorexception;
@@ -70,6 +78,7 @@ symbol::symbol (int symtype, int num) {
 
   catch (exception& e) {
     cout << e.what() << endl;
+    throw;
   }
 }
 
@@ -81,14 +90,21 @@ pass the string in and store it directly
 symbol::symbol (int symtype, char* name_in) {
   try {
     if (symtype == 8) {
+      if (isalpha(name_in[0]) == true) { // check first char is alphabetic
+	  int i = 1;
+	  while (name_in[i] != '\0') {
+	    if (isalnum(name_in[i]) != true) throw symbolconstructorunameexception;
+	  }
       type_var = symtype;
       uname_var = name_in;
     } else {
-      throw symbolconstructorexception;
-    }
+      throw symbolconstructorunameexception;
+      }
+    } else throw symbolconstructorexception;
   }
   catch (exception& e) {
     cout << e.what() << endl;
+    throw;
   }
 }
 
@@ -108,51 +124,31 @@ int symbol::get_type () {
   }
   catch (exception& e) {
     cout << e.what() << endl;
+    throw;
+    return -1;
   }
 }
 
 /* Returns the value of symbol held in the object (for
 all except unames
 */
-int symbol::get_value (int symtype) { // symtype is 'uint'
+int symbol::get_value () {
   try {
-    if (symtype == 0) {
-      if ( uint_var != -1) return uint_var;
-      else throw get_symboldataexception;
-
-    } else if (symtype == 1) { // symtype is 'bl'
-      if ( bl_var != -1) return bl_var;
-      else throw get_symboldataexception;
-
-    } else if (symtype == 2) { // symtype is 'section'
-      if ( section_var != -1) return section_var;
-      else throw get_symboldataexception;
-
-    } else if (symtype == 3) { // symtype is 'devname'
-      if ( devname_var != -1) return devname_var;
-      else throw get_symboldataexception;
-
-    } else if (symtype == 4) { // symtype is 'devswitch'
-      if ( devswitch_var != -1) return devswitch_var;
-      else throw get_symboldataexception;
-
-    } else if (symtype == 5) { // symtype is 'outname'
-      if ( outname_var != -1) return outname_var;
-      else throw get_symboldataexception;
-
-    } else if (symtype == 6) { // symtype is 'inname'
-      if ( inname_var != -1) return inname_var;
-      else throw get_symboldataexception;
-
-    } else if (symtype == 7) { // symtype is 'charsym'
-      if ( charsym_var != -1) return charsym_var;
-      else throw get_symboldataexception;
-
-    } else throw get_symboldataexception;
+    if ( uint_var != -1) return uint_var; // symbol is a 'uint'
+    if ( bl_var != -1) return bl_var; // symbol is a 'bl'
+    if ( section_var != -1) return section_var; // symbol is a 'section'
+    if ( devname_var != -1) return devname_var; // symbol is a 'devname'
+    if ( devswitch_var != -1) return devswitch_var; // symbol is a 'devswitch'
+    if ( outname_var != -1) return outname_var; // symbol is a 'outname'
+    if ( inname_var != -1) return inname_var; // symbol is a 'inname'
+    if ( charsym_var != -1) return charsym_var; // symbol is a 'charsym'
+    throw get_symboldataexception;
   }
 
   catch (exception& e) {
     cout << e.what() << endl;
+    throw;
+    return -1;
   }
 }
 
@@ -164,6 +160,8 @@ char* symbol::get_uname () {
   }
   catch (exception& e) {
     cout << e.what() << endl;
+    throw;
+    return '\0';
   }
 }
 
