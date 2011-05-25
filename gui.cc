@@ -156,6 +156,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
 	EVT_BUTTON(RUN_BUTTON_ID, MyFrame::OnRunButton)
 	EVT_BUTTON(CONT_BUTTON_ID, MyFrame::OnContButton)
+	EVT_BUTTON(SWITCH_BUTTON_ID, MyFrame::OnSwitchButton)
+	EVT_BUTTON(MONITOR_BUTTON_ID, MyFrame::OnMonitorButton)
 	EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
 	EVT_TEXT_ENTER(MY_TEXTCTRL_ID, MyFrame::OnText)
 END_EVENT_TABLE()
@@ -166,7 +168,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
   // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
   // using sizers
 {
-	SetIcon(wxIcon(wx_icon));
+	SetIcon(wxIcon(wx_icon_xpm));
 	nmz = names_mod;
 	dmz = devices_mod;
 	mmz = monitor_mod;
@@ -193,25 +195,37 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	menuBar->Append(helpMenu, wxT("&Help"));
 	SetMenuBar(menuBar);
 
-	// Main window
+	// Main window layout
 	wxBoxSizer *topsizer = new wxBoxSizer(wxHORIZONTAL);
 		// Left panel
 		wxBoxSizer *left_sizer = new wxBoxSizer(wxVERTICAL);
 			// Canvas
-			canvas = new MyGLCanvas(this, wxID_ANY, monitor_mod, names_mod);
-		left_sizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
+			wxScrolledWindow *s_canvas = new wxScrolledWindow(this);
+				s_canvas->SetScrollbars(10, 10, 600, 400);
+				canvas = new MyGLCanvas(s_canvas, wxID_ANY, monitor_mod, names_mod);
+			left_sizer->Add(s_canvas, 1, wxEXPAND | wxALL, 10);
+//			canvas = new MyGLCanvas(this, wxID_ANY, monitor_mod, names_mod);
+//			left_sizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 			// Button panel
-			wxBoxSizer *button_sizer = new wxBoxSizer(wxHORIZONTAL);
-				// Buttons
-			button_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0, wxALL, 10);
-			button_sizer->Add(new wxButton(this, CONT_BUTTON_ID, wxT("Continue")), 0, wxALL, 10);
-			button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Cycles")), 0, wxTOP|wxLEFT|wxRIGHT, 10);
-				// Spinner
-			spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString(wxT("10")));
-			button_sizer->Add(spin, 0 , wxALL, 10);
-				// Free text field
-			button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
-		left_sizer->Add(button_sizer, 1, wxEXPAND | wxALL, 10);
+			wxFlexGridSizer *button_sizer = new wxFlexGridSizer(2,0,0,0);
+					// Run button
+				button_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0, wxALL, 10);
+					// SWITCH button
+				button_sizer->Add(new wxButton(this, SWITCH_BUTTON_ID, wxT("Change initial switch value")), 0, wxALL, 10);
+					// Spinner (label)
+				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Cycles:")), 0, wxALIGN_RIGHT|wxTOP|wxLEFT, 10);
+					// Spinner (device)
+				spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString(wxT("10")));
+				button_sizer->Add(spin, 0 , wxALL, 10);
+					// Continue button
+				button_sizer->Add(new wxButton(this, CONT_BUTTON_ID, wxT("Continue")), 0, wxALL, 10);
+					// MONITOR button
+				button_sizer->Add(new wxButton(this, MONITOR_BUTTON_ID, wxT("Change monitor points")), 0, wxALL, 10);
+					// Free text field (label)
+				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Text:")), 0, wxALIGN_RIGHT|wxTOP|wxLEFT, 10);
+					// Free text field (device)
+				button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
+			left_sizer->Add(button_sizer, 0, wxEXPAND | wxALL, 10);
 		//Right panel
 		wxBoxSizer *right_sizer = new wxBoxSizer(wxVERTICAL);
 			// Button2 panel
@@ -225,9 +239,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 			button2_sizer->Add(spin, 0 , wxALL, 10);
 		right_sizer->Add(button2_sizer, 0, wxALIGN_CENTER);
 	topsizer->Add(left_sizer, 1, wxEXPAND | wxALL, 10);
-	topsizer->Add(right_sizer, 1, wxEXPAND | wxALL, 10);
+	topsizer->Add(right_sizer, 0, wxEXPAND | wxALL, 10);
 
-	SetSizeHints(800, 800);
+	SetSizeHints(700, 400);
 	SetSizer(topsizer);
 }
 
@@ -312,6 +326,19 @@ void MyFrame::OnContButton(wxCommandEvent &event)
 	}*/
 }
 
+void MyFrame::OnSwitchButton(wxCommandEvent &event)
+  // Callback for the SWITCH button
+{
+	MyFrame::OnDevelopment(event);		// Placeholder until feature is developed
+	/*--------------- Insert code here-----------------------*/
+}
+
+void MyFrame::OnMonitorButton(wxCommandEvent &event)
+  // Callback for the MONITOR BUTTON
+{
+	MyFrame::OnDevelopment(event);		// Placeholder until feature is developed
+	/*--------------- Insert code here-----------------------*/
+}
 
 void MyFrame::OnSpin(wxSpinEvent &event)
   // Callback for the spin control
