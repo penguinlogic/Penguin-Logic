@@ -6,6 +6,7 @@
 #include "network.h"
 #include "devices.h"
 #include "monitor.h"
+#include "symbol.h"
 
 
 using namespace std;
