@@ -35,9 +35,10 @@ logsim.o: logsim.h names.h devices.h network.h monitor.h parser.h userint.h
 logsim.o: gui.h 
 names.o: names.h
 network.o: network.h names.h
-parser.o: parser.h names.h network.h devices.h monitor.h
+parser.o: parser.h names.h network.h devices.h monitor.h symbol.h
 monitor.o: monitor.h names.h network.h devices.h
 devices.o: devices.h names.h network.h
 userint.o: userint.h names.h network.h devices.h monitor.h
 gui.o: gui.h names.h devices.h network.h monitor.h
 guitest.o: guitest.h names.h devices.h network.h monitor.h gui.h
+scanner.o: symbol.h names.h
