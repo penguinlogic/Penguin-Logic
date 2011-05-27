@@ -67,7 +67,7 @@ skipspaces();
 skipcomments();
 
 if (eofile) {
-s = new symbol (7,7)
+  s = new symbol (7,7);
 }
 
 else if (isdigit(curch))
@@ -117,7 +117,7 @@ else if (isalpha(curch))
 	if id=="numinputs") s = new symbol (4,2);
 	if (id=="Q")s = new symbol (5,0);
 	if (id=="QBAR")s = new symbol (5,1);
-	else s = new symbol (8, id)
+	else s = new symbol (8, id);
 	
 }
 
