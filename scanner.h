@@ -18,27 +18,21 @@ using namespace std;
 class scanner
 {
 private:
-	// Insert private stuff here
 ifstream inf;
 char curch;
 bool eofile;
 namestring id;
 int num;
 
-public:
+public:	
+scanner(names* names_mod, const char* defname); // Constructor
 
-	
-	
-	scanner(names* names_mod, const char* defname); // Constructor
-
-	//~scanner();		//Destructor
-
-	void getsymbol (symbol *s); //return symbol object
-	void skipspaces ();
-	void skipcomments();
-	void getch();
-	void getnumber (int &number);
-	void getname (namestring &str);
+void getsymbol (symbol &s); //gets next symbol object
+void skipspaces ();
+void skipcomments();
+void getch();
+void getnumber (int &number);
+void getname (namestring &str);
 
 };
 

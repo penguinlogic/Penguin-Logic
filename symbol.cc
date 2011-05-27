@@ -6,23 +6,9 @@ using namespace std;
 class symbolconstructorexception : public exception {
   virtual const char* what () const throw ()
   {
-    return "Exception: Assigment failed in symbol constructor";
+    return "Exception: Assignment failed in symbol constructor";
   }
 } symbolconstructorexception_i;
-
-/* Exception for uname conditions failure */
-class symbolconstructorunameexception : public symbolconstructorexception {
-  virtual const char* what () const throw ()
-  {
-    return "Exception: Invalid 'uname' found by symbol constructor";
-  }
-} symbolconstructorunameexception_i;
-
-/*  Constructor assigns type_var (an enum describing the
-type of symbol contained by the object) and one variable
-(e.g. uint_var, bl_var, section_var, etc.) containing the
-value of that symbol.
- */
 
 symbol::symbol (type in_type, value in_value, int in_uint, string in_uname) {
   type_var = notype;
@@ -31,6 +17,10 @@ symbol::symbol (type in_type, value in_value, int in_uint, string in_uname) {
   uname_var = "\0";
 
   try {
+    cout << "in_type: " << in_type << endl;
+    cout << "in_value: " << in_value << endl;
+    cout << "in_uint: " << in_uint << endl;
+    cout << "in_uname: " << in_uname << endl;
     type_var = in_type;
 
     if (type_var != notype &&
@@ -44,10 +34,11 @@ symbol::symbol (type in_type, value in_value, int in_uint, string in_uname) {
     else if (type_var == Uname)
       uname_var = in_uname;
 
-    else throw symbolconstructorexception_i;
+    //else throw symbolconstructorexception_i;
   }
   catch (exception& e) {
     cout << e.what() << endl;
+    cout << "type_var: " << type_var << endl;
     throw;
   }
 }
@@ -79,12 +70,16 @@ all except unames
 */
 value symbol::get_value () {
   try {
+    cout << "type_var: " << type_var << endl;
+    cout << "value_var: " << value_var << endl;
+    cout << "uint_var: " << uint_var << endl;
+    cout << "uname_var: " << uname_var << endl;
     if (type_var != notype &&
 	type_var != Uint &&
 	type_var != Uname)
       return value_var;
 
-    throw get_symboldataexception_i; // the value held was not of type 'Value'
+    //throw get_symboldataexception_i; // the value held was not of type 'Value'
   }
   catch (exception& e) {
     cout << e.what() << endl;
@@ -99,7 +94,7 @@ int symbol::get_uint () {
     if (type_var == Uint)
       return uint_var;
 
-    throw get_symboldataexception_i; // the value held was not of type 'Uint'
+    //throw get_symboldataexception_i; // the value held was not of type 'Uint'
   }
   catch (exception& e) {
     cout << e.what() << endl;
@@ -114,7 +109,7 @@ string symbol::get_uname () {
     if ( type_var == Uname)
       return uname_var;
 
-    throw get_symboldataexception_i; // the value held was not of type 'Uname'
+    //throw get_symboldataexception_i; // the value held was not of type 'Uname'
   }
   catch (exception& e) {
     cout << e.what() << endl;
@@ -132,6 +127,17 @@ bool symbol::operator== (symbol rhs) {
     return true;
 
   return false;
+}
+
+/* performs inequality operation */
+bool symbol::operator!= (symbol rhs) {
+  if (type_var == rhs.get_type() &&
+      value_var == rhs.get_value() &&
+      uint_var == rhs.get_uint() &&
+      uname_var == rhs.get_uname() )
+    return false;
+
+  return true;
 }
 
 /* performs assignment operation */

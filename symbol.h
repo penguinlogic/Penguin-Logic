@@ -11,6 +11,7 @@ using namespace std;
 
 class symbol
 {
+private:
   type type_var;
   value value_var;
   int uint_var;
@@ -21,13 +22,13 @@ class symbol
   //symbol (int symtype, string name_in);
 
   type get_type (); // returns symbol type
-
   value get_value (); // returns keyword values (i.e. not uints or unames)
   int get_uint (); // returns uint_var
   string get_uname (); // returns uname_var
 
   bool operator== (symbol rhs); // allows the use of ==
-  symbol operator= (const symbol rhs); // allows assignment
+  bool operator!= (symbol rhs); // allows the use of !=
+  symbol operator= (symbol rhs); // allows assignment
 
 /* No method:
   bool isbad ();

@@ -19,7 +19,7 @@ class parser {
 
   /* put other stuff that the class uses internally here */
   /* also declare internal functions                     */
-  symbol* cursym;
+  symbol cursym;
 
   void uint (void); // throws uintex if not given a valid uint
   void boolrule (void); // throws boolruleex if not given a valid bool
