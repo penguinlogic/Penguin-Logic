@@ -7,7 +7,7 @@
 using namespace std;
 
   typedef enum {notype = -1, Uint, Section, Devname, Devswitch, Outname, Inname, Charsym, Uname} type;
-  typedef enum {novalue = -1, DEVICES, CONNECTIONS, MONITOR, CLOCK, SWITCH, AND, NAND, OR, NOR, DTYPE, XOR, period, initialvalue, numinputs, Q, QBAR, DATA, SET, CLEAR, CLK, I1, I2, I3, I4, I5, I6, I7, I8, I9, I10, I11, I12, I13, I14, I15, I16, lbrak, rbrak, equals, rarrow, semicolon, dot, dash, eof, bad} value;
+  typedef enum {novalue = -1, DEVICES, CONNECTIONS, MONITOR, CLOCK, SWITCH, AND, NAND, OR, NOR, DTYPE, XOR, period, initialvalue, numinputs, Q, QBAR, DATA, SET, CLEAR, CLK, I1, I2, I3, I4, I5, I6, I7, I8, I9, I10, I11, I12, I13, I14, I15, I16, lbrak, rbrak, equals, rarrow, semicolon, dot, dash, endfile, bad} value;
 
 class symbol
 {
@@ -18,6 +18,7 @@ private:
   string uname_var;
 
  public:
+  symbol ();
   symbol (type in_type, value in_value, int in_uint, string in_uname); // constructor
   //symbol (int symtype, string name_in);
 

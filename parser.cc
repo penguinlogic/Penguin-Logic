@@ -417,5 +417,5 @@ cout << "flag2" << endl;
     cout << "uint_var: " << cursym.get_uint() << endl;
     cout << "uname_var: " << cursym.get_uname() << endl;
     section();
-  } while (!(cursym.get_value() == eof)); // i.e. while not eof
+  } while (!(cursym.get_value() == endfile)); // i.e. while not eof
 }
