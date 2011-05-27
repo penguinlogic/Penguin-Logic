@@ -13,7 +13,6 @@ BEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
 	EVT_SIZE(MyGLCanvas::OnSize)
 	EVT_PAINT(MyGLCanvas::OnPaint)
 	EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
-//	EVT_SCROLLWIN_TOP(MyGLCanvas::OnScroll)
 END_EVENT_TABLE()
   
 MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod,
@@ -129,14 +128,6 @@ void MyGLCanvas::OnSize(wxSizeEvent& event)	// Callback function for when the ca
 	Update();  // harmless on other platforms!
 }
 
-void MyGLCanvas::OnScroll(wxSizeEvent& event)  // Callback function for when the canvas is scrolled
-{
-	//wxGLCanvas::OnScroll(event); // required on some platforms
-	//init = false;
-	//Refresh(); // required by some buggy nvidia graphics drivers,
-	//Update();  // harmless on other platforms!
-}
-
 void MyGLCanvas::OnMouse(wxMouseEvent& event)	// Callback function for mouse events inside the GL canvas
 {
 	wxString text;
@@ -174,7 +165,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 END_EVENT_TABLE()
 
 MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
-		 names *names_mod, devices *devices_mod, monitor *monitor_mod, long style):
+		 names *names_mod, devices *devices_mod, monitor *monitor_mod, wxHelpController *m_helpController, long style):
   wxFrame(parent, wxID_ANY, title, pos, size, style)
   // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
   // using sizers
@@ -183,9 +174,10 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	nmz = names_mod;
 	dmz = devices_mod;
 	mmz = monitor_mod;
-	if (nmz == NULL || dmz == NULL || mmz == NULL)
+	hpc = m_helpController;
+	if (nmz == NULL || dmz == NULL || mmz == NULL || hpc == NULL)
 	{
-		cout << "Cannot operate GUI without names, devices and monitor classes" << endl;
+		cout << "Cannot operate GUI without names, devices and monitor classes (or help files)" << endl;
 		exit(1);
 	}
 
@@ -216,13 +208,12 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 		wxBoxSizer *left_sizer = new wxBoxSizer(wxVERTICAL);
 			// Canvas
 			wxScrolledWindow *sw = new wxScrolledWindow(this, wxID_ANY, wxPoint(0, 0), wxSize(400, 400), wxVSCROLL|wxHSCROLL);
-				const int s_inc = 40;	// Scroll increment
-				const int c_size = 800;	// Canvas size
-				sw->SetScrollbars(s_inc, s_inc, c_size/s_inc, c_size/s_inc);
-				canvas = new MyGLCanvas(sw, wxID_ANY, monitor_mod, names_mod, wxDefaultPosition, wxSize(c_size,c_size));
+				const int s_inc = 40;		// Scroll increment
+				const int cx_size = 1400;	// Canvas size
+				const int cy_size = 1000;	// Canvas size
+				sw->SetScrollbars(s_inc, s_inc, cx_size/s_inc, cy_size/s_inc);
+				canvas = new MyGLCanvas(sw, wxID_ANY, monitor_mod, names_mod, wxDefaultPosition, wxSize(cx_size,cy_size));
 			left_sizer->Add(sw, 1, wxEXPAND | wxALL, 10);
-//			canvas = new MyGLCanvas(this, wxID_ANY, monitor_mod, names_mod);
-//			left_sizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 			// Button panel
 			wxFlexGridSizer *button_sizer = new wxFlexGridSizer(2,0,0,0);
 					// Run button
@@ -265,8 +256,8 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 void MyFrame::OnDevelopment(wxCommandEvent &event)
   // Produces a dialog saying that feature is under development and unavailable
 {
-  wxMessageDialog development(this, wxT("We apologise, but this feature is currently under development and not yet available."), wxT("Error: Feature unavailable"), wxICON_INFORMATION | wxOK);
-  development.ShowModal();                  
+	wxMessageDialog development(this, wxT("We apologise, but this feature is currently under development and not yet available."), wxT("Error: Feature unavailable"), wxICON_INFORMATION | wxOK);
+	development.ShowModal();                  
 }
 
 void MyFrame::OnOpen(wxCommandEvent &event)
@@ -292,15 +283,22 @@ void MyFrame::OnExit(wxCommandEvent &event)
 void MyFrame::OnHelpContents(wxCommandEvent &event)
   // Callback for the [Help | View Help] menu item
 {
-  wxMessageDialog help(this, wxT("<Insert help here>"), wxT("Penguin Logic Help"), wxICON_INFORMATION | wxOK);
-  help.ShowModal();                  
+	if (hpc->LoadFile() == false)
+	{
+		wxMessageDialog development(this, wxT("Help file cannot be found"), wxT("Error: Feature unavailable"), wxICON_INFORMATION | wxOK);
+		development.ShowModal();    
+	}
+	else
+	hpc->DisplayContents();
+//  wxMessageDialog help(this, wxT("<Insert help here>"), wxT("Penguin Logic Help"), wxICON_INFORMATION | wxOK);
+// help.ShowModal();                  
 }
 
 void MyFrame::OnAbout(wxCommandEvent &event)
   // Callback for the [Help | About] menu item
 {
-  wxMessageDialog about(this, wxT("Penguin Logic is a program to simulate simple logic circuits. \n\n© Andy Marshall, James Robinson, Ollie Lambert\nMay 2011"), wxT("About Penguin Logic"), wxICON_INFORMATION | wxOK);
-  about.ShowModal();                  
+	wxMessageDialog about(this, wxT("Penguin Logic is a program to simulate simple logic circuits. \n\n Andy Marshall, James Robinson, Ollie Lambert\nMay 2011"), wxT("About Penguin Logic"), wxICON_INFORMATION | wxOK);
+	about.ShowModal();                  
 }
 
 void MyFrame::OnRunButton(wxCommandEvent &event)
@@ -346,15 +344,54 @@ void MyFrame::OnContButton(wxCommandEvent &event)
 void MyFrame::OnSwitchButton(wxCommandEvent &event)
   // Callback for the SWITCH button
 {
-	MyFrame::OnDevelopment(event);		// Placeholder until feature is developed
+	//MyFrame::OnDevelopment(event);		// Placeholder until feature is developed
 	/*--------------- Insert code here-----------------------*/
+	bool MyPropertySheetDialog::Create(...)
+    {
+        if (!wxPropertySheetDialog::Create(...))
+            return false;
+
+        CreateButtons(wxOK|wxCANCEL|wxHELP);
+
+        // Add page
+        wxPanel* panel = new wxPanel(GetBookCtrl(), ...);
+        GetBookCtrl()->AddPage(panel, "General");
+
+        LayoutDialog();
+        return true;
+    }
+	
+	wxString SwTit = wxT("Change initial switch value");
+	wxPropertySheetDialog switches(this, wxID_ANY, SwTit);
+	switches.Create(
+	switches.CreateButtons(wxOK|wxCANCEL);
+	wxPanel* panel = new wxPanel(switches.GetBookCtrl(), wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxT("My Panel"));
+    switches.GetBookCtrl()->AddPage(panel, "General");
+	switches.LayoutDialog();
 }
 
 void MyFrame::OnMonitorButton(wxCommandEvent &event)
   // Callback for the MONITOR BUTTON
 {
-	MyFrame::OnDevelopment(event);		// Placeholder until feature is developed
-	/*--------------- Insert code here-----------------------*/
+	//  Add all potential monitor points (i.e. all outputs)
+	wxArrayString choices;
+	choices.Add(wxT("monitor1"));
+	choices.Add(wxT("monitor2"));
+
+	// Choose monitor points which are already selected
+	wxArrayInt selections;
+	selections.Empty();
+	
+	// Create dialog box
+	wxString MonMsg = wxT("Please select the required monitor points and select OK");
+	wxString MonCap = wxT("Change monitor points");
+	wxMultiChoiceDialog monitor(this, MonMsg, MonCap, choices);
+	monitor.SetSelections(selections);
+	
+	if(monitor.ShowModal() == wxID_OK)
+	{
+		monitor.GetSelections(); // Sets the selections which are required
+	};
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)
@@ -392,3 +429,40 @@ void MyFrame::runnetwork(int ncycles)
   if (ok) cyclescompleted = cyclescompleted + ncycles;
   else cyclescompleted = 0;
 }
+
+//void MonitorFrame::OnOkButton(wxCommandEvent &event)
+//{
+//}
+//
+//void MonitorFrame::OnAddButton(wxCommandEvent &event);
+//void OnAddButton(wxCommandEvent &event);
+//void OnRemoveButton(wxCommandEvent &event);
+//void OnMoveUpButton(wxCommandEvent &event);
+//void OnMoveDownButton(wxCommandEvent &event);
+//void OnOkButton(wxCommandEvent &event);
+//void OnCancelButton(wxCommandEvent &event);
+
+// Old code for monitor dialog
+//{
+//		wxFrame *MonitorFrame = new wxFrame(this, wxID_ANY, wxT("Change monitor points"), wxDefaultPosition, wxSize(300,200), wxDEFAULT_FRAME_STYLE);
+//	MonitorFrame->SetBackgroundColour(wxColour(204, 204, 255));
+//	MonitorFrame->Show(true);
+//	wxBoxSizer *monsizer = new wxBoxSizer(wxVERTICAL);
+//		wxFlexGridSizer *gridsizer = new wxFlexGridSizer(3,10,10);
+//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Available monitors")), 1, wxEXPAND|wxALL, 10);
+//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Options")), 1, wxEXPAND|wxALL, 10);
+//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Active monitors")), 1, wxEXPAND|wxALL, 10);
+//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Available monitors")), 1, wxEXPAND|wxALL, 10);
+//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Options")), 1, wxEXPAND|wxALL, 10);
+//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Active monitors")), 1, wxEXPAND|wxALL, 10);
+//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Available monitors")), 1, wxEXPAND|wxALL, 10);
+//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Options")), 1, wxEXPAND|wxALL, 10);
+//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Active monitors")), 1, wxEXPAND|wxALL, 10);
+//		monsizer->Add(gridsizer, 1, wxEXPAND|wxALL, 10);
+//		wxBoxSizer *OkCancelSizer = new wxBoxSizer(wxHORIZONTAL);
+//			OkCancelSizer->Add(new wxButton(MonitorFrame, OK_BUTTON_ID, wxT(OK)), 1, wxEXPAND|wxALL, 10);
+//			OkCancelSizer->Add(new wxButton(wxCANCEL), 1, wxEXPAND|wxALL, 10);
+//		monsizer->Add(OkCancelSizer, 1, wxEXPAND|wxALL, 10);
+//	SetSizeHints(300, 200);
+//	SetSizer(monsizer);
+//}

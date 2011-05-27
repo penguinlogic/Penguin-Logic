@@ -5,9 +5,13 @@
 #include <wx/glcanvas.h>
 #include <wx/spinctrl.h>
 #include <wx/textctrl.h>
+#include <wx/propdlg.h> // Used for the property sheet dialog in Switch value changing
 #include "names.h"
 #include "devices.h"
 #include "monitor.h"
+#include "wx/help.h" // Required for help file
+#include "wx/fs_zip.h"	// Required for help file
+#include <wx/wxhtml.h>	// Required for viewing html
 
 enum { 
   MY_SPINCNTRL_ID = wxID_HIGHEST + 1,
@@ -15,7 +19,7 @@ enum {
   RUN_BUTTON_ID,
   CONT_BUTTON_ID,
   SWITCH_BUTTON_ID,
-  MONITOR_BUTTON_ID
+  MONITOR_BUTTON_ID,
 }; // widget identifiers
 
 class MyGLCanvas;
@@ -24,7 +28,7 @@ class MyFrame: public wxFrame
 {
 	public:
 		MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, 
-			names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL,
+			names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, wxHelpController *m_helpController = NULL,
 			long style = wxDEFAULT_FRAME_STYLE); // constructor
 	private:
 			// PRIVATE VARIABLES
@@ -33,6 +37,7 @@ class MyFrame: public wxFrame
 		names *nmz;										// pointer to names class
 		devices *dmz;									// pointer to devices class
 		monitor *mmz;									// pointer to monitor class
+		wxHelpController *hpc;							// pointer to help controller
 		int cyclescompleted;							// how many simulation cycles have been completed
 			// EVENT HANDLERS
 		void runnetwork(int ncycles);					// function to run the logic network
@@ -51,6 +56,32 @@ class MyFrame: public wxFrame
 			// EVENT TABLE
 		DECLARE_EVENT_TABLE()
 };
+
+//enum {
+//	ADD_BUTTON_ID;
+//	REMOVE_BUTTON_ID;
+//	MOVE_UP_BUTTON_ID;
+//	MOVE_DOWN_BUTTON_ID;
+//	OK_BUTTON_ID;
+//	CANCEL_BUTTON_ID;
+//};
+
+//class MonitorFrame: public wxFrame
+//{
+//	public:
+//		MonitorFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, long style = wxDEFAULT_FRAME_STYLE); // constructor
+//	private:
+//			// EVENT HANDLERS
+//		void MonitorFrame::OnAddButton(wxCommandEvent &event);
+//		void OnAddButton(wxCommandEvent &event);
+//		void OnRemoveButton(wxCommandEvent &event);
+//		void OnMoveUpButton(wxCommandEvent &event);
+//		void OnMoveDownButton(wxCommandEvent &event);
+//		void OnOkButton(wxCommandEvent &event);
+//		void OnCancelButton(wxCommandEvent &event);
+//			// EVENT TABLE
+//		DECLARE_EVENT_TABLE();
+//}
     
 class MyGLCanvas: public wxGLCanvas
 {
@@ -66,7 +97,6 @@ class MyGLCanvas: public wxGLCanvas
   names *nmz;                        // pointer to names class, used to extract signal names
   void InitGL();                     // function to initialise GL context
   void OnSize(wxSizeEvent& event);   // callback for when canvas is resized
-  void OnScroll(wxSizeEvent& event);   // callback for when canvas is scrolled
   void OnPaint(wxPaintEvent& event); // callback for when canvas is exposed
   void OnMouse(wxMouseEvent& event); // callback for mouse events inside canvas
   DECLARE_EVENT_TABLE()

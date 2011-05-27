@@ -6,6 +6,8 @@
 #include "devices.h"
 #include "monitor.h"
 #include "network.h"
+#include "wx/help.h" // Required for help file
+#include "wx/fs_zip.h"	// Required for help file
 
 class MyApp: public wxApp
 {
@@ -16,6 +18,7 @@ class MyApp: public wxApp
   network *netz; // pointer to the network class
   devices *dmz;  // pointer to the devices class
   monitor *mmz;  // pointer to the monitor class
+  wxHelpController *m_helpController; // pointer to the help file
 };
 
 #endif /* guitest_h */
