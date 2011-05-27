@@ -22,17 +22,18 @@ private:
 ifstream inf;
 char curch;
 bool eofile;
-char * id;
+namestring id;
+int num;
 
 public:
 
 	
 	
-	scanner(names* names_mod, char* defname); // Constructor
+	scanner(names* names_mod, const char* defname); // Constructor
 
 	//~scanner();		//Destructor
 
-	void getsymbol (symbol &s, namestring &id, int &num); //return type of symbol, name if it has one, value if a number.
+	void getsymbol (symbol *s); //return symbol object
 	void skipspaces ();
 	void skipcomments();
 	void getch();
