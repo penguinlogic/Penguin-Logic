@@ -67,7 +67,7 @@ skipspaces();
 skipcomments();
 
 if (eofile) {
-  s = *new symbol (Charsym, eof, -1, "\0");
+  s = *new symbol (Charsym, endfile, -1, "\0");
 }
 
 else if (isdigit(curch))

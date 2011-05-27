@@ -10,6 +10,14 @@ class symbolconstructorexception : public exception {
   }
 } symbolconstructorexception_i;
 
+symbol::symbol () {
+  type_var = notype;
+  value_var = novalue;
+  uint_var = -1;
+  uname_var = "\0";
+  cout << "look at me!!!" << endl;
+}
+
 symbol::symbol (type in_type, value in_value, int in_uint, string in_uname) {
   type_var = notype;
   value_var = novalue;
