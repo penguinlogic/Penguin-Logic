@@ -1,3 +1,5 @@
+// The program can't start because MSVCP100.dll is missing from your computer.
+
 #include "gui.h"
 #include <GL/glut.h>
 #include "wx_icon.xpm"
@@ -11,6 +13,7 @@ BEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
 	EVT_SIZE(MyGLCanvas::OnSize)
 	EVT_PAINT(MyGLCanvas::OnPaint)
 	EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
+//	EVT_SCROLLWIN_TOP(MyGLCanvas::OnScroll)
 END_EVENT_TABLE()
   
 MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod,
@@ -126,6 +129,14 @@ void MyGLCanvas::OnSize(wxSizeEvent& event)	// Callback function for when the ca
 	Update();  // harmless on other platforms!
 }
 
+void MyGLCanvas::OnScroll(wxSizeEvent& event)  // Callback function for when the canvas is scrolled
+{
+	//wxGLCanvas::OnScroll(event); // required on some platforms
+	//init = false;
+	//Refresh(); // required by some buggy nvidia graphics drivers,
+	//Update();  // harmless on other platforms!
+}
+
 void MyGLCanvas::OnMouse(wxMouseEvent& event)	// Callback function for mouse events inside the GL canvas
 {
 	wxString text;
@@ -152,7 +163,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(wxID_OPEN, MyFrame::OnOpen)
 	EVT_MENU(wxID_SAVE, MyFrame::OnSave)
 	EVT_MENU(wxID_EXIT, MyFrame::OnExit)
-	EVT_MENU(wxID_HELP, MyFrame::OnHelp)
+	EVT_MENU(wxID_HELP_CONTENTS, MyFrame::OnHelpContents)
 	EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
 	EVT_BUTTON(RUN_BUTTON_ID, MyFrame::OnRunButton)
 	EVT_BUTTON(CONT_BUTTON_ID, MyFrame::OnContButton)
@@ -186,7 +197,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 
 	// Define Help menu
 	wxMenu *helpMenu = new wxMenu;
-	helpMenu->Append(wxID_HELP, wxT("&View Help"));
+	helpMenu->Append(wxID_HELP_CONTENTS, wxT("&View Help"));
 	helpMenu->Append(wxID_ABOUT, wxT("&About"));
 
 	// Define Menu bar
@@ -195,15 +206,21 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	menuBar->Append(helpMenu, wxT("&Help"));
 	SetMenuBar(menuBar);
 
+	// Create Status bar
+	CreateStatusBar(3);
+	SetStatusText(wxT("Ready"), 0);
+
 	// Main window layout
 	wxBoxSizer *topsizer = new wxBoxSizer(wxHORIZONTAL);
 		// Left panel
 		wxBoxSizer *left_sizer = new wxBoxSizer(wxVERTICAL);
 			// Canvas
-			wxScrolledWindow *s_canvas = new wxScrolledWindow(this);
-				s_canvas->SetScrollbars(10, 10, 600, 400);
-				canvas = new MyGLCanvas(s_canvas, wxID_ANY, monitor_mod, names_mod);
-			left_sizer->Add(s_canvas, 1, wxEXPAND | wxALL, 10);
+			wxScrolledWindow *sw = new wxScrolledWindow(this, wxID_ANY, wxPoint(0, 0), wxSize(400, 400), wxVSCROLL|wxHSCROLL);
+				const int s_inc = 40;	// Scroll increment
+				const int c_size = 800;	// Canvas size
+				sw->SetScrollbars(s_inc, s_inc, c_size/s_inc, c_size/s_inc);
+				canvas = new MyGLCanvas(sw, wxID_ANY, monitor_mod, names_mod, wxDefaultPosition, wxSize(c_size,c_size));
+			left_sizer->Add(sw, 1, wxEXPAND | wxALL, 10);
 //			canvas = new MyGLCanvas(this, wxID_ANY, monitor_mod, names_mod);
 //			left_sizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 			// Button panel
@@ -248,8 +265,8 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 void MyFrame::OnDevelopment(wxCommandEvent &event)
   // Produces a dialog saying that feature is under development and unavailable
 {
-  wxMessageDialog about(this, wxT("We apologise, but this feature is currently under development and not yet available."), wxT("Error: Feature unavailable"), wxICON_INFORMATION | wxOK);
-  about.ShowModal();                  
+  wxMessageDialog development(this, wxT("We apologise, but this feature is currently under development and not yet available."), wxT("Error: Feature unavailable"), wxICON_INFORMATION | wxOK);
+  development.ShowModal();                  
 }
 
 void MyFrame::OnOpen(wxCommandEvent &event)
@@ -272,11 +289,11 @@ void MyFrame::OnExit(wxCommandEvent &event)
   Close(true);
 }
 
-void MyFrame::OnHelp(wxCommandEvent &event)
+void MyFrame::OnHelpContents(wxCommandEvent &event)
   // Callback for the [Help | View Help] menu item
 {
-  wxMessageDialog about(this, wxT("<Insert help here>"), wxT("Penguin Logic Help"), wxICON_INFORMATION | wxOK);
-  about.ShowModal();                  
+  wxMessageDialog help(this, wxT("<Insert help here>"), wxT("Penguin Logic Help"), wxICON_INFORMATION | wxOK);
+  help.ShowModal();                  
 }
 
 void MyFrame::OnAbout(wxCommandEvent &event)
