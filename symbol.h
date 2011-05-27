@@ -1,33 +1,34 @@
 #ifndef symbol_h
 #define symbol_h
 
+#include <iostream>
+#include <string>
+
 using namespace std;
+
+  typedef enum {notype = -1, Uint, Section, Devname, Devswitch, Outname, Inname, Charsym, Uname} type;
+  typedef enum {novalue = -1, DEVICES, CONNECTIONS, MONITOR, CLOCK, SWITCH, AND, NAND, OR, NOR, DTYPE, XOR, period, initialvalue, numinputs, Q, QBAR, DATA, SET, CLEAR, CLK, I1, I2, I3, I4, I5, I6, I7, I8, I9, I10, I11, I12, I13, I14, I15, I16, lbrak, rbrak, equals, rarrow, semicolon, dot, dash, eof, bad} value;
 
 class symbol
 {
- private:
-  typedef enum type {'null' = -1, 'uint', 'bl', 'section', 'devname', 'devswitch', 'outname', 'inname', 'charsym', 'uname'} type_var = -1;
-
-  int uint_var = -1;
-  int bl_var = -1; // type is int so it can be initialised as null ('-1')
-  typedef enum section {'null' = -1, 'DEVICES', 'CONNECTIONS', 'MONITOR'} section_var = -1;
-  typedef enum devname {'null' = -1, 'CLOCK', 'SWITCH', 'AND', 'NAND', 'OR', 'NOR', 'DTYPE', 'XOR'} devname_var = -1;
-  typedef enum devswitch {'null' = -1, '-period','-initialvalue', '-numinputs'} devswitch_var = -1;
-  typedef enum outname {'null' = -1, 'Q', 'QBAR'} outname_var = -1;
-  typedef enum inname {'null' = -1, 'DATA', 'SET', 'CLEAR', 'CLK', 'I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9', 'I10', 'I11', 'I12', 'I13', 'I41', 'I15', 'I16'} inname_var = -1;
-  typedef enum charsym {'null' = -1, '{', '}', '=', '>', ';', '.', 'eof'} charsym_var = -1;
-  char* uname_var = '\0'; // null char
+private:
+  type type_var;
+  value value_var;
+  int uint_var;
+  string uname_var;
 
  public:
-  symbol (int symtype, int num); // constructors
-  symbol (int symtype, char* name_in);
+  symbol (type in_type, value in_value, int in_uint, string in_uname); // constructor
+  //symbol (int symtype, string name_in);
 
-  int get_type (); // returns symbol type
-
-  int get_value (); // returns any value except uname_var
-  char* get_uname (); // returns uname_var
+  type get_type (); // returns symbol type
+  value get_value (); // returns keyword values (i.e. not uints or unames)
+  int get_uint (); // returns uint_var
+  string get_uname (); // returns uname_var
 
   bool operator== (symbol rhs); // allows the use of ==
+  bool operator!= (symbol rhs); // allows the use of !=
+  symbol operator= (symbol rhs); // allows assignment
 
 /* No method:
   bool isbad ();

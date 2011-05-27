@@ -10,9 +10,10 @@ bool parser::readin (void)
 {
   try {
     parsedeffile();
-    return true:
+    cout << "It worked!" << endl;
+    return true;
   }
-  catch {
+  catch (exception& e) {
     cout << "Failed to correctly parse definition file." << endl;
     return false;
   }
@@ -27,8 +28,7 @@ parser::parser (network* network_mod, devices* devices_mod,
   smz = scanner_mod;   /* class you say:                               */
                        /* netz->makeconnection (i1, i2, o1, o2, ok);   */
 
-  /* any other initialisation you want to do? */
-
+  cursym = *new symbol(notype, novalue, -1, "\0");
 }
 
 class uintex : public exception
@@ -37,13 +37,13 @@ class uintex : public exception
   {
     return "Exception: invalid uint in definition file";
   }
-}
+} uintex_i;
 
 void parser::uint (void) // throws uintex if not given a valid uint
 {
 try
   {
-    if (cursym.get_type() != 0) throw uintex; // didn't get uint
+    if (cursym.get_type() != Uint) throw uintex_i; // didn't get uint
   }
 catch(exception& e)
   {
@@ -59,13 +59,15 @@ class boolruleex : public exception
   {
     return "Exception: invalid bool in definition file";
   }
-}
+} boolruleex_i;
 
+// deprecated - not using bools any more
+/*
 void parser::boolrule (void) // throws boolruleex if not given a valid bool
 {
 try
   {
-    if (cursym.get_type() != 1) throw boolruleex; // didn't get a bl
+    if (cursym.get_type() != 1) throw boolruleex_i; // didn't get a bl
   }
 catch(exception& e)
   {
@@ -73,6 +75,7 @@ catch(exception& e)
     throw;
   }
 }
+*/
 
 class innameex : public exception
 {
@@ -80,13 +83,13 @@ class innameex : public exception
   {
     return "Exception: invalid inname in definition file";
   }
-}
+} innameex_i;
 
 void parser::inname (void) // throws innameex if not given a valid inname
 {
 try
   {
-    if (cursym.get_type() != 6) throw innameex; // didn't get an inname
+    if (cursym.get_type() != Inname) throw innameex_i; // didn't get an inname
   }
  catch (exception& e)
    {
@@ -101,13 +104,13 @@ class outnameex : public exception
   {
     return "Exception: invalid outname in definition file";
   }
-}
+} outnameex_i;
 
 void parser::outname (void) // throws outnameex if not given a valid outname
 {
 try
   {
-    if (cursym.get_type() != 5) throw outnameex; // didn't get an outname
+    if (cursym.get_type() != Outname) throw outnameex_i; // didn't get an outname
   }
  catch (exception& e)
    {
@@ -122,93 +125,106 @@ class deviceex : public exception
   {
     return "Exception: invalid device in definition file";
   }
-}
+} deviceex_i;
 
 void parser::device (void) // throws deviceex if finds invalid device
 {
 try
   {
-    if (cursym.get_type() == 3) { //i.e. if symbol is a 'devname'
+    if (cursym.get_type() == Devname) { //i.e. if symbol is a 'devname'
 	/* Now we need to test if the device is valid.
         We test each combination of devname, devswitch, and if
         necessary the next symbol to make sure of a valid device
 	*/
-	if (cursym.get_value() == 0) { //i.e. devname is CLOCK
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 4 &&
-            cursym.get_value() == 0) { //i.e. devswitch is '-period'
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 0) { // i.e. symbol is a uint
-	  return; // we have a valid CLOCK
-	} else throw deviceex; // expected a uint
-	} else throw deviceex; // expected '-period'
+	if (cursym.get_value() == CLOCK) { //i.e. devname is CLOCK
+	  smz->getsymbol (cursym);
+	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	    smz->getsymbol (cursym);
+	    if (cursym.get_value() == period) { //i.e. devswitch is '-period'
+	      smz->getsymbol (cursym);
+	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
+		return; // we have a valid CLOCK
+	      } else throw deviceex_i; // expected a uint
+	    } else throw deviceex_i; // expected 'period'
+	  } else throw deviceex_i; // expected '-'
 	}
 
-	if (cursym.get_value() == 1) { //i.e. devname is SWITCH
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 4 &&
-            cursym.get_value() == 1) { //i.e. devswitch is '-initialvalue'
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 1) { // i.e. symbol is a bl
-	  return; // we have a valid SWITCH
-	} else throw deviceex; // expected a bl
-	} else throw deviceex; // expected '-initialvalue'
+	if (cursym.get_value() == SWITCH) { //i.e. devname is SWITCH
+	  smz->getsymbol (cursym);
+	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	    smz->getsymbol (cursym);
+	    if (cursym.get_value() == initialvalue) { //i.e. devswitch is 'initialvalue'
+	      smz->getsymbol (cursym);
+	      if (cursym.get_type() == Uint &&
+		  (cursym.get_uint() == 0 || cursym.get_uint() == 1)) { // i.e. symbol is a uint but is also a bool
+		return; // we have a valid SWITCH
+	      } else throw deviceex_i; // expected a bl
+	    } else throw deviceex_i; // expected '-initialvalue'
+      	  } else throw deviceex_i; // expected '-'
 	}
 
-	if (cursym.get_value() == 2) { //i.e. devname is AND
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 4 &&
-            cursym.get_value() == 2) { //i.e. devswitch is '-numinputs'
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 0) { // i.e. symbol is a uint
-	  return; // we have a valid AND
-	} else throw deviceex; // expected a uint
-	} else throw deviceex; // expected '-numinputs'
+	if (cursym.get_value() == AND) { //i.e. devname is AND
+	  smz->getsymbol (cursym);
+	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	    smz->getsymbol (cursym);
+	    if (cursym.get_value() == numinputs) { //i.e. devswitch is 'numinputs'
+	      smz->getsymbol (cursym);
+	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
+		return; // we have a valid AND
+	      } else throw deviceex_i; // expected a uint
+	    } else throw deviceex_i; // expected '-numinputs'
+      	  } else throw deviceex_i; // expected '-'
 	}
 
-	if (cursym.get_value() == 3) { //i.e. devname is NAND
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 4 &&
-            cursym.get_value() == 2) { //i.e. devswitch is '-numinputs'
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 0) { // i.e. symbol is a uint
-	  return; // we have a valid NAND
-	} else throw deviceex; // expected a uint
-	} else throw deviceex; // expected '-numinputs'
+	if (cursym.get_value() == NAND) { //i.e. devname is NAND
+	  smz->getsymbol (cursym);
+	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	    smz->getsymbol (cursym);
+	    if (cursym.get_value() == numinputs) { //i.e. devswitch is 'numinputs'
+	      smz->getsymbol (cursym);
+	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
+		return; // we have a valid NAND
+	      } else throw deviceex_i; // expected a uint
+	    } else throw deviceex_i; // expected '-numinputs'
+      	  } else throw deviceex_i; // expected '-'
 	}
 
-	if (cursym.get_value() == 4) { //i.e. devname is OR
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 4 &&
-            cursym.get_value() == 2) { //i.e. devswitch is '-numinputs'
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 0) { // i.e. symbol is a uint
-	  return; // we have a valid OR
-	} else throw deviceex; // expected a uint
-	} else throw deviceex; // expected '-numinputs'
+	if (cursym.get_value() == OR) { //i.e. devname is OR
+	  smz->getsymbol (cursym);
+	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	    smz->getsymbol (cursym);
+	    if (cursym.get_value() == numinputs) { //i.e. devswitch is '-numinputs'
+	      smz->getsymbol (cursym);
+	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
+		return; // we have a valid OR
+	      } else throw deviceex_i; // expected a uint
+	    } else throw deviceex_i; // expected '-numinputs'
+      	  } else throw deviceex_i; // expected '-'
 	}
 
-	if (cursym.get_value() == 5) { //i.e. devname is NOR
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 4 &&
-            cursym.get_value() == 2) { //i.e. devswitch is '-numinputs'
-	getsymbol (cursym, curid, curnum);
-	if (cursym.get_type() == 0) { // i.e. symbol is a uint
-	  return; // we have a valid NOR
-	} else throw deviceex; // expected a uint
-	} else throw deviceex; // expected '-numinputs'
+	if (cursym.get_value() == NOR) { //i.e. devname is NOR
+	  smz->getsymbol (cursym);
+	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	    smz->getsymbol (cursym);
+	    if (cursym.get_value() == numinputs) { //i.e. devswitch is '-numinputs'
+	      smz->getsymbol (cursym);
+	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
+		return; // we have a valid NOR
+	      } else throw deviceex_i; // expected a uint
+	    } else throw deviceex_i; // expected '-numinputs'
+      	  } else throw deviceex_i; // expected '-'
 	}
 
-	if (cursym.get_value() == 6) { //i.e. devname is DTYPE
+	if (cursym.get_value() == DTYPE) { //i.e. devname is DTYPE
 	  return; // we have a valid DTYPE
 	}
 
-	if (cursym.get_value() == 7) { //i.e. devname is XOR
+	if (cursym.get_value() == XOR) { //i.e. devname is XOR
 	  return; // we have a valid XOR
 	}
 
-	throw deviceex; // didn't get a valid devname
-    } else throw deviceex; // didn't get a devname to start with
+	throw deviceex_i; // didn't get a valid devname
+    } else throw deviceex_i; // didn't get a devname to start with
   }
  catch (exception& e)
    {
@@ -223,13 +239,13 @@ class unameex : public exception
   {
     return "Exception: invalid uname in definition file";
   }
-}
+} unameex_i;
 
 void parser::uname (void) // throws unameex if not given a valid uname
 {
 try
   {
-    if (cursym.get_type() != 8) throw unameex; // didn't get a uname
+    if (cursym.get_type() != Uname) throw unameex_i; // didn't get a uname
   }
  catch (exception& e)
    {
@@ -244,26 +260,26 @@ class monruleex : public exception
   {
     return "Exception: invalid monrule in definition file";
   }
-}
+} monruleex_i;
 
 void parser::monrule (void) // throws monruleex if finds invalid monrule
 {
 try
   {
     uname();
-    getsymbol (cursym, curid, curnum);
-    if (cursym.get_type() == 7 && cursym.get_value() == 5) { // cursym is '.'
-      getsymbol (cursym, curid, curnum);
+    smz->getsymbol (cursym);
+    if (cursym.get_value() == dot) { // cursym is '.'
+      smz->getsymbol (cursym);
       outname();
-    } else if (cursym.get_type() == 7 && cursym.get_value() == 4) { // cursym is ';'
+    } else if (cursym.get_value() == semicolon) { // cursym is ';'
       return;
-    } else throw monruleex; // didn't get a '.' or ';'
+    } else throw monruleex_i; // didn't get a '.' or ';'
   }
  catch (exception& e)
    {
      cout << e.what() << endl;
-     while (!(cursym.get_type() == 7 && cursym.get_value() == 4)) { // iterates while cursym is not ';'
-       getsymbol (cursym, curid, curnum);
+     while (!(cursym.get_value() == semicolon)) { // iterates while cursym is not ';'
+       smz->getsymbol (cursym);
      }
      throw;
    }
@@ -275,36 +291,36 @@ class connruleex : public exception
   {
     return "Exception: invalid connrule in definition file";
   }
-}
+} connruleex_i;
 
 void parser::connrule (void) // throws connruleex if finds invalid connrule
 {
 try
   {
     uname();
-    getsymbol (cursym, curid, curnum);
-    if (cursym.get_type() == 7 && cursym.get_value() == 5) { // cursym is '.'
-    getsymbol (cursym, curid, curnum);
+    smz->getsymbol (cursym);
+    if (cursym.get_value() == dot) { // cursym is '.'
+    smz->getsymbol (cursym);
     outname();
-    } else if (cursym.get_type() == 7 && cursym.get_value() == 3) { // cursym is '>'
-    getsymbol (cursym, curid, curnum);
+    } else if (cursym.get_value() == rarrow) { // cursym is '>'
+    smz->getsymbol (cursym);
     uname();
-    getsymbol (cursym, curid, curnum);
-    if (cursym.get_type() == 7 && cursym.get_value() == 5) { // cursym is '.'
-      getsymbol (cursym, curid, curnum);
+    smz->getsymbol (cursym);
+    if (cursym.get_value() == dot) { // cursym is '.'
+      smz->getsymbol (cursym);
       inname();
-      getsymbol (cursym, curid, curnum);
-      if (cursym.get_type() == 7 && cursym.get_value() == 4) { // cursym is ';'
+      smz->getsymbol (cursym);
+      if (cursym.get_value() == semicolon) { // cursym is ';'
 	return;
-      } else throw connruleex; // we expected a ';'
-    } else throw connruleex; // we expected a '.'
-    } else throw connruleex; // we expected a '>'
+      } else throw connruleex_i; // we expected a ';'
+    } else throw connruleex_i; // we expected a '.'
+    } else throw connruleex_i; // we expected a '>'
   }
  catch (exception& e)
    {
      cout << e.what() << endl;
-     while (!(cursym.get_type() == 7 && cursym.get_value() == 4)) { // iterates while cursym is not ';'
-       getsymbol (cursym, curid, curnum);
+     while (!(cursym.get_value() == semicolon)) { // iterates while cursym is not ';'
+       smz->getsymbol (cursym);
      }
      throw;
    }
@@ -316,26 +332,26 @@ class devruleex : public exception
   {
     return "Exception: invalid devrule in definition file";
   }
-}
+} devruleex_i;
 
 void parser::devrule (void) // throws devruleex if finds invalid devrule
 {
 try
   {
     device();
-    getsymbol (cursym, curid, curnum);
-    if (cursym.get_type() == 7 && cursym.get_value() == 2) { // we have an '='
+    smz->getsymbol (cursym);
+    if (cursym.get_value() == equals) { // we have an '='
       uname();
-      if (cursym.get_type() == 7 && cursym.get_value() == 4) { // we have a ';'
+      if (cursym.get_value() == semicolon) { // we have a ';'
 	return;
-      } else throw devruleex; // we expected a ';'
-    } else throw devruleex; // we expected an '='
+      } else throw devruleex_i; // we expected a ';'
+    } else throw devruleex_i; // we expected an '='
   }
  catch (exception& e)
    {
      cout << e.what() << endl;
-     while (!(cursym.get_type() == 7 && cursym.get_value() == 4)) { // iterates while cursym is not ';'
-       getsymbol (cursym, curid, curnum);
+     while (!(cursym.get_value() == semicolon)) { // iterates while cursym is not ';'
+       smz->getsymbol (cursym);
      }
      throw;
    }
@@ -347,42 +363,42 @@ class sectionex : public exception
   {
     return "Exception: invalid section in definition file";
   }
-}
+} sectionex_i;
 
 void parser::section (void) // throws sectionex if finds invalid section
 {
 try
   {
-    if (cursym.get_type() == 2 && cursym.get_value() == 0) { // cursym is 'DEVICES'
-      getsymbol (cursym, curid, curnum);
-      if (cursym.get_type() == 7 && cursym.get_value() == 0) { // cursym is '{'
-	getsymbol (cursym, curid, curnum);
-	while (!(cursym.get_type() == 7 && cursym.get_value() == 1)) { // i.e. while inside braces
-	  devrule;
-	  getsymbol (cursym, curid, curnum);
+    if (cursym.get_value() == DEVICES) { // cursym is 'DEVICES'
+      smz->getsymbol (cursym);
+      if (cursym.get_value() == lbrak) { // cursym is '{'
+	smz->getsymbol (cursym);
+	while (!(cursym.get_value() == rbrak)) { // i.e. while inside braces
+	  devrule();
+	  smz->getsymbol (cursym);
 	}
-      } else throw sectionex; // we expected an '{'
+      } else throw sectionex_i; // we expected an '{'
 
-    } else if (cursym.get_type() == 2 && cursym.get_value() == 1) { // cursym is 'CONNECTIONS'
-      getsymbol (cursym, curid, curnum);
-      if (cursym.get_type() == 7 && cursym.get_value() == 0) { // cursym is '{'
-	getsymbol (cursym, curid, curnum);
-	while (!(cursym.get_type() == 7 && cursym.get_value() == 1)) { // i.e. while inside braces
-	  connrule;
-	  getsymbol (cursym, curid, curnum);
+    } else if (cursym.get_value() == CONNECTIONS) { // cursym is 'CONNECTIONS'
+      smz->getsymbol (cursym);
+      if (cursym.get_value() == lbrak) { // cursym is '{'
+	smz->getsymbol (cursym);
+	while (!(cursym.get_value() == rbrak)) { // i.e. while inside braces
+	  connrule();
+	  smz->getsymbol (cursym);
 	}
-      } else throw sectionex; // we expected an '{'
+      } else throw sectionex_i; // we expected an '{'
 
-    } else if (cursym.get_type() == 2 && cursym.get_value() == 2) { // cursym is 'MONITOR'
-      getsymbol (cursym, curid, curnum);
-      if (cursym.get_type() == 7 && cursym.get_value() == 0) { // cursym is '{'
-	getsymbol (cursym, curid, curnum);
-	while (!(cursym.get_type() == 7 && cursym.get_value() == 1)) { // i.e. while inside braces
-	  monnrule;
-	  getsymbol (cursym, curid, curnum);
+    } else if (cursym.get_value() == MONITOR) { // cursym is 'MONITOR'
+      smz->getsymbol (cursym);
+      if (cursym.get_value() == lbrak) { // cursym is '{'
+	smz->getsymbol (cursym);
+	while (!(cursym.get_value() == rbrak)) { // i.e. while inside braces
+	  monrule();
+	  smz->getsymbol (cursym);
 	}
-      } else throw sectionex; // we expected an '{'
-    } else throw sectionex; // didn't get a valid section keyword
+      } else throw sectionex_i; // we expected an '{'
+    } else throw sectionex_i; // didn't get a valid section keyword
   }
 catch (exception& e)
    {
@@ -394,7 +410,12 @@ catch (exception& e)
 void parser::parsedeffile (void)
 {
   do {
-    getsymbol (cursym, curid, curnum);
+cout << "flag2" << endl;
+    smz->getsymbol (cursym);
+    cout << "1type_var: " << cursym.get_type() << endl;
+    cout << "value_var: " << cursym.get_value() << endl;
+    cout << "uint_var: " << cursym.get_uint() << endl;
+    cout << "uname_var: " << cursym.get_uname() << endl;
     section();
-  } while (!(cursym.get_type() == 7 && cursym.get_value() == 6)) // i.e. while not eof
+  } while (!(cursym.get_value() == eof)); // i.e. while not eof
 }
