@@ -15,44 +15,10 @@ symbol::symbol () {
   value_var = novalue;
   uint_var = -1;
   uname_var = "\0";
-  cout << "look at me!!!" << endl;
-}
-
-symbol::symbol (type in_type, value in_value, int in_uint, string in_uname) {
-  type_var = notype;
-  value_var = novalue;
-  uint_var = -1;
-  uname_var = "\0";
-
-  try {
-    cout << "in_type: " << in_type << endl;
-    cout << "in_value: " << in_value << endl;
-    cout << "in_uint: " << in_uint << endl;
-    cout << "in_uname: " << in_uname << endl;
-    type_var = in_type;
-
-    if (type_var != notype &&
-	type_var != Uint &&
-	type_var != Uname)
-      value_var = in_value;
-
-    else if (type_var == Uint)
-      uint_var = in_uint;
-
-    else if (type_var == Uname)
-      uname_var = in_uname;
-
-    //else throw symbolconstructorexception_i;
-  }
-  catch (exception& e) {
-    cout << e.what() << endl;
-    cout << "type_var: " << type_var << endl;
-    throw;
-  }
 }
 
 
-/* Exception for get_<thing> failure */
+/* Exception for get_<thing> failure  */
 class get_symboldataexception : public exception {
   virtual const char* what () const throw ()
   {
@@ -60,9 +26,14 @@ class get_symboldataexception : public exception {
   }
 } get_symboldataexception_i;
 
+void symbol::set_parameters (type in_type, value in_value, int in_uint, string in_uname){
+type_var=in_type;
+value_var=in_value;
+uint_var=in_uint;
+uname_var=in_uname;
+}
 /* Returns the type of symbol held in the object*/
 type symbol::get_type () {
-  cout << "hello world" << endl;
   try {
     if ( type_var != notype) return type_var;
     else throw get_symboldataexception_i;
@@ -78,53 +49,55 @@ type symbol::get_type () {
 all except unames
 */
 value symbol::get_value () {
-  try {
-    cout << "type_var: " << type_var << endl;
-    cout << "value_var: " << value_var << endl;
-    cout << "uint_var: " << uint_var << endl;
-    cout << "uname_var: " << uname_var << endl;
-    if (type_var != notype &&
-	type_var != Uint &&
-	type_var != Uname)
+ // try {
+   // cout << "type_var: " << type_var << endl;
+   // cout << "value_var: " << value_var << endl;
+    //cout << "uint_var: " << uint_var << endl;
+    //cout << "uname_var: " << uname_var << endl;
+    //if (type_var != notype &&
+	//type_var != Uint &&
+	//type_var != Uname)
       return value_var;
 
     //throw get_symboldataexception_i; // the value held was not of type 'Value'
-  }
-  catch (exception& e) {
-    cout << e.what() << endl;
-    throw;
-    return novalue;
-  }
+//  }
+ // catch (exception& e) {
+   // cout << e.what() << endl;
+    //throw;
+    //return novalue;
+  //}
 }
 
 /* returns uint if there is one */
 int symbol::get_uint () {
-  try {
-    if (type_var == Uint)
+ // try {
+   // if (type_var == Uint){
+	//cout<<"getting uint"<<endl;
       return uint_var;
-
+//	}
     //throw get_symboldataexception_i; // the value held was not of type 'Uint'
-  }
-  catch (exception& e) {
-    cout << e.what() << endl;
-    throw;
-    return -1;
-  }
+ //}
+  //catch (exception& e) {
+    //cout << e.what() << endl;
+   // throw;
+   // return -1;
+//  } 
 }
 
 /* returns uname if there is one */
 string symbol::get_uname () {
-  try {
-    if ( type_var == Uname)
+//  try {
+  //  if ( type_var == Uname)
       return uname_var;
+//else return "\0";
 
     //throw get_symboldataexception_i; // the value held was not of type 'Uname'
-  }
-  catch (exception& e) {
-    cout << e.what() << endl;
-    throw;
-    return "\0";
-  }
+ // }
+ // catch (exception& e) {
+   // cout << e.what() << endl;
+   // throw;
+   // return "\0";
+//  }
 }
 
 /* performs equality operation */
