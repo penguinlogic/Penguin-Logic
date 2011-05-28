@@ -12,6 +12,7 @@
 using namespace std;
 
 class parser {
+private:
   network* netz; // instantiations of various classes for parser to use.
   devices* dmz; 
   monitor* mmz;

@@ -62,6 +62,7 @@ class get_symboldataexception : public exception {
 
 /* Returns the type of symbol held in the object*/
 type symbol::get_type () {
+  cout << "hello world" << endl;
   try {
     if ( type_var != notype) return type_var;
     else throw get_symboldataexception_i;
