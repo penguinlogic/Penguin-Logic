@@ -19,16 +19,19 @@ bool parser::readin (void)
   }
 }
 
-parser::parser (network* network_mod, devices* devices_mod,
-		monitor* monitor_mod, scanner* scanner_mod)
+parser::parser (/*network* network_mod, devices* devices_mod,
+		monitor* monitor_mod,*/ scanner* scanner_mod)
 {
-  netz = network_mod;  /* make internal copies of these class pointers */
-  dmz = devices_mod;   /* so we can call functions from these classes  */
-  mmz = monitor_mod;   /* eg. to call makeconnection from the network  */
+cout << "parser constructor" << endl;
+  //netz = network_mod;  /* make internal copies of these class pointers */
+  //dmz = devices_mod;   /* so we can call functions from these classes  */
+  //mmz = monitor_mod;   /* eg. to call makeconnection from the network  */
   smz = scanner_mod;   /* class you say:                               */
                        /* netz->makeconnection (i1, i2, o1, o2, ok);   */
 
-  cursym = *new symbol(notype, novalue, -1, "\0");
+ // cursym = *new symbol();
+	symbol cursym;
+
 }
 
 class uintex : public exception
@@ -52,7 +55,6 @@ catch(exception& e)
   }
 }
 
-
 class boolruleex : public exception
 {
   virtual const char* what () const throw ()
@@ -61,21 +63,6 @@ class boolruleex : public exception
   }
 } boolruleex_i;
 
-// deprecated - not using bools any more
-/*
-void parser::boolrule (void) // throws boolruleex if not given a valid bool
-{
-try
-  {
-    if (cursym.get_type() != 1) throw boolruleex_i; // didn't get a bl
-  }
-catch(exception& e)
-  {
-    cout << e.what() << endl;
-    throw;
-  }
-}
-*/
 
 class innameex : public exception
 {
@@ -245,6 +232,7 @@ void parser::uname (void) // throws unameex if not given a valid uname
 {
 try
   {
+    cout<<"running uname"<<endl;
     if (cursym.get_type() != Uname) throw unameex_i; // didn't get a uname
   }
  catch (exception& e)
@@ -266,6 +254,7 @@ void parser::monrule (void) // throws monruleex if finds invalid monrule
 {
 try
   {
+    cout<<"testing monrule"<<endl;
     uname();
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
@@ -297,6 +286,7 @@ void parser::connrule (void) // throws connruleex if finds invalid connrule
 {
 try
   {
+    cout<<"testing conrule 1"<<endl;
     uname();
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
@@ -304,6 +294,7 @@ try
     outname();
     } else if (cursym.get_value() == rarrow) { // cursym is '>'
     smz->getsymbol (cursym);
+    cout<<"testing conrule 2"<<endl;
     uname();
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
@@ -338,10 +329,15 @@ void parser::devrule (void) // throws devruleex if finds invalid devrule
 {
 try
   {
+    cout<<"starting devrule"<<endl;
     device();
+    cout<<"device ran"<<endl;
     smz->getsymbol (cursym);
     if (cursym.get_value() == equals) { // we have an '='
-      uname();
+	cout<<"= found, starting uname"<<endl; 
+	smz->getsymbol (cursym);     
+	uname();
+	smz->getsymbol (cursym);
       if (cursym.get_value() == semicolon) { // we have a ';'
 	return;
       } else throw devruleex_i; // we expected a ';'
@@ -369,11 +365,13 @@ void parser::section (void) // throws sectionex if finds invalid section
 {
 try
   {
-    if (cursym.get_value() == DEVICES) { // cursym is 'DEVICES'
-      smz->getsymbol (cursym);
-      if (cursym.get_value() == lbrak) { // cursym is '{'
+    smz->getsymbol (cursym);
+     if (cursym.get_value() == endfile) return;
+     if (cursym.get_value() == DEVICES) { // cursym is 'DEVICES'     
 	smz->getsymbol (cursym);
-	while (!(cursym.get_value() == rbrak)) { // i.e. while inside braces
+      if (cursym.get_value() == lbrak) { // cursym is '{'	
+	smz->getsymbol (cursym);
+	while (cursym.get_value() != rbrak) { // i.e. while inside braces
 	  devrule();
 	  smz->getsymbol (cursym);
 	}
@@ -410,12 +408,11 @@ catch (exception& e)
 void parser::parsedeffile (void)
 {
   do {
-cout << "flag2" << endl;
-    smz->getsymbol (cursym);
-    cout << "1type_var: " << cursym.get_type() << endl;
+cout << "start parsedeffile" << endl;
+    /*   cout << "type_var: " << cursym.get_type() << endl;
     cout << "value_var: " << cursym.get_value() << endl;
     cout << "uint_var: " << cursym.get_uint() << endl;
-    cout << "uname_var: " << cursym.get_uname() << endl;
+    cout << "uname_var: " << cursym.get_uname() << endl; */
     section();
   } while (!(cursym.get_value() == endfile)); // i.e. while not eof
 }
