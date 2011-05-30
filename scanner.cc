@@ -63,6 +63,7 @@ void scanner::getname (namestring &str)
 
 void scanner::getsymbol (symbol& s)
 {
+cout<<"getting symbol"<<endl;
 skipspaces();
 skipcomments();
 
@@ -134,6 +135,7 @@ else
 	}
 getch(); 
 }
+cout<<"type: "<<s.get_type()<<" value:"<<s.get_value()<<" uint:"<<s.get_uint()<<" uname:"<<s.get_uname()<<endl;
 }
 
 
