@@ -1,5 +1,3 @@
-// The program can't start because MSVCP100.dll is missing from your computer.
-
 #include "gui.h"
 #include <GL/glut.h>
 #include "wx_icon.xpm"
@@ -13,7 +11,6 @@ BEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
 	EVT_SIZE(MyGLCanvas::OnSize)
 	EVT_PAINT(MyGLCanvas::OnPaint)
 	EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
-//	EVT_SCROLLWIN_TOP(MyGLCanvas::OnScroll)
 END_EVENT_TABLE()
   
 MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod,
@@ -129,14 +126,6 @@ void MyGLCanvas::OnSize(wxSizeEvent& event)	// Callback function for when the ca
 	Update();  // harmless on other platforms!
 }
 
-void MyGLCanvas::OnScroll(wxSizeEvent& event)  // Callback function for when the canvas is scrolled
-{
-	//wxGLCanvas::OnScroll(event); // required on some platforms
-	//init = false;
-	//Refresh(); // required by some buggy nvidia graphics drivers,
-	//Update();  // harmless on other platforms!
-}
-
 void MyGLCanvas::OnMouse(wxMouseEvent& event)	// Callback function for mouse events inside the GL canvas
 {
 	wxString text;
@@ -174,7 +163,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 END_EVENT_TABLE()
 
 MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
-		 names *names_mod, devices *devices_mod, monitor *monitor_mod, long style):
+		 names *names_mod, devices *devices_mod, monitor *monitor_mod, wxHelpController *m_helpController, long style):
   wxFrame(parent, wxID_ANY, title, pos, size, style)
   // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
   // using sizers
@@ -183,9 +172,10 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	nmz = names_mod;
 	dmz = devices_mod;
 	mmz = monitor_mod;
-	if (nmz == NULL || dmz == NULL || mmz == NULL)
+	hpc = m_helpController;
+	if (nmz == NULL || dmz == NULL || mmz == NULL || hpc == NULL)
 	{
-		cout << "Cannot operate GUI without names, devices and monitor classes" << endl;
+		cout << "Cannot operate GUI without names, devices and monitor classes (or help files)" << endl;
 		exit(1);
 	}
 
@@ -216,13 +206,12 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 		wxBoxSizer *left_sizer = new wxBoxSizer(wxVERTICAL);
 			// Canvas
 			wxScrolledWindow *sw = new wxScrolledWindow(this, wxID_ANY, wxPoint(0, 0), wxSize(400, 400), wxVSCROLL|wxHSCROLL);
-				const int s_inc = 40;	// Scroll increment
-				const int c_size = 800;	// Canvas size
-				sw->SetScrollbars(s_inc, s_inc, c_size/s_inc, c_size/s_inc);
-				canvas = new MyGLCanvas(sw, wxID_ANY, monitor_mod, names_mod, wxDefaultPosition, wxSize(c_size,c_size));
+				const int s_inc = 40;		// Scroll increment
+				const int cx_size = 1400;	// Canvas size
+				const int cy_size = 1000;	// Canvas size
+				sw->SetScrollbars(s_inc, s_inc, cx_size/s_inc, cy_size/s_inc);
+				canvas = new MyGLCanvas(sw, wxID_ANY, monitor_mod, names_mod, wxDefaultPosition, wxSize(cx_size,cy_size));
 			left_sizer->Add(sw, 1, wxEXPAND | wxALL, 10);
-//			canvas = new MyGLCanvas(this, wxID_ANY, monitor_mod, names_mod);
-//			left_sizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 			// Button panel
 			wxFlexGridSizer *button_sizer = new wxFlexGridSizer(2,0,0,0);
 					// Run button
@@ -265,8 +254,8 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 void MyFrame::OnDevelopment(wxCommandEvent &event)
   // Produces a dialog saying that feature is under development and unavailable
 {
-  wxMessageDialog development(this, wxT("We apologise, but this feature is currently under development and not yet available."), wxT("Error: Feature unavailable"), wxICON_INFORMATION | wxOK);
-  development.ShowModal();                  
+	wxMessageDialog development(this, wxT("We apologise, but this feature is currently under development and not yet available."), wxT("Error: Feature unavailable"), wxICON_INFORMATION | wxOK);
+	development.ShowModal();                  
 }
 
 void MyFrame::OnOpen(wxCommandEvent &event)
@@ -292,15 +281,22 @@ void MyFrame::OnExit(wxCommandEvent &event)
 void MyFrame::OnHelpContents(wxCommandEvent &event)
   // Callback for the [Help | View Help] menu item
 {
-  wxMessageDialog help(this, wxT("<Insert help here>"), wxT("Penguin Logic Help"), wxICON_INFORMATION | wxOK);
-  help.ShowModal();                  
+	if (hpc->LoadFile() == false)
+	{
+		wxMessageDialog development(this, wxT("Help file cannot be found"), wxT("Error: Feature unavailable"), wxICON_INFORMATION | wxOK);
+		development.ShowModal();    
+	}
+	else
+	hpc->DisplayContents();
+//  wxMessageDialog help(this, wxT("<Insert help here>"), wxT("Penguin Logic Help"), wxICON_INFORMATION | wxOK);
+// help.ShowModal();                  
 }
 
 void MyFrame::OnAbout(wxCommandEvent &event)
   // Callback for the [Help | About] menu item
 {
-  wxMessageDialog about(this, wxT("Penguin Logic is a program to simulate simple logic circuits. \n\n Andy Marshall, James Robinson, Ollie Lambert\nMay 2011"), wxT("About Penguin Logic"), wxICON_INFORMATION | wxOK);
-  about.ShowModal();                  
+	wxMessageDialog about(this, wxT("Penguin Logic is a program to simulate simple logic circuits. \n\n Andy Marshall, James Robinson, Ollie Lambert\nMay 2011"), wxT("About Penguin Logic"), wxICON_INFORMATION | wxOK);
+	about.ShowModal();                  
 }
 
 void MyFrame::OnRunButton(wxCommandEvent &event)
@@ -346,15 +342,32 @@ void MyFrame::OnContButton(wxCommandEvent &event)
 void MyFrame::OnSwitchButton(wxCommandEvent &event)
   // Callback for the SWITCH button
 {
-	MyFrame::OnDevelopment(event);		// Placeholder until feature is developed
-	/*--------------- Insert code here-----------------------*/
+	ConfigDialog dialog(this);
+    dialog.ShowModal();
 }
 
 void MyFrame::OnMonitorButton(wxCommandEvent &event)
   // Callback for the MONITOR BUTTON
 {
-	MyFrame::OnDevelopment(event);		// Placeholder until feature is developed
-	/*--------------- Insert code here-----------------------*/
+	//  Add all potential monitor points (i.e. all outputs)
+	wxArrayString choices;
+	choices.Add(wxT("monitor1"));
+	choices.Add(wxT("monitor2"));
+
+	// Choose monitor points which are already selected
+	wxArrayInt selections;
+	selections.Empty();
+	
+	// Create dialog box
+	wxString MonMsg = wxT("Please select the required monitor points and select OK");
+	wxString MonCap = wxT("Change monitor points");
+	wxMultiChoiceDialog monitor(this, MonMsg, MonCap, choices);
+	monitor.SetSelections(selections);
+	
+	if(monitor.ShowModal() == wxID_OK)
+	{
+		monitor.GetSelections(); // Sets the selections which are required
+	};
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)
@@ -392,3 +405,134 @@ void MyFrame::runnetwork(int ncycles)
   if (ok) cyclescompleted = cyclescompleted + ncycles;
   else cyclescompleted = 0;
 }
+
+// ----------------------------------------------------------------------------
+// ConfigDialog
+// ----------------------------------------------------------------------------
+
+IMPLEMENT_CLASS(ConfigDialog, wxPropertySheetDialog)
+
+BEGIN_EVENT_TABLE(ConfigDialog, wxPropertySheetDialog)
+END_EVENT_TABLE()
+
+ConfigDialog::ConfigDialog(wxWindow* win)
+{
+    //SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
+
+    Create(win, wxID_ANY, _("Preferences"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    CreateButtons(wxOK|wxCANCEL);
+
+    wxBookCtrlBase* notebook = GetBookCtrl();
+		wxPanel* generalSettings = CreateDevicePropertiesPage(notebook);
+	notebook->AddPage(generalSettings, _("Device Properties"));
+	//	wxPanel* aestheticSettings = CreateAestheticSettingsPage(notebook);
+	//notebook->AddPage(aestheticSettings, _("Aesthetics"));
+
+    LayoutDialog();
+}
+
+wxPanel* ConfigDialog::CreateDevicePropertiesPage(wxWindow* parent)
+{
+    wxPanel* panel = new wxPanel(parent, wxID_ANY);
+
+    wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    //// LOAD LAST FILE
+
+    wxBoxSizer* itemSizer3 = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* checkBox3 = new wxCheckBox(panel, ID_LOAD_LAST_PROJECT, _("&Load last project on startup"), wxDefaultPosition, wxDefaultSize);
+    itemSizer3->Add(checkBox3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add(itemSizer3, 0, wxGROW|wxALL, 0);
+
+    //// AUTOSAVE
+
+    wxString autoSaveLabel = _("&Auto-save every");
+    wxString minsLabel = _("mins");
+
+    wxBoxSizer* itemSizer12 = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* checkBox12 = new wxCheckBox(panel, ID_AUTO_SAVE, autoSaveLabel, wxDefaultPosition, wxDefaultSize);
+
+
+    wxSpinCtrl* spinCtrl12 = new wxSpinCtrl(panel, ID_AUTO_SAVE_MINS, wxEmptyString,
+        wxDefaultPosition, wxSize(40, wxDefaultCoord), wxSP_ARROW_KEYS, 1, 60, 1);
+
+    itemSizer12->Add(checkBox12, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+
+    itemSizer12->Add(spinCtrl12, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    itemSizer12->Add(new wxStaticText(panel, wxID_STATIC, minsLabel), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add(itemSizer12, 0, wxGROW|wxALL, 0);
+
+    //// TOOLTIPS
+
+    wxBoxSizer* itemSizer8 = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* checkBox6 = new wxCheckBox(panel, ID_SHOW_TOOLTIPS, _("Show &tooltips"), wxDefaultPosition, wxDefaultSize);
+    itemSizer8->Add(checkBox6, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add(itemSizer8, 0, wxGROW|wxALL, 0);
+
+    topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
+
+    panel->SetSizer(topSizer);
+    topSizer->Fit(panel);
+
+    return panel;
+}
+
+/*wxPanel* ConfigDialog::CreateAestheticSettingsPage(wxWindow* parent)
+{
+    wxPanel* panel = new wxPanel(parent, wxID_ANY);
+
+    wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    //// PROJECT OR GLOBAL
+    wxString globalOrProjectChoices[2];
+    globalOrProjectChoices[0] = _("&New projects");
+    globalOrProjectChoices[1] = _("&This project");
+
+    wxRadioBox* projectOrGlobal = new wxRadioBox(panel, ID_APPLY_SETTINGS_TO, _("&Apply settings to:"),
+        wxDefaultPosition, wxDefaultSize, 2, globalOrProjectChoices);
+    item0->Add(projectOrGlobal, 0, wxGROW|wxALL, 5);
+
+    projectOrGlobal->SetSelection(0);
+
+    //// BACKGROUND STYLE
+    wxArrayString backgroundStyleChoices;
+    backgroundStyleChoices.Add(wxT("Colour"));
+    backgroundStyleChoices.Add(wxT("Image"));
+    wxStaticBox* staticBox3 = new wxStaticBox(panel, wxID_ANY, _("Background style:"));
+
+    wxBoxSizer* styleSizer = new wxStaticBoxSizer( staticBox3, wxVERTICAL );
+    item0->Add(styleSizer, 0, wxGROW|wxALL, 5);
+
+    wxBoxSizer* itemSizer2 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxChoice* choice2 = new wxChoice(panel, ID_BACKGROUND_STYLE, wxDefaultPosition, wxDefaultSize, backgroundStyleChoices);
+
+    itemSizer2->Add(new wxStaticText(panel, wxID_ANY, _("&Window:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    itemSizer2->Add(5, 5, 1, wxALL, 0);
+    itemSizer2->Add(choice2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+
+    styleSizer->Add(itemSizer2, 0, wxGROW|wxALL, 5);
+
+#if wxUSE_SPINCTRL
+    //// FONT SIZE SELECTION
+
+    wxStaticBox* staticBox1 = new wxStaticBox(panel, wxID_ANY, _("Tile font size:"));
+    wxBoxSizer* itemSizer5 = new wxStaticBoxSizer( staticBox1, wxHORIZONTAL );
+
+    wxSpinCtrl* spinCtrl = new wxSpinCtrl(panel, ID_FONT_SIZE, wxEmptyString, wxDefaultPosition,
+        wxSize(80, wxDefaultCoord));
+    itemSizer5->Add(spinCtrl, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+
+    item0->Add(itemSizer5, 0, wxGROW|wxLEFT|wxRIGHT, 5);
+#endif
+
+    topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
+    topSizer->AddSpacer(5);
+
+    panel->SetSizer(topSizer);
+    topSizer->Fit(panel);
+
+    return panel;
+}*/

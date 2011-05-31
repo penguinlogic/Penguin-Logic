@@ -1,0 +1,1 @@
+1.  If definition file can't be opened, program doesn't throw an exception, just carries on anyway

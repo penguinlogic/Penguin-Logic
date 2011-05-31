@@ -1,6 +1,6 @@
 #ifndef symbol_h
 #define symbol_h
-
+#include "names.h"
 #include <iostream>
 #include <string>
 
@@ -15,27 +15,20 @@ private:
   type type_var;
   value value_var;
   int uint_var;
-  string uname_var;
+  name uname_id_var;
 
  public:
   symbol ();
 
-  void set_parameters (type in_type, value in_value, int in_uint, string in_uname);
+  void set_parameters (type in_type, value in_value, int in_uint, name in_uname_id);
   type get_type (); // returns symbol type
   value get_value (); // returns keyword values (i.e. not uints or unames)
   int get_uint (); // returns uint_var
-  string get_uname (); // returns uname_var
+  name get_uname_id (); // returns uname__id_var
 
   bool operator== (symbol rhs); // allows the use of ==
   bool operator!= (symbol rhs); // allows the use of !=
   symbol operator= (symbol rhs); // allows assignment
-
-/* No method:
-  bool isbad ();
-as there should be no way for a symbol to be invalid.
-Currently there is no way to change the value of a symbol;
-values can only be given during initialisation.
-*/
 
 };
 

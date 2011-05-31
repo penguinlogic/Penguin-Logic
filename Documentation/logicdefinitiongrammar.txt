@@ -5,7 +5,7 @@ section                = ( `DEVICES' `{' {devrule} `}' ) |
 devrule                = device `=' uname `;'
 connrule               = uname [ `.' outname ] `>' uname `.' inname `;'
 monrule                = uname [ `.' outname ] `;'
-uname                  = ``' alphachar { alnumchar } `''
+uname                  = alphachar { alnumchar }
 device                 = ( `CLOCK' `-period' uint ) |
                          ( `SWITCH' `-initialvalue' bool ) |
                          ( `AND' `-numinputs' uint ) |

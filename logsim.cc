@@ -3,6 +3,10 @@
 #include "gui.h"
 #include <GL/glut.h>
 
+#if defined(_WINDOWS) && defined(_DEBUG)
+	#include "guicon.h"  
+#endif
+
 // #define USE_GUI
 
 IMPLEMENT_APP(MyApp)
@@ -10,10 +14,15 @@ IMPLEMENT_APP(MyApp)
 bool MyApp::OnInit()
   // This function is automatically called when the application starts
 {
-  if (argc != 2) { // check we have one command line argument
-    wcout << "Usage:      " << argv[0] << " [filename]" << endl;
-    exit(1);
-  }
+  
+	#if defined(_WINDOWS) && defined(_DEBUG)
+		RedirectIOToConsole();          // Required for cout in windows
+	#endif
+	
+	if (argc != 2) { // check we have one command line argument
+		wcout << "Usage:      " << argv[0] << " [filename]" << endl;
+		exit(1);
+	}
 
   // Construct the six classes required by the innards of the logic simulator
   nmz = new names();
