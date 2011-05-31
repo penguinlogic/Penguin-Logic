@@ -27,11 +27,12 @@ character operator= (character rhs); // allows assignment
 class scanner
 {
 private:
+names names_mod;
 ifstream inf;
 character current;
 character last;
 bool eofile;
-namestring id;
+namestring idstr;
 int num;
 
 public:	
