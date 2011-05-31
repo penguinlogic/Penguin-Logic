@@ -22,7 +22,7 @@ enum {
   MONITOR_BUTTON_ID,
 }; // widget identifiers
 
-class ConfigDialog;
+class DeviceConfigDialog;
 class MyGLCanvas;
 
 class MyFrame: public wxFrame
@@ -58,14 +58,14 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
-class ConfigDialog: public wxPropertySheetDialog
+class DeviceConfigDialog: public wxPropertySheetDialog
 {
-DECLARE_CLASS(ConfigDialog)
+//DECLARE_CLASS(DeviceConfigDialog)
 public:
-    ConfigDialog(wxWindow* parent);
+    DeviceConfigDialog(wxWindow* parent);
 
-    wxPanel* CreateDevicePropertiesPage(wxWindow* parent);
-    //wxPanel* CreateAestheticSettingsPage(wxWindow* parent);
+    wxPanel* CreateSwitchPropertiesPage(wxWindow* parent);
+    //wxPanel* CreateClockPropertiesPage(wxWindow* parent);
 
 protected:
 

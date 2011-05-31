@@ -342,7 +342,7 @@ void MyFrame::OnContButton(wxCommandEvent &event)
 void MyFrame::OnSwitchButton(wxCommandEvent &event)
   // Callback for the SWITCH button
 {
-	ConfigDialog dialog(this);
+	DeviceConfigDialog dialog(this);
     dialog.ShowModal();
 }
 
@@ -407,31 +407,31 @@ void MyFrame::runnetwork(int ncycles)
 }
 
 // ----------------------------------------------------------------------------
-// ConfigDialog
+// DeviceConfigDialog
 // ----------------------------------------------------------------------------
 
-IMPLEMENT_CLASS(ConfigDialog, wxPropertySheetDialog)
+//IMPLEMENT_CLASS(DeviceConfigDialog, wxPropertySheetDialog)
 
-BEGIN_EVENT_TABLE(ConfigDialog, wxPropertySheetDialog)
+BEGIN_EVENT_TABLE(DeviceConfigDialog, wxPropertySheetDialog)
 END_EVENT_TABLE()
 
-ConfigDialog::ConfigDialog(wxWindow* win)
+DeviceConfigDialog::DeviceConfigDialog(wxWindow* win)
 {
     //SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
-    Create(win, wxID_ANY, _("Preferences"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    Create(win, wxID_ANY, _("Device Configuration"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
     CreateButtons(wxOK|wxCANCEL);
 
     wxBookCtrlBase* notebook = GetBookCtrl();
-		wxPanel* generalSettings = CreateDevicePropertiesPage(notebook);
-	notebook->AddPage(generalSettings, _("Device Properties"));
-	//	wxPanel* aestheticSettings = CreateAestheticSettingsPage(notebook);
-	//notebook->AddPage(aestheticSettings, _("Aesthetics"));
+		wxPanel* switchProperties = CreateSwitchPropertiesPage(notebook);
+	notebook->AddPage(switchProperties, _("Switch Properties"));
+	//	wxPanel* clockProperties = CreateClockPropertiesPage(notebook);
+	//notebook->AddPage(clockProperties, _("Aesthetics"));
 
     LayoutDialog();
 }
 
-wxPanel* ConfigDialog::CreateDevicePropertiesPage(wxWindow* parent)
+wxPanel* DeviceConfigDialog::CreateSwitchPropertiesPage(wxWindow* parent)
 {
     wxPanel* panel = new wxPanel(parent, wxID_ANY);
 
@@ -478,7 +478,7 @@ wxPanel* ConfigDialog::CreateDevicePropertiesPage(wxWindow* parent)
     return panel;
 }
 
-/*wxPanel* ConfigDialog::CreateAestheticSettingsPage(wxWindow* parent)
+/*wxPanel* DeviceConfigDialog::CreateClockPropertiesPage(wxWindow* parent)
 {
     wxPanel* panel = new wxPanel(parent, wxID_ANY);
 
