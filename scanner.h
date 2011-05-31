@@ -15,11 +15,21 @@
 
 using namespace std;
 
+class character
+{public:
+string line;
+char ch;
+int pos;
+int linenum;
+character operator= (character rhs); // allows assignment
+};
+
 class scanner
 {
 private:
 ifstream inf;
-char curch;
+character current;
+character last;
 bool eofile;
 namestring id;
 int num;
@@ -33,7 +43,10 @@ void skipcomments();
 void getch();
 void getnumber (int &number);
 void getname (namestring &str);
+void print_err(const char* error);
 
 };
+
+
 
 #endif /* scanner_h */
