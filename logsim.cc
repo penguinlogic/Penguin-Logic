@@ -2,12 +2,15 @@
 #include "userint.h"
 #include "gui.h"
 #include <GL/glut.h>
+//#include "wx/help.h" // Required for help file
+//#include "wx/fs_zip.h"	// Required for help file
+
 
 #if defined(_WINDOWS) && defined(_DEBUG)
 	#include "guicon.h"	
 #endif
 
-// #define USE_GUI
+#define USE_GUI
 
 IMPLEMENT_APP(MyApp)
   
@@ -30,18 +33,19 @@ bool MyApp::OnInit()
   mmz = new monitor(nmz, netz);
   smz = new scanner(nmz, wxString(argv[1]).mb_str());
 cout << "pre parser constructor" << endl;
-  pmz = new parser(netz, dmz, mmz, smz);
+  pmz = new parser(/*netz, dmz, mmz,*/ smz);
 cout << "finished constructing parser" << endl;
 
   if (pmz->readin ()) { // check the logic file parsed correctly
 #ifdef USE_GUI
     // glutInit cannot cope with Unicode command line arguments, so we pass
     // it some fake ASCII ones instead
-    char **tmp1; int tmp2 = 0; glutInit(&tmp2, tmp1);
+    char *a[2]={"dummy","dummy"};
+	char **tmp1=(char**)a; int tmp2 = 0; glutInit(&tmp2, tmp1);
     // Construct the GUI
-    MyFrame *frame = new MyFrame(NULL, wxT("Logic simulator"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz);
-    frame->Show(true);
-    return(true); // enter the GUI event loop
+    MyFrame *frame = new MyFrame(NULL, wxT("Penguin Logic"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz, m_helpController, wxDEFAULT_FRAME_STYLE);
+	frame->SetBackgroundColour(wxColour(204, 204, 255));
+	frame->Show(true); // enter the GUI event loop
 #else
     // Construct the text-based interface
     userint umz(nmz, dmz, mmz);

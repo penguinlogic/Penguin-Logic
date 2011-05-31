@@ -345,7 +345,7 @@ void MyFrame::OnSwitchButton(wxCommandEvent &event)
   // Callback for the SWITCH button
 {
 	//MyFrame::OnDevelopment(event);		// Placeholder until feature is developed
-	/*--------------- Insert code here-----------------------*/
+	/*
 	bool MyPropertySheetDialog::Create(...)
     {
         if (!wxPropertySheetDialog::Create(...))
@@ -367,7 +367,7 @@ void MyFrame::OnSwitchButton(wxCommandEvent &event)
 	switches.CreateButtons(wxOK|wxCANCEL);
 	wxPanel* panel = new wxPanel(switches.GetBookCtrl(), wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxT("My Panel"));
     switches.GetBookCtrl()->AddPage(panel, "General");
-	switches.LayoutDialog();
+	switches.LayoutDialog();*/
 }
 
 void MyFrame::OnMonitorButton(wxCommandEvent &event)
