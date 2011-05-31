@@ -6,14 +6,37 @@ scanner::scanner (names* names_mod, const char*defname)
 inf.open(defname);
 if(!inf) cout<<"unable to open file"<<endl;
 else cout<<defname<<" was opened successfully"<<endl;
+linenumber=1;
+charposition=0;
+getline(inf, currentline);
+cout<<"line "<<linenumber<<endl;
 getch();
 }
 
 
 void scanner::getch()
 {
-curch=0;
-eofile=(inf.get(curch)==0);
+last.ch=curch;
+last.pos=charposition;
+last.linenumber=linenumber;
+last.line=currentline;
+
+if (!inf.eof())
+{
+if (charposition==currentline.size())
+{
+getline(inf, currentline);
+charposition=0;
+linenumber++;
+cout<<"line "<<linenumber<<endl;
+}
+
+if(charposition<=(currentline.size()-1)){
+curch=currentline[charposition];
+charposition++;
+}
+
+}
 }
 
 
@@ -21,7 +44,7 @@ void scanner::getnumber (int &number)
 {
   number =0;
   string string;
-  while (!eofile && isdigit(curch))
+  while (!inf.eof() && isdigit(curch))
     {
       string.push_back(curch);
       stringstream ss(string);
@@ -32,9 +55,18 @@ void scanner::getnumber (int &number)
 
 void scanner::skipspaces ()
 {
- 
-  while (!eofile && isspace(curch))
+
+while (currentline.size()==0 && !inf.eof())
+{
+getline(inf, currentline);
+charposition=0;
+linenumber++;
+cout<<"line "<<linenumber<<endl;
+} 
+
+  while (!inf.eof() && isspace(curch))
    {
+	cout<<"*"<<endl;
    getch();
    }
 }
@@ -43,7 +75,7 @@ void scanner::skipcomments()
 {
 if (curch=='/')
 {
-do {getch();} while (curch !='/');
+do {getch();} while (curch !='/' && !inf.eof());
 getch();
 skipspaces();
 }
@@ -52,23 +84,22 @@ skipspaces();
 void scanner::getname (namestring &str)
 {
 	str.clear();
-	while (!eofile && (isalnum(curch))) 
-	{
-	str.push_back(curch);
+	while (!inf.eof() && (isalnum(curch))){
+	str.push_back(curch);	
 	getch();
-	}
+	} 
 
 }
 
 
 void scanner::getsymbol (symbol& s)
 {
-cout<<"getting symbol"<<endl;
 skipspaces();
 skipcomments();
 
-if (eofile) {
+if (inf.eof()) {
   s.set_parameters (Charsym, endfile, -1, "\0");
+ cout<<"THE END"<<endl;
 }
 
 else if (isdigit(curch))
@@ -139,7 +170,14 @@ cout<<"type: "<<s.get_type()<<" value:"<<s.get_value()<<" uint:"<<s.get_uint()<<
 }
 
 
-
+void scanner::print_err(const char* error)
+{
+cout<<"Error in line "<<lastchar.linenumber<<", at character "<<lastchar.charposition<<":"<<endl;
+cout<<lastchar.line<<endl;
+for (int i=0; i<lastchar.charposition-1; i++) cout<<" ";
+cout<<"^"<<endl;
+cout<<error<<endl;
+}
 
 
 

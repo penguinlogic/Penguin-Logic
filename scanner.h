@@ -15,14 +15,26 @@
 
 using namespace std;
 
+class character
+{public:
+string line;
+char ch;
+int pos;
+int linenumber;
+};
+
 class scanner
 {
 private:
 ifstream inf;
 char curch;
+character lastchar;
 bool eofile;
 namestring id;
 int num;
+int linenumber;
+int charposition;
+string currentline;
 
 public:	
 scanner(names* names_mod, const char* defname); // Constructor
@@ -33,7 +45,10 @@ void skipcomments();
 void getch();
 void getnumber (int &number);
 void getname (namestring &str);
+void print_err(const char* error);
 
 };
+
+
 
 #endif /* scanner_h */
