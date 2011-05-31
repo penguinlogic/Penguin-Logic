@@ -22,84 +22,84 @@ enum {
   MONITOR_BUTTON_ID,
 }; // widget identifiers
 
+class ConfigDialog;
 class MyGLCanvas;
 
 class MyFrame: public wxFrame
 {
-	public:
-		MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, 
-			names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, wxHelpController *m_helpController = NULL,
-			long style = wxDEFAULT_FRAME_STYLE); // constructor
-	private:
-			// PRIVATE VARIABLES
-		MyGLCanvas *canvas;								// GL drawing area widget to draw traces
-		wxSpinCtrl *spin;								// control widget to select the number of cycles
-		names *nmz;										// pointer to names class
-		devices *dmz;									// pointer to devices class
-		monitor *mmz;									// pointer to monitor class
-		wxHelpController *hpc;							// pointer to help controller
-		int cyclescompleted;							// how many simulation cycles have been completed
-			// EVENT HANDLERS
-		void runnetwork(int ncycles);					// function to run the logic network
-		void OnDevelopment(wxCommandEvent& event);		// callback for functions under development
-		void OnOpen(wxCommandEvent& event);				// callback for [File | Open] menu item
-		void OnSave(wxCommandEvent& event);				// callback for [File | Save] menu item
-		void OnExit(wxCommandEvent& event);				// callback for [File | Exit] menu item
-		void OnHelpContents(wxCommandEvent& event);				// callback for [Help | View help] menu item
-		void OnAbout(wxCommandEvent& event);			// callback for [Help | About] menu item
-		void OnRunButton(wxCommandEvent& event);		// callback for push button (run)
-		void OnContButton(wxCommandEvent& event);		// callback for push button (cont)
-		void OnSwitchButton(wxCommandEvent& event);		// callback for push button (SWITCH)
-		void OnMonitorButton(wxCommandEvent& event);	// callback for push button (MONITOR)
-		void OnSpin(wxSpinEvent& event);				// callback for spin control
-		void OnText(wxCommandEvent& event);				// callback for text entry field
-			// EVENT TABLE
-		DECLARE_EVENT_TABLE()
+public:
+	MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, 
+		names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, wxHelpController *m_helpController = NULL,
+		long style = wxDEFAULT_FRAME_STYLE); // constructor
+private:
+		// PRIVATE VARIABLES
+	MyGLCanvas *canvas;								// GL drawing area widget to draw traces
+	wxSpinCtrl *spin;								// control widget to select the number of cycles
+	names *nmz;										// pointer to names class
+	devices *dmz;									// pointer to devices class
+	monitor *mmz;									// pointer to monitor class
+	wxHelpController *hpc;							// pointer to help controller
+	int cyclescompleted;							// how many simulation cycles have been completed
+		// EVENT HANDLERS
+	void runnetwork(int ncycles);					// function to run the logic network
+	void OnDevelopment(wxCommandEvent& event);		// callback for functions under development
+	void OnOpen(wxCommandEvent& event);				// callback for [File | Open] menu item
+	void OnSave(wxCommandEvent& event);				// callback for [File | Save] menu item
+	void OnExit(wxCommandEvent& event);				// callback for [File | Exit] menu item
+	void OnHelpContents(wxCommandEvent& event);				// callback for [Help | View help] menu item
+	void OnAbout(wxCommandEvent& event);			// callback for [Help | About] menu item
+	void OnRunButton(wxCommandEvent& event);		// callback for push button (run)
+	void OnContButton(wxCommandEvent& event);		// callback for push button (cont)
+	void OnSwitchButton(wxCommandEvent& event);		// callback for push button (SWITCH)
+	void OnMonitorButton(wxCommandEvent& event);	// callback for push button (MONITOR)
+	void OnSpin(wxSpinEvent& event);				// callback for spin control
+	void OnText(wxCommandEvent& event);				// callback for text entry field
+		// EVENT TABLE
+	DECLARE_EVENT_TABLE()
 };
 
-//enum {
-//	ADD_BUTTON_ID;
-//	REMOVE_BUTTON_ID;
-//	MOVE_UP_BUTTON_ID;
-//	MOVE_DOWN_BUTTON_ID;
-//	OK_BUTTON_ID;
-//	CANCEL_BUTTON_ID;
-//};
+class ConfigDialog: public wxPropertySheetDialog
+{
+DECLARE_CLASS(ConfigDialog)
+public:
+    ConfigDialog(wxWindow* parent);
 
-//class MonitorFrame: public wxFrame
-//{
-//	public:
-//		MonitorFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, long style = wxDEFAULT_FRAME_STYLE); // constructor
-//	private:
-//			// EVENT HANDLERS
-//		void MonitorFrame::OnAddButton(wxCommandEvent &event);
-//		void OnAddButton(wxCommandEvent &event);
-//		void OnRemoveButton(wxCommandEvent &event);
-//		void OnMoveUpButton(wxCommandEvent &event);
-//		void OnMoveDownButton(wxCommandEvent &event);
-//		void OnOkButton(wxCommandEvent &event);
-//		void OnCancelButton(wxCommandEvent &event);
-//			// EVENT TABLE
-//		DECLARE_EVENT_TABLE();
-//}
+    wxPanel* CreateDevicePropertiesPage(wxWindow* parent);
+    //wxPanel* CreateAestheticSettingsPage(wxWindow* parent);
+
+protected:
+
+    enum {
+        ID_SHOW_TOOLTIPS = 100,
+        ID_AUTO_SAVE,
+        ID_AUTO_SAVE_MINS,
+        ID_LOAD_LAST_PROJECT,
+
+        ID_APPLY_SETTINGS_TO,
+        ID_BACKGROUND_STYLE,
+        ID_FONT_SIZE
+    };
+
+DECLARE_EVENT_TABLE()
+};
     
 class MyGLCanvas: public wxGLCanvas
 {
- public:
-  MyGLCanvas(wxWindow *parent, wxWindowID id = wxID_ANY, monitor* monitor_mod = NULL, names* names_mod = NULL,
-	     const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
-	     const wxString& name = wxT("MyGLCanvas")); // constructor
-  void Render(wxString example_text = wxT(""), int cycles = -1); // function to draw canvas contents
- private:
-  bool init;                         // has the GL context been initialised?
-  int cyclesdisplayed;               // how many simulation cycles have been displayed
-  monitor *mmz;                      // pointer to monitor class, used to extract signal traces
-  names *nmz;                        // pointer to names class, used to extract signal names
-  void InitGL();                     // function to initialise GL context
-  void OnSize(wxSizeEvent& event);   // callback for when canvas is resized
-  void OnPaint(wxPaintEvent& event); // callback for when canvas is exposed
-  void OnMouse(wxMouseEvent& event); // callback for mouse events inside canvas
-  DECLARE_EVENT_TABLE()
+public:
+	MyGLCanvas(wxWindow *parent, wxWindowID id = wxID_ANY, monitor* monitor_mod = NULL, names* names_mod = NULL,
+			const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
+			const wxString& name = wxT("MyGLCanvas")); // constructor
+	void Render(wxString example_text = wxT(""), int cycles = -1); // function to draw canvas contents
+private:
+	bool init;                         // has the GL context been initialised?
+	int cyclesdisplayed;               // how many simulation cycles have been displayed
+	monitor *mmz;                      // pointer to monitor class, used to extract signal traces
+	names *nmz;                        // pointer to names class, used to extract signal names
+	void InitGL();                     // function to initialise GL context
+	void OnSize(wxSizeEvent& event);   // callback for when canvas is resized
+	void OnPaint(wxPaintEvent& event); // callback for when canvas is exposed
+	void OnMouse(wxMouseEvent& event); // callback for mouse events inside canvas
+	DECLARE_EVENT_TABLE()
 };
     
 #endif /* gui_h */

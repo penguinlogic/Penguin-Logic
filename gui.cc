@@ -1,5 +1,3 @@
-// The program can't start because MSVCP100.dll is missing from your computer.
-
 #include "gui.h"
 #include <GL/glut.h>
 #include "wx_icon.xpm"
@@ -344,30 +342,8 @@ void MyFrame::OnContButton(wxCommandEvent &event)
 void MyFrame::OnSwitchButton(wxCommandEvent &event)
   // Callback for the SWITCH button
 {
-	//MyFrame::OnDevelopment(event);		// Placeholder until feature is developed
-	/*
-	bool MyPropertySheetDialog::Create(...)
-    {
-        if (!wxPropertySheetDialog::Create(...))
-            return false;
-
-        CreateButtons(wxOK|wxCANCEL|wxHELP);
-
-        // Add page
-        wxPanel* panel = new wxPanel(GetBookCtrl(), ...);
-        GetBookCtrl()->AddPage(panel, "General");
-
-        LayoutDialog();
-        return true;
-    }
-	
-	wxString SwTit = wxT("Change initial switch value");
-	wxPropertySheetDialog switches(this, wxID_ANY, SwTit);
-	switches.Create(
-	switches.CreateButtons(wxOK|wxCANCEL);
-	wxPanel* panel = new wxPanel(switches.GetBookCtrl(), wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxT("My Panel"));
-    switches.GetBookCtrl()->AddPage(panel, "General");
-	switches.LayoutDialog();*/
+	ConfigDialog dialog(this);
+    dialog.ShowModal();
 }
 
 void MyFrame::OnMonitorButton(wxCommandEvent &event)
@@ -430,39 +406,133 @@ void MyFrame::runnetwork(int ncycles)
   else cyclescompleted = 0;
 }
 
-//void MonitorFrame::OnOkButton(wxCommandEvent &event)
-//{
-//}
-//
-//void MonitorFrame::OnAddButton(wxCommandEvent &event);
-//void OnAddButton(wxCommandEvent &event);
-//void OnRemoveButton(wxCommandEvent &event);
-//void OnMoveUpButton(wxCommandEvent &event);
-//void OnMoveDownButton(wxCommandEvent &event);
-//void OnOkButton(wxCommandEvent &event);
-//void OnCancelButton(wxCommandEvent &event);
+// ----------------------------------------------------------------------------
+// ConfigDialog
+// ----------------------------------------------------------------------------
 
-// Old code for monitor dialog
-//{
-//		wxFrame *MonitorFrame = new wxFrame(this, wxID_ANY, wxT("Change monitor points"), wxDefaultPosition, wxSize(300,200), wxDEFAULT_FRAME_STYLE);
-//	MonitorFrame->SetBackgroundColour(wxColour(204, 204, 255));
-//	MonitorFrame->Show(true);
-//	wxBoxSizer *monsizer = new wxBoxSizer(wxVERTICAL);
-//		wxFlexGridSizer *gridsizer = new wxFlexGridSizer(3,10,10);
-//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Available monitors")), 1, wxEXPAND|wxALL, 10);
-//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Options")), 1, wxEXPAND|wxALL, 10);
-//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Active monitors")), 1, wxEXPAND|wxALL, 10);
-//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Available monitors")), 1, wxEXPAND|wxALL, 10);
-//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Options")), 1, wxEXPAND|wxALL, 10);
-//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Active monitors")), 1, wxEXPAND|wxALL, 10);
-//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Available monitors")), 1, wxEXPAND|wxALL, 10);
-//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Options")), 1, wxEXPAND|wxALL, 10);
-//			gridsizer->Add(new wxStaticText(MonitorFrame, wxID_ANY, wxT("Active monitors")), 1, wxEXPAND|wxALL, 10);
-//		monsizer->Add(gridsizer, 1, wxEXPAND|wxALL, 10);
-//		wxBoxSizer *OkCancelSizer = new wxBoxSizer(wxHORIZONTAL);
-//			OkCancelSizer->Add(new wxButton(MonitorFrame, OK_BUTTON_ID, wxT(OK)), 1, wxEXPAND|wxALL, 10);
-//			OkCancelSizer->Add(new wxButton(wxCANCEL), 1, wxEXPAND|wxALL, 10);
-//		monsizer->Add(OkCancelSizer, 1, wxEXPAND|wxALL, 10);
-//	SetSizeHints(300, 200);
-//	SetSizer(monsizer);
-//}
+IMPLEMENT_CLASS(ConfigDialog, wxPropertySheetDialog)
+
+BEGIN_EVENT_TABLE(ConfigDialog, wxPropertySheetDialog)
+END_EVENT_TABLE()
+
+ConfigDialog::ConfigDialog(wxWindow* win)
+{
+    //SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
+
+    Create(win, wxID_ANY, _("Preferences"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    CreateButtons(wxOK|wxCANCEL);
+
+    wxBookCtrlBase* notebook = GetBookCtrl();
+		wxPanel* generalSettings = CreateDevicePropertiesPage(notebook);
+	notebook->AddPage(generalSettings, _("Device Properties"));
+	//	wxPanel* aestheticSettings = CreateAestheticSettingsPage(notebook);
+	//notebook->AddPage(aestheticSettings, _("Aesthetics"));
+
+    LayoutDialog();
+}
+
+wxPanel* ConfigDialog::CreateDevicePropertiesPage(wxWindow* parent)
+{
+    wxPanel* panel = new wxPanel(parent, wxID_ANY);
+
+    wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    //// LOAD LAST FILE
+
+    wxBoxSizer* itemSizer3 = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* checkBox3 = new wxCheckBox(panel, ID_LOAD_LAST_PROJECT, _("&Load last project on startup"), wxDefaultPosition, wxDefaultSize);
+    itemSizer3->Add(checkBox3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add(itemSizer3, 0, wxGROW|wxALL, 0);
+
+    //// AUTOSAVE
+
+    wxString autoSaveLabel = _("&Auto-save every");
+    wxString minsLabel = _("mins");
+
+    wxBoxSizer* itemSizer12 = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* checkBox12 = new wxCheckBox(panel, ID_AUTO_SAVE, autoSaveLabel, wxDefaultPosition, wxDefaultSize);
+
+
+    wxSpinCtrl* spinCtrl12 = new wxSpinCtrl(panel, ID_AUTO_SAVE_MINS, wxEmptyString,
+        wxDefaultPosition, wxSize(40, wxDefaultCoord), wxSP_ARROW_KEYS, 1, 60, 1);
+
+    itemSizer12->Add(checkBox12, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+
+    itemSizer12->Add(spinCtrl12, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    itemSizer12->Add(new wxStaticText(panel, wxID_STATIC, minsLabel), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add(itemSizer12, 0, wxGROW|wxALL, 0);
+
+    //// TOOLTIPS
+
+    wxBoxSizer* itemSizer8 = new wxBoxSizer( wxHORIZONTAL );
+    wxCheckBox* checkBox6 = new wxCheckBox(panel, ID_SHOW_TOOLTIPS, _("Show &tooltips"), wxDefaultPosition, wxDefaultSize);
+    itemSizer8->Add(checkBox6, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    item0->Add(itemSizer8, 0, wxGROW|wxALL, 0);
+
+    topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
+
+    panel->SetSizer(topSizer);
+    topSizer->Fit(panel);
+
+    return panel;
+}
+
+/*wxPanel* ConfigDialog::CreateAestheticSettingsPage(wxWindow* parent)
+{
+    wxPanel* panel = new wxPanel(parent, wxID_ANY);
+
+    wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
+
+    //// PROJECT OR GLOBAL
+    wxString globalOrProjectChoices[2];
+    globalOrProjectChoices[0] = _("&New projects");
+    globalOrProjectChoices[1] = _("&This project");
+
+    wxRadioBox* projectOrGlobal = new wxRadioBox(panel, ID_APPLY_SETTINGS_TO, _("&Apply settings to:"),
+        wxDefaultPosition, wxDefaultSize, 2, globalOrProjectChoices);
+    item0->Add(projectOrGlobal, 0, wxGROW|wxALL, 5);
+
+    projectOrGlobal->SetSelection(0);
+
+    //// BACKGROUND STYLE
+    wxArrayString backgroundStyleChoices;
+    backgroundStyleChoices.Add(wxT("Colour"));
+    backgroundStyleChoices.Add(wxT("Image"));
+    wxStaticBox* staticBox3 = new wxStaticBox(panel, wxID_ANY, _("Background style:"));
+
+    wxBoxSizer* styleSizer = new wxStaticBoxSizer( staticBox3, wxVERTICAL );
+    item0->Add(styleSizer, 0, wxGROW|wxALL, 5);
+
+    wxBoxSizer* itemSizer2 = new wxBoxSizer( wxHORIZONTAL );
+
+    wxChoice* choice2 = new wxChoice(panel, ID_BACKGROUND_STYLE, wxDefaultPosition, wxDefaultSize, backgroundStyleChoices);
+
+    itemSizer2->Add(new wxStaticText(panel, wxID_ANY, _("&Window:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+    itemSizer2->Add(5, 5, 1, wxALL, 0);
+    itemSizer2->Add(choice2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+
+    styleSizer->Add(itemSizer2, 0, wxGROW|wxALL, 5);
+
+#if wxUSE_SPINCTRL
+    //// FONT SIZE SELECTION
+
+    wxStaticBox* staticBox1 = new wxStaticBox(panel, wxID_ANY, _("Tile font size:"));
+    wxBoxSizer* itemSizer5 = new wxStaticBoxSizer( staticBox1, wxHORIZONTAL );
+
+    wxSpinCtrl* spinCtrl = new wxSpinCtrl(panel, ID_FONT_SIZE, wxEmptyString, wxDefaultPosition,
+        wxSize(80, wxDefaultCoord));
+    itemSizer5->Add(spinCtrl, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+
+    item0->Add(itemSizer5, 0, wxGROW|wxLEFT|wxRIGHT, 5);
+#endif
+
+    topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
+    topSizer->AddSpacer(5);
+
+    panel->SetSizer(topSizer);
+    topSizer->Fit(panel);
+
+    return panel;
+}*/

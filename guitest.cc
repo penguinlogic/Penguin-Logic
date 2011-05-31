@@ -1,9 +1,6 @@
 #include "guitest.h"
 #include "gui.h"
 #include <GL/glut.h>
-#include "wx/help.h" // Required for help file
-#include "wx/fs_zip.h"	// Required for help file
-
 
 IMPLEMENT_APP(MyApp)
   
