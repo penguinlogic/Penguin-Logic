@@ -14,7 +14,7 @@ while (sym.get_value()!=endfile)
 scan.getsymbol(sym);
 //cout<<"Symbol "<<i<<" type: "<<sym.get_type()<<" value:"<<sym.get_value()<<" uint:"<<sym.get_uint()<<" uname:"<<sym.get_uname()<<endl;
 
-if (sym.get_type() == Uint){
+if (sym.get_value() == MONITOR){
 char error[]= "exception";
 scan.print_err(error);
 break;

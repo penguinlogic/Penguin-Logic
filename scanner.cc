@@ -6,36 +6,41 @@ scanner::scanner (names* names_mod, const char*defname)
 inf.open(defname);
 if(!inf) cout<<"unable to open file"<<endl;
 else cout<<defname<<" was opened successfully"<<endl;
-linenumber=1;
-charposition=0;
-getline(inf, currentline);
-cout<<"line "<<linenumber<<endl;
+current.linenum=1;
+current.pos=0;
+getline(inf, current.line);
+cout<<"line "<<current.linenum<<endl;
 getch();
+}
+
+/* performs assignment operation */
+character character::operator= (character rhs) {
+  ch = rhs.ch;
+  pos = rhs.pos;
+  linenum = rhs.linenum;
+  line = rhs.line;
+  return *this;
 }
 
 
 void scanner::getch()
 {
-last.ch=curch;
-last.pos=charposition;
-last.linenumber=linenumber;
-last.line=currentline;
+last=current;
 
 if (!inf.eof())
 {
-if (charposition==currentline.size())
+if (current.pos==current.line.size())
 {
-getline(inf, currentline);
-charposition=0;
-linenumber++;
-cout<<"line "<<linenumber<<endl;
+getline(inf, current.line);
+current.pos=0;
+current.linenum++;
+cout<<"line "<<current.linenum<<endl;
 }
 
-if(charposition<=(currentline.size()-1)){
-curch=currentline[charposition];
-charposition++;
+if(current.pos<=(current.line.size()-1)){
+current.ch=current.line[current.pos];
+current.pos++;
 }
-
 }
 }
 
@@ -43,11 +48,11 @@ charposition++;
 void scanner::getnumber (int &number)
 {
   number =0;
-  string string;
-  while (!inf.eof() && isdigit(curch))
+  string str;
+  while (!inf.eof() && isdigit(current.ch))
     {
-      string.push_back(curch);
-      stringstream ss(string);
+      str.push_back(current.ch);
+      stringstream ss(str);
    	ss >>number;
 	getch();
     }
@@ -56,26 +61,25 @@ void scanner::getnumber (int &number)
 void scanner::skipspaces ()
 {
 
-while (currentline.size()==0 && !inf.eof())
+while (current.line.size()==0 && !inf.eof())
 {
-getline(inf, currentline);
-charposition=0;
-linenumber++;
-cout<<"line "<<linenumber<<endl;
+getline(inf, current.line);
+current.pos=0;
+current.linenum++;
+cout<<"line "<<current.linenum<<endl;
 } 
 
-  while (!inf.eof() && isspace(curch))
+  while (!inf.eof() && isspace(current.ch))
    {
-	cout<<"*"<<endl;
    getch();
    }
 }
 
 void scanner::skipcomments()
 {
-if (curch=='/')
+if (current.ch=='/')
 {
-do {getch();} while (curch !='/' && !inf.eof());
+do {getch();} while (current.ch !='/' && !inf.eof());
 getch();
 skipspaces();
 }
@@ -84,8 +88,8 @@ skipspaces();
 void scanner::getname (namestring &str)
 {
 	str.clear();
-	while (!inf.eof() && (isalnum(curch))){
-	str.push_back(curch);	
+	while (!inf.eof() && (isalnum(current.ch))){
+	str.push_back(current.ch);	
 	getch();
 	} 
 
@@ -102,13 +106,13 @@ if (inf.eof()) {
  cout<<"THE END"<<endl;
 }
 
-else if (isdigit(curch))
+else if (isdigit(current.ch))
 {	
 	getnumber (num);
 	s.set_parameters (Uint, novalue, num, "\0");
 }
 
-else if (isalpha(curch))
+else if (isalpha(current.ch))
 {
 	getname ( id);
 	cout << "id: " << id << endl;
@@ -154,7 +158,7 @@ else if (isalpha(curch))
 
 else
 {
-	switch (curch){ 
+	switch (current.ch){ 
 	case '.' : s.set_parameters(Charsym, dot, -1, "\0"); break;
 	case '{' : s.set_parameters(Charsym, lbrak, -1, "\0"); break; 
 	case '}' : s.set_parameters(Charsym, rbrak, -1, "\0"); break;
@@ -172,9 +176,9 @@ cout<<"type: "<<s.get_type()<<" value:"<<s.get_value()<<" uint:"<<s.get_uint()<<
 
 void scanner::print_err(const char* error)
 {
-cout<<"Error in line "<<lastchar.linenumber<<", at character "<<lastchar.charposition<<":"<<endl;
-cout<<lastchar.line<<endl;
-for (int i=0; i<lastchar.charposition-1; i++) cout<<" ";
+cout<<"Error in line "<<last.linenum<<", at character "<<last.pos<<":"<<endl;
+cout<<last.line<<endl;
+for (int i=0; i<last.pos-1; i++) cout<<" ";
 cout<<"^"<<endl;
 cout<<error<<endl;
 }
