@@ -14,7 +14,7 @@ symbol::symbol () {
   type_var = notype;
   value_var = novalue;
   uint_var = -1;
-  uname_var = "\0";
+  uname_id_var = 0;
 }
 
 
@@ -26,11 +26,11 @@ class get_symboldataexception : public exception {
   }
 } get_symboldataexception_i;
 
-void symbol::set_parameters (type in_type, value in_value, int in_uint, string in_uname){
+void symbol::set_parameters (type in_type, value in_value, int in_uint, name in_uname_id){
 type_var=in_type;
 value_var=in_value;
 uint_var=in_uint;
-uname_var=in_uname;
+uname_id_var=in_uname_id;
 }
 /* Returns the type of symbol held in the object*/
 type symbol::get_type () {
@@ -49,55 +49,18 @@ type symbol::get_type () {
 all except unames
 */
 value symbol::get_value () {
- // try {
-   // cout << "type_var: " << type_var << endl;
-   // cout << "value_var: " << value_var << endl;
-    //cout << "uint_var: " << uint_var << endl;
-    //cout << "uname_var: " << uname_var << endl;
-    //if (type_var != notype &&
-	//type_var != Uint &&
-	//type_var != Uname)
       return value_var;
-
-    //throw get_symboldataexception_i; // the value held was not of type 'Value'
-//  }
- // catch (exception& e) {
-   // cout << e.what() << endl;
-    //throw;
-    //return novalue;
-  //}
 }
 
 /* returns uint if there is one */
 int symbol::get_uint () {
- // try {
-   // if (type_var == Uint){
-	//cout<<"getting uint"<<endl;
       return uint_var;
-//	}
-    //throw get_symboldataexception_i; // the value held was not of type 'Uint'
- //}
-  //catch (exception& e) {
-    //cout << e.what() << endl;
-   // throw;
-   // return -1;
-//  } 
 }
 
 /* returns uname if there is one */
-string symbol::get_uname () {
-//  try {
-  //  if ( type_var == Uname)
-      return uname_var;
-//else return "\0";
-
-    //throw get_symboldataexception_i; // the value held was not of type 'Uname'
- // }
- // catch (exception& e) {
-   // cout << e.what() << endl;
-   // throw;
-   // return "\0";
-//  }
+name symbol::get_uname_id () 
+{
+      return uname_id_var;
 }
 
 /* performs equality operation */
@@ -105,7 +68,7 @@ bool symbol::operator== (symbol rhs) {
   if (type_var == rhs.get_type() &&
       value_var == rhs.get_value() &&
       uint_var == rhs.get_uint() &&
-      uname_var == rhs.get_uname() )
+      uname_id_var == rhs.get_uname_id() )
     return true;
 
   return false;
@@ -116,7 +79,7 @@ bool symbol::operator!= (symbol rhs) {
   if (type_var == rhs.get_type() &&
       value_var == rhs.get_value() &&
       uint_var == rhs.get_uint() &&
-      uname_var == rhs.get_uname() )
+      uname_id_var == rhs.get_uname_id() )
     return false;
 
   return true;
@@ -127,6 +90,6 @@ symbol symbol::operator= (symbol rhs) {
   type_var = rhs.get_type();
   value_var = rhs.get_value();
   uint_var = rhs.get_uint();
-  uname_var = rhs.get_uname();
+  uname_id_var = rhs.get_uname_id();
   return *this;
 }
