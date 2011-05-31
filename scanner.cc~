@@ -67,7 +67,6 @@ getline(inf, current.line);
 current.pos=0;
 current.linenum++;
 cout<<"(skipspaces) line "<<current.linenum<<endl;
-getch();
 } 
 
   while (!inf.eof() && isspace(current.ch))

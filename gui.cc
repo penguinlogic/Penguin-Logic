@@ -299,7 +299,7 @@ void MyFrame::OnHelpContents(wxCommandEvent &event)
 void MyFrame::OnAbout(wxCommandEvent &event)
   // Callback for the [Help | About] menu item
 {
-  wxMessageDialog about(this, wxT("Penguin Logic is a program to simulate simple logic circuits. \n\n© Andy Marshall, James Robinson, Ollie Lambert\nMay 2011"), wxT("About Penguin Logic"), wxICON_INFORMATION | wxOK);
+  wxMessageDialog about(this, wxT("Penguin Logic is a program to simulate simple logic circuits. \n\n Andy Marshall, James Robinson, Ollie Lambert\nMay 2011"), wxT("About Penguin Logic"), wxICON_INFORMATION | wxOK);
   about.ShowModal();                  
 }
 
