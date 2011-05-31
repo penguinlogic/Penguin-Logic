@@ -30,10 +30,10 @@ bool MyApp::OnInit()
   dmz = new devices(nmz, netz);
   mmz = new monitor(nmz, netz);
   smz = new scanner(nmz, wxString(argv[1]).mb_str());
-cout << "pre parser constructor" << endl;
+//cout << "pre parser constructor" << endl;
 //  pmz = new parser(netz, dmz, mmz, smz);
   pmz = new parser(smz);
-cout << "finished constructing parser" << endl;
+//cout << "finished constructing parser" << endl;
 
   if (pmz->readin ()) { // check the logic file parsed correctly
 #ifdef USE_GUI
