@@ -26,13 +26,13 @@ bool parser::readin (void)
 //  }
 }
 
-parser::parser (/*network* network_mod, devices* devices_mod,
-		monitor* monitor_mod,*/ scanner* scanner_mod)
+parser::parser (network* network_mod, devices* devices_mod,
+		monitor* monitor_mod, scanner* scanner_mod)
 {
 //cout << "parser constructor" << endl;
-  //netz = network_mod;  /* make internal copies of these class pointers */
-  //dmz = devices_mod;   /* so we can call functions from these classes  */
-  //mmz = monitor_mod;   /* eg. to call makeconnection from the network  */
+  netz = network_mod;  /* make internal copies of these class pointers */
+  dmz = devices_mod;   /* so we can call functions from these classes  */
+  mmz = monitor_mod;   /* eg. to call makeconnection from the network  */
   smz = scanner_mod;   /* class you say:                               */
                        /* netz->makeconnection (i1, i2, o1, o2, ok);   */
 
