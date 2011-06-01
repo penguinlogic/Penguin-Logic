@@ -22,7 +22,7 @@ bool parser::readin (void)
 parser::parser (/*network* network_mod, devices* devices_mod,
 		monitor* monitor_mod,*/ scanner* scanner_mod)
 {
-cout << "parser constructor" << endl;
+//cout << "parser constructor" << endl;
   //netz = network_mod;  /* make internal copies of these class pointers */
   //dmz = devices_mod;   /* so we can call functions from these classes  */
   //mmz = monitor_mod;   /* eg. to call makeconnection from the network  */
@@ -215,7 +215,8 @@ try
   }
  catch (exception& e)
    {
-     cout << e.what() << endl;
+     //cout << e.what() << endl;
+     smz->print_err(e.what());
      throw;
    }
 }
@@ -232,7 +233,7 @@ void parser::uname (void) // throws unameex if not given a valid uname
 {
 try
   {
-    cout<<"running uname"<<endl;
+//    cout<<"running uname"<<endl;
     if (cursym.get_type() != Uname) throw unameex_i; // didn't get a uname
   }
  catch (exception& e)
@@ -260,7 +261,9 @@ try
     if (cursym.get_value() == dot) { // cursym is '.'
       smz->getsymbol (cursym);
       outname();
-    } else if (cursym.get_value() == semicolon) { // cursym is ';'
+	  smz->getsymbol (cursym);
+    } 
+	if (cursym.get_value() == semicolon) { // cursym is ';'
       return;
     } else throw monruleex_i; // didn't get a '.' or ';'
   }
@@ -286,7 +289,7 @@ void parser::connrule (void) // throws connruleex if finds invalid connrule
 {
 try
   {
-    cout<<"testing conrule 1"<<endl;
+//    cout<<"testing conrule 1"<<endl;
     uname();
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
@@ -294,7 +297,7 @@ try
     outname();
     } else if (cursym.get_value() == rarrow) { // cursym is '>'
     smz->getsymbol (cursym);
-    cout<<"testing conrule 2"<<endl;
+//    cout<<"testing conrule 2"<<endl;
     uname();
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
@@ -329,12 +332,12 @@ void parser::devrule (void) // throws devruleex if finds invalid devrule
 {
 try
   {
-    cout<<"starting devrule"<<endl;
+//    cout<<"starting devrule"<<endl;
     device();
-    cout<<"device ran"<<endl;
+//    cout<<"device ran"<<endl;
     smz->getsymbol (cursym);
     if (cursym.get_value() == equals) { // we have an '='
-	cout<<"= found, starting uname"<<endl; 
+//	cout<<"= found, starting uname"<<endl; 
 	smz->getsymbol (cursym);     
 	uname();
 	smz->getsymbol (cursym);
@@ -393,6 +396,7 @@ try
 	smz->getsymbol (cursym);
 	while (!(cursym.get_value() == rbrak)) { // i.e. while inside braces
 	  monrule();
+	  cout << "monrule ran" << endl;
 	  smz->getsymbol (cursym);
 	}
       } else throw sectionex_i; // we expected an '{'
@@ -408,7 +412,7 @@ catch (exception& e)
 void parser::parsedeffile (void)
 {
   do {
-cout << "start parsedeffile" << endl;
+//cout << "start parsedeffile" << endl;
     /*   cout << "type_var: " << cursym.get_type() << endl;
     cout << "value_var: " << cursym.get_value() << endl;
     cout << "uint_var: " << cursym.get_uint() << endl;

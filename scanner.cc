@@ -125,7 +125,7 @@ else if (isalpha(current.ch))
 	else if (idstr=="DATA")s.set_parameters (Inname, DATA, -1, 0);
 	else if (idstr=="SET")s.set_parameters (Inname, SET, -1, 0);
 	else if (idstr=="CLEAR")s.set_parameters(Inname, CLEAR, -1, 0);
-	else if (idstr=="CLOCK")s.set_parameters (Inname, CLOCK, -1, 0);
+	else if (idstr=="CLK")s.set_parameters (Inname, CLK, -1, 0);
 	else if (idstr=="I1")s.set_parameters (Inname, I1, -1, 0);
 	else if (idstr=="I2")s.set_parameters (Inname, I2, -1, 0);
 	else if (idstr=="I3")s.set_parameters (Inname, I3, -1, 0);
