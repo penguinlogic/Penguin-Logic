@@ -246,20 +246,30 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 					// Free text field (device)
 				button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
 			left_sizer->Add(button_sizer, 0, wxEXPAND | wxALL, 10);
+	topsizer->Add(left_sizer, 1, wxEXPAND | wxALL, 10);
 		//Right panel
 		wxBoxSizer *right_sizer = new wxBoxSizer(wxVERTICAL);
-			// Button2 panel
-			wxBoxSizer *button2_sizer = new wxBoxSizer(wxVERTICAL);
-				// Buttons
-			button2_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0, wxALL, 10);
-			button2_sizer->Add(new wxButton(this, CONT_BUTTON_ID, wxT("Continue")), 0, wxALL, 10);
-			button2_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Cycles")), 0, wxTOP|wxLEFT|wxRIGHT, 10);
-				// Spinner
-			spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString(wxT("10")));
-			button2_sizer->Add(spin, 0 , wxALL, 10);
-		right_sizer->Add(button2_sizer, 0, wxALIGN_CENTER);
-	topsizer->Add(left_sizer, 1, wxEXPAND | wxALL, 10);
-	topsizer->Add(right_sizer, 0, wxEXPAND | wxALL, 10);
+			wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1), wxVSCROLL|wxHSCROLL)/*this, wxID_ANY, wxDefaultPosition, wxSize(100, 600), wxVSCROLL|wxHSCROLL)*/;
+				const int p_inc = 40;		// Scroll increment
+				const int px_size = 400;	// Canvas size
+				const int py_size = 1000;	// Canvas size
+				sp->SetScrollbars(p_inc, p_inc, px_size/p_inc, py_size/p_inc);
+					MyGLCanvas *canvas2 = new MyGLCanvas(sp, wxID_ANY, monitor_mod, names_mod, wxPoint(-1, -1), wxSize(px_size,py_size));
+				// Run button
+				new wxButton(sp, RUN_BUTTON_ID, wxT("Run"));
+				// Button2 panel
+				//wxBoxSizer *info_sizer = new wxBoxSizer(wxVERTICAL);
+				//	// Buttons
+				//	wxBoxSizer *deffile_sizer = new wxBoxSizer(wxHORIZONTAL);
+				//		wxStaticText* label = new wxStaticText(this, wxID_ANY, wxT("Definition file name:"));
+				//	deffile_sizer->Add(label, 0, wxEXPAND|wxALL,10);
+				//		wxTextCtrl* value = new wxTextCtrl(this, MY_TEXTCTRL_ID, wxT("grammar_eg1.txt"), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+				//	deffile_sizer->Add(value, 0, wxEXPAND|wxALL,10);
+				//info_sizer->Add(deffile_sizer, 0, wxEXPAND | wxALL, 10);
+		right_sizer->Add(sw, 1, wxEXPAND | wxALL, 10);
+		// Run button
+		right_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0, wxALL, 10);
+	topsizer->Add(right_sizer, 1, wxEXPAND | wxALL, 10);
 
 	SetSizeHints(700, 400);
 	SetSizer(topsizer);
@@ -320,7 +330,7 @@ void MyFrame::OnHelpContents(wxCommandEvent &event)
 void MyFrame::OnAbout(wxCommandEvent &event)
   // Callback for the [Help | About] menu item
 {
-	wxMessageDialog about(this, wxT("Penguin Logic is a program to simulate simple logic circuits. \n\n Andy Marshall, James Robinson, Ollie Lambert\nMay 2011"), wxT("About Penguin Logic"), wxICON_INFORMATION | wxOK);
+	wxMessageDialog about(this, wxT("Penguin Logic is a program to simulate simple logic circuits. \n\nAndy Marshall, James Robinson, Ollie Lambert\nMay 2011"), wxT("About Penguin Logic"), wxICON_INFORMATION | wxOK);
 	about.ShowModal();                  
 }
 
@@ -332,6 +342,7 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
     mmz->resetmonitor ();
     runnetwork(spin->GetValue());
 	canvas->Render(wxT("Run button pressed"), cyclescompleted);
+	SetStatusText(wxT("Run button pressed"), 1);
 	/*
 	rdnumber (ncycles, 1, maxcycles);
     if (cmdok)
@@ -349,6 +360,7 @@ void MyFrame::OnContButton(wxCommandEvent &event)
     mmz->resetmonitor ();
     runnetwork(spin->GetValue());
 	canvas->Render(wxT("Continue button pressed"), cyclescompleted);
+	SetStatusText(wxT("Continue button pressed"), 1);
 	/*
 	if (cmdok)
 	{
@@ -463,38 +475,48 @@ wxPanel* DeviceConfigDialog::CreateSwitchPropertiesPage(wxWindow* parent)
 		switchValue.Add(wxT("Off"));
 		switchValue.Add(wxT("On"));
 
-	// Define names of switches
-	wxArrayString switchNames;
-		switchNames.Add("Switch 1:");
-		switchNames.Add("Switch 2:");
-		switchNames.Add("Switch 3:");
-		
-	// Define default values of switches
-	wxArrayString switchDefaults;
-		switchDefaults.Add(switchValue.Item(1));
-		switchDefaults.Add(switchValue.Item(0));
-		switchDefaults.Add(switchValue.Item(0));
+	struct switchProp
+	{
+		wxString Name;
+		wxString Value;
+	};
+	
+	wxString postSwitch = ":";
+	vector<switchProp> switchTable;
+
+	// Switch 1
+	switchProp switch1;
+	switch1.Name = wxT("switch1");
+	switch1.Name.Append(postSwitch);
+	switch1.Value = switchValue.Item(1);
+	switchTable.push_back(switch1);
+
+	// Switch 2
+	switchProp switch2;
+	switch2.Name = wxT("switch2");
+	switch2.Name.Append(postSwitch);
+	switch2.Value = switchValue.Item(0);
+	switchTable.push_back(switch2);
+
+	// Switch 3
+	switchProp switch3;
+	switch3.Name = wxT("switch3");
+	switch3.Name.Append(postSwitch);
+	switch3.Value = switchValue.Item(0);
+	switchTable.push_back(switch3);
 
 	// Create layout
 	wxPanel* panel = new wxPanel(parent, wxID_ANY);
 	wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
 		wxGridSizer *item0 = new wxGridSizer(2, 10, 10);
-			// Switch 1
-			wxStaticText* field1 = new wxStaticText(panel, wxID_ANY,switchNames.Item(0));
-		item0->Add(field1, 0, wxALL, 5);
-			
-			wxComboBox* value1 = new wxComboBox(panel, ID_SWITCH_1, switchDefaults.Item(0), wxDefaultPosition, wxDefaultSize, switchValue, wxCB_READONLY);
-		item0->Add(value1, 0, wxALL, 0);
-			// Switch 2
-			wxStaticText* field2 = new wxStaticText(panel, wxID_ANY, switchNames.Item(1));
-		item0->Add(field2, 0, wxALL, 5);
-			wxComboBox* value2 = new wxComboBox(panel, ID_SWITCH_1, switchDefaults.Item(1), wxDefaultPosition, wxDefaultSize, switchValue, wxCB_READONLY);
-		item0->Add(value2, 0, wxALL, 0);
-			// Switch 3
-			wxStaticText* field3 = new wxStaticText(panel, wxID_ANY, switchNames.Item(2));
-		item0->Add(field3, 0, wxALL, 5);
-			wxComboBox* value3 = new wxComboBox(panel, ID_SWITCH_1, switchDefaults.Item(2), wxDefaultPosition, wxDefaultSize, switchValue, wxCB_READONLY);
-		item0->Add(value3, 0, wxALL, 0);
+			// Create switch options
+		for(int i=0; i<switchTable.size(); i++)
+		{
+			wxStaticText* field = new wxStaticText(panel, wxID_ANY,switchTable[i].Name);
+			item0->Add(field, 0, wxALL, 5);
+			wxComboBox* value = new wxComboBox(panel, ID_SWITCH, switchTable[i].Value, wxDefaultPosition, wxDefaultSize, switchValue, wxCB_READONLY);
+			item0->Add(value, 0, wxALL, 0);
+		}
 	topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
 	panel->SetSizer(topSizer);
     topSizer->Fit(panel);
@@ -504,19 +526,42 @@ wxPanel* DeviceConfigDialog::CreateSwitchPropertiesPage(wxWindow* parent)
 
 wxPanel* DeviceConfigDialog::CreateClockPropertiesPage(wxWindow* parent)
 {
-    wxPanel* panel = new wxPanel(parent, wxID_ANY);
+	struct clockProp
+	{
+		wxString Name;
+		wxString Value;
+	};
+	
+	wxString postClock = ":";
+	vector<clockProp> clockTable;
+
+	// Clock 1
+	clockProp clock1;
+	clock1.Name = wxT("clock1");
+	clock1.Name.Append(postClock);
+	clock1.Value = wxT("5");
+	clockTable.push_back(clock1);
+
+	// Clock 2
+	clockProp clock2;
+	clock2.Name = wxT("clock2");
+	clock2.Name.Append(postClock);
+	clock2.Value = wxT("10");
+	clockTable.push_back(clock2);
+	
+
+	// Create layout
+	wxPanel* panel = new wxPanel(parent, wxID_ANY);
 	wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
 		wxGridSizer *item0 = new wxGridSizer(2, 10, 10);
-			// Clock 1
-			wxStaticText* field1 = new wxStaticText(panel, wxID_ANY, _("Clock 1:"));
-		item0->Add(field1, 0, wxALL, 5);			
-			wxSpinCtrl* value1 = new wxSpinCtrl(panel, ID_FONT_SIZE, wxT("5"), wxDefaultPosition, wxDefaultSize);
-		item0->Add(value1, 0, wxALL, 5);
-			// Clock 2
-			wxStaticText* field2 = new wxStaticText(panel, wxID_ANY, _("Clock 2:"));
-		item0->Add(field2, 0, wxALL, 5);			
-			wxSpinCtrl* value2 = new wxSpinCtrl(panel, ID_FONT_SIZE, wxT("5"), wxDefaultPosition, wxDefaultSize);
-		item0->Add(value2, 0, wxALL, 5);
+			// Create clock options
+			for(int i=0; i<clockTable.size(); i++)
+			{
+			wxStaticText* field = new wxStaticText(panel, wxID_ANY, clockTable[i].Name);
+			item0->Add(field, 0, wxALL, 5);			
+			wxSpinCtrl* value = new wxSpinCtrl(panel, ID_FONT_SIZE, clockTable[i].Value, wxDefaultPosition, wxDefaultSize);
+			item0->Add(value, 0, wxALL, 5);
+			}
 	topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
 	topSizer->AddSpacer(5);
 

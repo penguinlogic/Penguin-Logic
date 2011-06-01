@@ -67,9 +67,7 @@ private:
 enum
 {
 	// 
-	ID_SWITCH_1,
-	ID_SWITCH_2,
-	ID_SWITCH_3,
+	ID_SWITCH,
 	
 	ID_APPLY_SETTINGS_TO,
 	ID_BACKGROUND_STYLE,
