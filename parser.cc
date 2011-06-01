@@ -61,11 +61,13 @@ class uintex : public exception
   }
 } uintex_i;
 
-void parser::uint (void) // throws uintex if not given a valid uint
+void parser::uint (int& uint_var) // throws uintex if not given a valid uint
+	                              // updates uint_var with given uint
 {
 try
   {
     if (cursym.get_type() != Uint) {errcount++; throw uintex_i;} // didn't get uint
+	else uint_var = cursym.get_uint();
   }
 catch(exception& e)
   {
@@ -177,7 +179,7 @@ class devdashex : public deviceex
   }
 } devdashex_i;
 
-void parser::device (void) // throws deviceex if finds invalid device
+void parser::device (devkind &devkind_var, int &variant_var) // throws deviceex if finds invalid device
 {
 try
   {
@@ -193,7 +195,9 @@ try
 	    if (cursym.get_value() == period) { //i.e. devswitch is '-period'
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
-		return; // we have a valid CLOCK
+			  devkind_var = aclock;
+			  variant_var = cursym.get_uint();
+	  		  return; // we have a valid CLOCK
 	      } else {errcount++; throw uintex_i;} // expected a uint
 	    } else {errcount++; throw swperiodex_i;} // expected 'period'
 	  } else {errcount++; throw devdashex_i;} // expected '-'
@@ -207,12 +211,15 @@ try
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint &&
 		  (cursym.get_uint() == 0 || cursym.get_uint() == 1)) { // i.e. symbol is a uint but is also a bool
-		return; // we have a valid SWITCH
+			  devkind_var = aswitch;
+			  variant_var = cursym.get_uint();
+			  return; // we have a valid SWITCH
 	      } else {errcount++; throw boolex_i;} // expected a bl
 	    } else {errcount++; throw swinitialvalueex_i;}// expected '-initialvalue'
       	  } else {errcount++; throw devdashex_i;} // expected '-'
 	}
 
+	//TODO: check uint within bounds (1-16) for all these devices
 	if (cursym.get_value() == AND) { //i.e. devname is AND
 	  smz->getsymbol (cursym);
 	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
@@ -220,7 +227,9 @@ try
 	    if (cursym.get_value() == numinputs) { //i.e. devswitch is 'numinputs'
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
-		return; // we have a valid AND
+			  devkind_var = andgate;
+			  variant_var = cursym.get_uint();
+			  return; // we have a valid AND
 	      } else {errcount++; throw uintex_i;} // expected a uint
 	    } else {errcount++; throw swnuminputsex_i;} // expected 'numinputs'
 	  } else {errcount++; throw devdashex_i;} // expected '-'
@@ -234,6 +243,8 @@ try
 	    if (cursym.get_value() == numinputs) { //i.e. devswitch is 'numinputs'
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
+			  devkind_var = nandgate;
+			  variant_var = cursym.get_uint();
 		return; // we have a valid NAND
 	      } else {errcount++; throw uintex_i;} // expected a uint
 	    } else {errcount++; throw swnuminputsex_i;} // expected 'numinputs'
@@ -247,6 +258,8 @@ try
 	    if (cursym.get_value() == numinputs) { //i.e. devswitch is '-numinputs'
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
+			  devkind_var = orgate;
+			  variant_var = cursym.get_uint();
 		return; // we have a valid OR
 	      } else {errcount++; throw uintex_i;} // expected a uint
 	    } else {errcount++; throw swnuminputsex_i;} // expected 'numinputs'
@@ -260,6 +273,8 @@ try
 	    if (cursym.get_value() == numinputs) { //i.e. devswitch is '-numinputs'
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
+			  devkind_var = norgate;
+			  variant_var = cursym.get_uint();
 		return; // we have a valid NOR
 	      } else {errcount++; throw uintex_i;} // expected a uint
 	    } else {errcount++; throw swnuminputsex_i;} // expected 'numinputs'
@@ -267,10 +282,12 @@ try
 	}
 
 	if (cursym.get_value() == DTYPE) { //i.e. devname is DTYPE
+		devkind_var = dtype;
 	  return; // we have a valid DTYPE
 	}
 
 	if (cursym.get_value() == XOR) { //i.e. devname is XOR
+		devkind_var = xorgate;
 	  return; // we have a valid XOR
 	}
 
@@ -294,12 +311,13 @@ class unameex : public exception
   }
 } unameex_i;
 
-void parser::uname (void) // throws unameex if not given a valid uname
+void parser::uname (name &did_var) // throws unameex if not given a valid uname
 {
 try
   {
 //    cout<<"running uname"<<endl;
     if (cursym.get_type() != Uname) {errcount++; throw unameex_i;} // didn't get a uname
+	else did_var = cursym.get_uname_id();
   }
  catch (exception& e)
    {
@@ -362,7 +380,7 @@ try
   {
     //cout<<"testing monrule"<<endl;
     uname();
-	//TODO:check if this uname is in nametable (once James has finished that
+	//TODO:check if this uname is in nametable (once James has finished that)
 	//do this for all three *rule functions
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
