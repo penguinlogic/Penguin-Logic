@@ -5,7 +5,7 @@ using namespace std;
 
 /* The parser for the circuit definition files */
 
-
+/***************************************************************************************/
 bool parser::readin (void)
 {
 //  try {
@@ -41,7 +41,7 @@ parser::parser (network* network_mod, devices* devices_mod,
 	errcount = 0;
 
 }
-
+/***************************************************************************************/
 class parseex : public exception // thrown by catch statements to indicate failed
 				                 // parsing once error has been reported
 {
@@ -51,7 +51,7 @@ class parseex : public exception // thrown by catch statements to indicate faile
 			return "Exception: failed to parse definition file";
 		}
 } parseex_i;
-
+/***************************************************************************************/
 class uintex : public exception
 {
 	public:
@@ -60,7 +60,7 @@ class uintex : public exception
     return "Exception: expected a positive integer";
   }
 } uintex_i;
-
+/***************************************************************************************/
 void parser::uint (int& uint_var) // throws uintex if not given a valid uint
 	                              // updates uint_var with given uint
 {
@@ -76,7 +76,7 @@ catch(exception& e)
     throw;
   }
 }
-
+/***************************************************************************************/
 class boolex : public exception // used in parser::device
 {
   virtual const char* what () const throw ()
@@ -85,7 +85,7 @@ class boolex : public exception // used in parser::device
   }
 } boolex_i;
 
-
+/***************************************************************************************/
 class innameex : public exception
 {
 	public:
@@ -94,13 +94,14 @@ class innameex : public exception
     return "Exception: expected an inname";
   }
 } innameex_i;
-
-void parser::inname (void) // throws innameex if not given a valid inname
+/***************************************************************************************/
+void parser::inname (name & iname) // throws innameex if not given a valid inname
 {
 try
   {
     if (cursym.get_type() != Inname) {errcount++; throw innameex_i;} // didn't get an inname
-  }
+ else iname = cursym.get_uname_id();
+ }
  catch (exception& e)
    {
 //    // cout << e.what() << endl;
@@ -108,7 +109,7 @@ try
      throw;
    }
 }
-
+/***************************************************************************************/
 class outnameex : public exception
 {
 	public:
@@ -117,13 +118,14 @@ class outnameex : public exception
     return "Exception: expected an outname";
   }
 } outnameex_i;
-
-void parser::outname (void) // throws outnameex if not given a valid outname
+/***************************************************************************************/
+void parser::outname (name &oname) // throws outnameex if not given a valid outname
 {
 try
   {
     if (cursym.get_type() != Outname) {errcount++; throw outnameex_i;} // didn't get an outname
-  }
+else oname = cursym.get_uname_id();  
+	}
  catch (exception& e)
    {
 //   //  cout << e.what() << endl;
@@ -131,7 +133,7 @@ try
      throw;
    }
 }
-
+/***************************************************************************************/
 class deviceex : public exception
 {
 	public:
@@ -140,9 +142,9 @@ class deviceex : public exception
     return "Exception: expected a device";
   }
 } deviceex_i;
-
+/***************************************************************************************/
 class switchex : public deviceex {};
-
+/***************************************************************************************/
 class swperiodex : public switchex
 {
 	public:
@@ -151,7 +153,7 @@ class swperiodex : public switchex
     return "Exception: expected switch 'period'";
   }
 } swperiodex_i;
-
+/***************************************************************************************/
 class swinitialvalueex : public switchex
 {
 	public:
@@ -160,7 +162,7 @@ class swinitialvalueex : public switchex
     return "Exception: expected switch 'initialvalue'";
   }
 } swinitialvalueex_i;
-
+/***************************************************************************************/
 class swnuminputsex : public switchex
 {
 	public:
@@ -169,7 +171,7 @@ class swnuminputsex : public switchex
     return "Exception: expected switch 'numinputs'";
   }
 } swnuminputsex_i;
-
+/***************************************************************************************/
 class devdashex : public deviceex
 {
 	public:
@@ -179,7 +181,12 @@ class devdashex : public deviceex
   }
 } devdashex_i;
 
-void parser::device (devkind &devkind_var, int &variant_var) // throws deviceex if finds invalid device
+
+/******************************************************************************************************
+tests device-specific syntax and, if valid, sets parameters for device creation
+*/
+
+void parser::device (devicekind &devkind_var, int &variant_var) // throws deviceex if finds invalid device
 {
 try
   {
@@ -197,6 +204,7 @@ try
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 			  devkind_var = aclock;
 			  variant_var = cursym.get_uint();
+			
 	  		  return; // we have a valid CLOCK
 	      } else {errcount++; throw uintex_i;} // expected a uint
 	    } else {errcount++; throw swperiodex_i;} // expected 'period'
@@ -302,6 +310,7 @@ try
    }
 }
 
+/**************************************************************************************/
 class unameex : public exception
 {
 	public:
@@ -311,6 +320,7 @@ class unameex : public exception
   }
 } unameex_i;
 
+/**************************************************************************************/
 void parser::uname (name &did_var) // throws unameex if not given a valid uname
 {
 try
@@ -327,6 +337,7 @@ try
    }
 }
 
+/***************************************************************************************/
 class rulesymbolex : public exception {};
 
 class rulesymequalsex : public rulesymbolex
@@ -338,6 +349,7 @@ class rulesymequalsex : public rulesymbolex
   }
 } rulesymequalsex_i;
 
+/***************************************************************************************/
 class rulesymrarrowex : public rulesymbolex
 {
 	public:
@@ -345,8 +357,9 @@ class rulesymrarrowex : public rulesymbolex
   {
     return "Exception: expected a '>'";
   }
-} rulesymrarrowex_i
-;
+} rulesymrarrowex_i;
+
+/***************************************************************************************/
 class rulesymsemicolonex : public rulesymbolex
 {
 	public:
@@ -356,6 +369,7 @@ class rulesymsemicolonex : public rulesymbolex
   }
 } rulesymsemicolonex_i;
 
+/***************************************************************************************/
 class rulesymdotex : public rulesymbolex
 {
 	public:
@@ -365,31 +379,36 @@ class rulesymdotex : public rulesymbolex
   }
 } rulesymdotex_i;
 
-//class monruleex : public exception
-//{
-//	public:
-//  virtual const char* what () const throw ()
-//  {
-//    return "Exception: invalid monrule in definition file";
-//  }
-//} monruleex_i;
+/***************************************************************************************/
+class makemonex : public exception
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: Error setting monitor point";
+  }
+} makemonex_i;
 
+/***************************************************************************************/
 void parser::monrule (void) // throws monruleex if finds invalid monrule
 {
 try
   {
+	name dev;
+	name outp;
+	bool ok;
     //cout<<"testing monrule"<<endl;
-    uname();
-	//TODO:check if this uname is in nametable (once James has finished that)
-	//do this for all three *rule functions
+    uname(dev);
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
       smz->getsymbol (cursym);
-      outname();
+      outname(outp);
 	  smz->getsymbol (cursym);
     } 
 	if (cursym.get_value() == semicolon) { // cursym is ';'
-      return;
+	mmz->makemonitor(dev, outp, ok);      
+	if (ok) return;
+	else {errcount++; throw makemonex_i;}
     } else {errcount++; throw rulesymsemicolonex_i;} // didn't get a '.' or ';'
   }
  catch (exception& e) // Only catches an error in monrule syntax. Does not
@@ -404,36 +423,42 @@ try
    }
 }
 
-//class connruleex : public exception
-//{
-//	public:
-//  virtual const char* what () const throw ()
-//  {
-//    return "Exception: invalid connrule in definition file";
-//  }
-//} connruleex_i;
+/***************************************************************************************/
+class makeconex : public exception
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: Error setting connection";
+  }
+} makeconex_i;
 
+/***************************************************************************************/
 void parser::connrule (void) // throws connruleex if finds invalid connrule
 {
 try
   {
 //    cout<<"testing conrule 1"<<endl;
-    uname();
+    name odev, idev, outp, inp;
+	bool ok;
+    uname(odev);
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
     smz->getsymbol (cursym);
-    outname();
+    outname(outp);
     } else if (cursym.get_value() == rarrow) { // cursym is '>'
     smz->getsymbol (cursym);
 //    cout<<"testing conrule 2"<<endl;
-    uname();
+    uname(idev);
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
       smz->getsymbol (cursym);
-      inname();
+      inname(inp);
       smz->getsymbol (cursym);
       if (cursym.get_value() == semicolon) { // cursym is ';'
-	return;
+	netz->makeconnection (idev, inp, odev, outp, ok);
+	if (ok) return;
+	else {errcount++; throw makeconex_i;}; //connection error
       } else {errcount++; throw rulesymsemicolonex_i;} // we expected a ';'
     } else {errcount++; throw rulesymdotex_i;} // we expected a '.'
     } else {errcount++; throw rulesymrarrowex_i;} // we expected a '>'
@@ -449,31 +474,37 @@ try
    }
 }
 
-//class devruleex : public exception
-//{
-//	public:
-//  virtual const char* what () const throw ()
-//  {
-//    return "Exception: invalid devrule in definition file";
-//  }
-//} devruleex_i;
-
+/***************************************************************************************/
+class makedevex : public exception
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: Error constructing device";
+  }
+} makedevex_i;
+/***************************************************************************************/
 void parser::devrule (void) // throws devruleex if finds invalid devrule
 {
 try
   {
 //    cout<<"starting devrule"<<endl;
-    device();
-//    cout<<"device ran"<<endl;
+    devicekind devkind_var;
+    int variant_var;	
+    name did_var;
+    bool ok;
+    device(devkind_var, variant_var);
     smz->getsymbol (cursym);
     if (cursym.get_value() == equals) { // we have an '='
 //	cout<<"= found, starting uname"<<endl; 
 	smz->getsymbol (cursym);     
-	uname();
+	uname(did_var);
 	smz->getsymbol (cursym);
       if (cursym.get_value() == semicolon) { // we have a ';'
-	return;
-      } else {errcount++; throw rulesymsemicolonex_i;} // we expected a ';'
+	dmz->makedevice(devkind_var, did_var, variant_var, ok); 
+	if (ok) return;
+	else {errcount++; throw makedevex_i;}	//could not construct device
+	} else {errcount++; throw rulesymsemicolonex_i;} // we expected a ';'
     } else {errcount++; throw rulesymequalsex_i;} // we expected an '='
   }
  catch (exception& e)
@@ -486,7 +517,7 @@ try
     //throw parseex_i;
    }
 }
-
+/***************************************************************************************/
 class sectionex : public exception
 {
 	public:
@@ -495,7 +526,7 @@ class sectionex : public exception
     return "Exception: invalid Section in definition file";
   }
 } sectionex_i;
-
+/***************************************************************************************/
 class lbrakex : public sectionex
 {
 	public:
@@ -504,7 +535,7 @@ class lbrakex : public sectionex
     return "Exception: expected '{' at beginning of Section";
   }
 } lbrakex_i;
-
+/***************************************************************************************/
 class rbrakex : public sectionex
 {
 	public:
@@ -513,7 +544,7 @@ class rbrakex : public sectionex
     return "Exception: expected '}' at beginning of Section";
   }
 } rbrakex_i;
-
+/***************************************************************************************/
 void parser::section (void) // throws sectionex if finds invalid section
 {
 try
@@ -562,7 +593,7 @@ catch (sectionex& e)
      //throw parseex_i;
    }
 }
-
+/***************************************************************************************/
 void parser::parsedeffile (void)
 {
 	try {
