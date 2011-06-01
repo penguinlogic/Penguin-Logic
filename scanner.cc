@@ -5,8 +5,11 @@ scanner::scanner (names* names_mod, const char*defname)
 {
 inf.open(defname);
 if(!inf) cout<<"unable to open file"<<endl;
+
+
+
+
 else cout<<defname<<" was opened successfully"<<endl;
-initialise_names_mod();
 current.linenum=1;
 current.pos=0;
 getline(inf, current.line);
@@ -22,11 +25,6 @@ character character::operator= (character rhs) {
   return *this;
 }
 
-void scanner::initialise_names_mod(void)
-{
-
-names_mod.lookup("novalue"); names_mod.lookup("DEVICES"); names_mod.lookup("CONNECTIONS"); names_mod.lookup("MONITOR"); names_mod.lookup("CLOCK"); names_mod.lookup("SWITCH"); names_mod.lookup("AND"); names_mod.lookup("NAND"); names_mod.lookup("OR"); names_mod.lookup("NOR"); names_mod.lookup("DTYPE"); names_mod.lookup("XOR"); names_mod.lookup("period"); names_mod.lookup("initialvalue"); names_mod.lookup("numinputs"); names_mod.lookup("Q"); names_mod.lookup("QBAR"); names_mod.lookup("DATA"); names_mod.lookup("SET"); names_mod.lookup("CLEAR"); names_mod.lookup("CLK"); names_mod.lookup("I1"); names_mod.lookup("I2"); names_mod.lookup("I3"); names_mod.lookup("I4"); names_mod.lookup("I5"); names_mod.lookup("I6"); names_mod.lookup("I7"); names_mod.lookup("I8"); names_mod.lookup("I9"); names_mod.lookup("I10"); names_mod.lookup("I11"); names_mod.lookup("I12"); names_mod.lookup("I13"); names_mod.lookup("I14"); names_mod.lookup("I15"); names_mod.lookup("I16"); names_mod.lookup("lbrak"); names_mod.lookup("rbrak"); names_mod.lookup("equals"); names_mod.lookup("rarrow"); names_mod.lookup("semicolon"); names_mod.lookup("dot"); names_mod.lookup("dash"); names_mod.lookup("endfile"); names_mod.lookup("bad");
-}
 
 void scanner::getch()
 {
@@ -39,7 +37,7 @@ if (!inf.eof())
 	getline(inf, current.line);
 	current.pos=0;
 	current.linenum++;
-	cout<<"line "<<current.linenum<<endl;
+	//cout<<"line "<<current.linenum<<endl;
 	}
 
 	if(current.pos<=(current.line.size()-1)){
@@ -71,6 +69,7 @@ while (current.line.size()==0 && !inf.eof())
 	getline(inf, current.line);
 	current.pos=0;
 	current.linenum++;
+	getch();
 } 
 
 while (!inf.eof() && isspace(current.ch)) getch();
@@ -104,7 +103,7 @@ skipcomments();
 
 if (inf.eof()) {
   s.set_parameters (Charsym, endfile, -1, 0);
- cout<<"THE END"<<endl;
+ //cout<<"THE END"<<endl;
 }
 
 else if (isdigit(current.ch))
@@ -116,55 +115,46 @@ else if (isdigit(current.ch))
 else if (isalpha(current.ch))
 {
 	getname ( idstr);
-	cout << "idstr: " << idstr << endl;
-	if (idstr=="DEVICES") s.set_parameters (Section, names_mod.lookup(idstr), -1); //cout << "sgettype" << s.get_type() << endl;}
-	else if (idstr=="CONNECTIONS")s.set_parameters (Section, names_mod.lookup(idstr), -1);
-	else if (idstr=="MONITOR") s.set_parameters (Section, names_mod.lookup(idstr), -1);
-	
-
-
-
-
-
-else if (idstr=="CLOCK")s.set_parameters (Devname, names_mod.lookup(idstr), -1);
-	else if (idstr=="SWITCH")s.set_parameters(Devname, names_mod.lookup(idstr), -1);
-	else if (idstr=="AND")s.set_parameters (Devname, names_mod.lookup(idstr), -1);
-	else if (idstr=="NAND")s.set_parameters (Devname, names_mod.lookup(idstr), -1);
-	else if (idstr=="OR")s.set_parameters(Devname, names_mod.lookup(idstr), -1);
-	else if (idstr=="NOR")s.set_parameters (Devname,names_mod.lookup(idstr), -1);
-	else if (idstr=="DTYPE")s.set_parameters (Devname, names_mod.lookup(idstr), -1);
-	else if (idstr=="XOR")s.set_parameters (Devname, names_mod.lookup(idstr), -1);
-	
-else if (idstr=="DATA")s.set_parameters (Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="SET")s.set_parameters (Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="CLEAR")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="CLOCK")s.set_parameters (Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I1")s.set_parameters (Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I2")s.set_parameters (Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I3")s.set_parameters (Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I4")s.set_parameters (Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I5")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I6")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I7")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I8")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I9")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I10")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I11")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I12")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I13")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I14")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I15")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	else if (idstr=="I16")s.set_parameters(Inname, names_mod.lookup(idstr), -1);
-	
-else if (idstr=="period")s.set_parameters(Devswitch, names_mod.lookup(idstr), -1);
-	else if (idstr=="initialvalue")s.set_parameters(Devswitch, names_mod.lookup(idstr), -1);
-	else if (idstr=="numinputs") s.set_parameters(Devswitch, names_mod.lookup(idstr), -1);
-	
-
-else if (idstr=="Q")s.set_parameters (Outname, names_mod.lookup(idstr), -1);
-	else if (idstr=="QBAR")s.set_parameters(Outname, names_mod.lookup(idstr), -1);
-	
-else s.set_parameters (Uname, names_mod.lookup(idstr), -1);
+	//cout << "idstr: " << idstr << endl;
+	if (idstr=="DEVICES") s.set_parameters (Section, DEVICES, -1, 0); //cout << "sgettype" << s.get_type() << endl;}
+	else if (idstr=="CONNECTIONS")s.set_parameters (Section, CONNECTIONS, -1, 0);
+	else if (idstr=="MONITOR") s.set_parameters (Section, MONITOR, -1, 0);
+	else if (idstr=="CLOCK")s.set_parameters (Devname, CLOCK, -1, 0);
+	else if (idstr=="SWITCH")s.set_parameters(Devname, SWITCH, -1, 0);
+	else if (idstr=="AND")s.set_parameters (Devname, AND, -1, 0);
+	else if (idstr=="NAND")s.set_parameters (Devname, NAND, -1, 0);
+	else if (idstr=="OR")s.set_parameters(Devname, OR, -1, 0);
+	else if (idstr=="NOR")s.set_parameters (Devname, NOR, -1, 0);
+	else if (idstr=="DTYPE")s.set_parameters (Devname, DTYPE, -1, 0);
+	else if (idstr=="XOR")s.set_parameters (Devname, XOR, -1, 0);
+	else if (idstr=="DATA")s.set_parameters (Inname, DATA, -1, 0);
+	else if (idstr=="SET")s.set_parameters (Inname, SET, -1, 0);
+	else if (idstr=="CLEAR")s.set_parameters(Inname, CLEAR, -1, 0);
+	else if (idstr=="CLK")s.set_parameters (Inname, CLK, -1, 0);
+	else if (idstr=="I1")s.set_parameters (Inname, I1, -1, 0);
+	else if (idstr=="I2")s.set_parameters (Inname, I2, -1, 0);
+	else if (idstr=="I3")s.set_parameters (Inname, I3, -1, 0);
+	else if (idstr=="I4")s.set_parameters (Inname, I4, -1, 0);
+	else if (idstr=="I5")s.set_parameters(Inname, I5, -1, 0);
+	else if (idstr=="I6")s.set_parameters(Inname, I6, -1, 0);
+	else if (idstr=="I7")s.set_parameters(Inname, I7, -1, 0);
+	else if (idstr=="I8")s.set_parameters(Inname, I8, -1, 0);
+	else if (idstr=="I9")s.set_parameters(Inname, I9, -1, 0);
+	else if (idstr=="I10")s.set_parameters(Inname, I10, -1, 0);
+	else if (idstr=="I11")s.set_parameters(Inname, I11, -1, 0);
+	else if (idstr=="I12")s.set_parameters(Inname, I12, -1, 0);
+	else if (idstr=="I13")s.set_parameters(Inname, I13, -1, 0);
+	else if (idstr=="I14")s.set_parameters(Inname, I14, -1, 0);
+	else if (idstr=="I15")s.set_parameters(Inname, I15, -1, 0);
+	else if (idstr=="I16")s.set_parameters(Inname, I16, -1, 0);
+	else if (idstr=="period")s.set_parameters(Devswitch, period, -1, 0);
+	else if (idstr=="initialvalue")s.set_parameters(Devswitch, initialvalue, -1, 0);
+	else if (idstr=="numinputs") s.set_parameters(Devswitch, numinputs, -1, 0);
+	else if (idstr=="Q")s.set_parameters (Outname, Q, -1, 0);
+	else if (idstr=="QBAR")s.set_parameters(Outname, QBAR, -1, 0);
+	else{
+		name id = names_mod.lookup(idstr);	
+		s.set_parameters (Uname, novalue, -1, id);
 }		
 }
 
@@ -182,15 +172,21 @@ else
 	}
 getch(); 
 }
-cout<<"type: "<<s.get_type()<<" value:"<<s.get_value()<<" uint:"<<s.get_uint()<<" uname:"<<s.get_uname_id()<<endl;
+//cout<<"type: "<<s.get_type()<<" value:"<<s.get_value()<<" uint:"<<s.get_uint()<<" uname:"<<s.get_uname_id()<<endl;
 }
 
 
 void scanner::print_err(const char* error)
 {
 cout<<"Error in line "<<last.linenum<<", at character "<<last.pos<<":"<<endl;
+
 cout<<last.line<<endl;
-for (int i=0; i<last.pos-1; i++) cout<<" ";
+
+for (int i=0; i<last.pos-1; i++) {
+	if (last.line[i] == '\t') cout << '\t';
+	else cout << " ";
+} // accounts for tabs at in erroneous line
+
 cout<<"^"<<endl;
 cout<<error<<endl;
 }
