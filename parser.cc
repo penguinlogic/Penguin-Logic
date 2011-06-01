@@ -57,7 +57,7 @@ class uintex : public exception
 	public:
   virtual const char* what () const throw ()
   {
-    return "Exception: expected a uint";
+    return "Exception: expected a positive integer";
   }
 } uintex_i;
 
@@ -75,13 +75,13 @@ catch(exception& e)
   }
 }
 
-//class boolruleex : public exception
-//{
-//  virtual const char* what () const throw ()
-//  {
-//    return "Exception: invalid bool in definition file";
-//  }
-//} boolruleex_i;
+class boolex : public exception // used in parser::device
+{
+  virtual const char* what () const throw ()
+  {
+    return "Exception: expected a Boolean value";
+  }
+} boolex_i;
 
 
 class innameex : public exception
@@ -139,6 +139,44 @@ class deviceex : public exception
   }
 } deviceex_i;
 
+class switchex : public deviceex {};
+
+class swperiodex : public switchex
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: expected switch 'period'";
+  }
+} swperiodex_i;
+
+class swinitialvalueex : public switchex
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: expected switch 'initialvalue'";
+  }
+} swinitialvalueex_i;
+
+class swnuminputsex : public switchex
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: expected switch 'numinputs'";
+  }
+} swnuminputsex_i;
+
+class devdashex : public deviceex
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: expected '-'";
+  }
+} devdashex_i;
+
 void parser::device (void) // throws deviceex if finds invalid device
 {
 try
@@ -156,9 +194,9 @@ try
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 		return; // we have a valid CLOCK
-	      } else {errcount++; throw deviceex_i;} // expected a uint
-	    } else {errcount++; throw deviceex_i;} // expected 'period'
-	  } else {errcount++; throw deviceex_i;} // expected '-'
+	      } else {errcount++; throw uintex_i;} // expected a uint
+	    } else {errcount++; throw swperiodex_i;} // expected 'period'
+	  } else {errcount++; throw devdashex_i;} // expected '-'
 	}
 
 	if (cursym.get_value() == SWITCH) { //i.e. devname is SWITCH
@@ -170,9 +208,9 @@ try
 	      if (cursym.get_type() == Uint &&
 		  (cursym.get_uint() == 0 || cursym.get_uint() == 1)) { // i.e. symbol is a uint but is also a bool
 		return; // we have a valid SWITCH
-	      } else {errcount++; throw deviceex_i;} // expected a bl
-	    } else {errcount++; throw deviceex_i;}// expected '-initialvalue'
-      	  } else {errcount++; throw deviceex_i;} // expected '-'
+	      } else {errcount++; throw boolex_i;} // expected a bl
+	    } else {errcount++; throw swinitialvalueex_i;}// expected '-initialvalue'
+      	  } else {errcount++; throw devdashex_i;} // expected '-'
 	}
 
 	if (cursym.get_value() == AND) { //i.e. devname is AND
@@ -183,9 +221,9 @@ try
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 		return; // we have a valid AND
-	      } else {errcount++; throw deviceex_i;} // expected a uint
-	    } else {errcount++; throw deviceex_i;} // expected 'numinputs'
-	  } else {errcount++; throw deviceex_i;} // expected '-'
+	      } else {errcount++; throw uintex_i;} // expected a uint
+	    } else {errcount++; throw swnuminputsex_i;} // expected 'numinputs'
+	  } else {errcount++; throw devdashex_i;} // expected '-'
 
 	}
 
@@ -197,9 +235,9 @@ try
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 		return; // we have a valid NAND
-	      } else {errcount++; throw deviceex_i;} // expected a uint
-	    } else {errcount++; throw deviceex_i;} // expected 'numinputs'
-	  } else {errcount++; throw deviceex_i;} // expected '-'
+	      } else {errcount++; throw uintex_i;} // expected a uint
+	    } else {errcount++; throw swnuminputsex_i;} // expected 'numinputs'
+	  } else {errcount++; throw devdashex_i;} // expected '-'
 	}
 
 	if (cursym.get_value() == OR) { //i.e. devname is OR
@@ -210,9 +248,9 @@ try
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 		return; // we have a valid OR
-	      } else {errcount++; throw deviceex_i;} // expected a uint
-	    } else {errcount++; throw deviceex_i;} // expected 'numinputs'
-	  } else {errcount++; throw deviceex_i;} // expected '-'
+	      } else {errcount++; throw uintex_i;} // expected a uint
+	    } else {errcount++; throw swnuminputsex_i;} // expected 'numinputs'
+	  } else {errcount++; throw devdashex_i;} // expected '-'
 	}
 
 	if (cursym.get_value() == NOR) { //i.e. devname is NOR
@@ -223,9 +261,9 @@ try
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 		return; // we have a valid NOR
-	      } else {errcount++; throw deviceex_i;} // expected a uint
-	    } else {errcount++; throw deviceex_i;} // expected 'numinputs'
-	  } else {errcount++; throw deviceex_i;} // expected '-'
+	      } else {errcount++; throw uintex_i;} // expected a uint
+	    } else {errcount++; throw swnuminputsex_i;} // expected 'numinputs'
+	  } else {errcount++; throw devdashex_i;} // expected '-'
 	}
 
 	if (cursym.get_value() == DTYPE) { //i.e. devname is DTYPE
@@ -271,14 +309,52 @@ try
    }
 }
 
-class monruleex : public exception
+class rulesymbolex : public exception {};
+
+class rulesymequalsex : public rulesymbolex
 {
 	public:
   virtual const char* what () const throw ()
   {
-    return "Exception: invalid monrule in definition file";
+    return "Exception: expected an '='";
   }
-} monruleex_i;
+} rulesymequalsex_i;
+
+class rulesymrarrowex : public rulesymbolex
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: expected a '>'";
+  }
+} rulesymrarrowex_i
+;
+class rulesymsemicolonex : public rulesymbolex
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: expected a ';'";
+  }
+} rulesymsemicolonex_i;
+
+class rulesymdotex : public rulesymbolex
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: expected a '.'";
+  }
+} rulesymdotex_i;
+
+//class monruleex : public exception
+//{
+//	public:
+//  virtual const char* what () const throw ()
+//  {
+//    return "Exception: invalid monrule in definition file";
+//  }
+//} monruleex_i;
 
 void parser::monrule (void) // throws monruleex if finds invalid monrule
 {
@@ -286,6 +362,8 @@ try
   {
     //cout<<"testing monrule"<<endl;
     uname();
+	//TODO:check if this uname is in nametable (once James has finished that
+	//do this for all three *rule functions
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
       smz->getsymbol (cursym);
@@ -294,28 +372,28 @@ try
     } 
 	if (cursym.get_value() == semicolon) { // cursym is ';'
       return;
-    } else {errcount++; throw monruleex_i;} // didn't get a '.' or ';'
+    } else {errcount++; throw rulesymsemicolonex_i;} // didn't get a '.' or ';'
   }
  catch (exception& e) // Only catches an error in monrule syntax. Does not
                       // throw it further, so subsequent lines can contine
 					  // to be parsed
    {
 	smz->print_err(e.what());
-     while (!(cursym.get_value() == semicolon)) { // iterates while cursym is not ';'
+     while (cursym.get_value() != semicolon && cursym.get_value() != endfile) { // iterates while cursym is not ';'
        smz->getsymbol (cursym);
 	   //throw parseex_i;
      }
    }
 }
 
-class connruleex : public exception
-{
-	public:
-  virtual const char* what () const throw ()
-  {
-    return "Exception: invalid connrule in definition file";
-  }
-} connruleex_i;
+//class connruleex : public exception
+//{
+//	public:
+//  virtual const char* what () const throw ()
+//  {
+//    return "Exception: invalid connrule in definition file";
+//  }
+//} connruleex_i;
 
 void parser::connrule (void) // throws connruleex if finds invalid connrule
 {
@@ -338,29 +416,29 @@ try
       smz->getsymbol (cursym);
       if (cursym.get_value() == semicolon) { // cursym is ';'
 	return;
-      } else {errcount++; throw connruleex_i;} // we expected a ';'
-    } else {errcount++; throw connruleex_i;} // we expected a '.'
-    } else {errcount++; throw connruleex_i;} // we expected a '>'
+      } else {errcount++; throw rulesymsemicolonex_i;} // we expected a ';'
+    } else {errcount++; throw rulesymdotex_i;} // we expected a '.'
+    } else {errcount++; throw rulesymrarrowex_i;} // we expected a '>'
   }
  catch (exception& e)
    {
      //cout << e.what() << endl;
 	smz->print_err(e.what());
-     while (!(cursym.get_value() == semicolon)) { // iterates while cursym is not ';'
+     while (cursym.get_value() != semicolon && cursym.get_value() != endfile) { // iterates while cursym is not ';'
        smz->getsymbol (cursym);
      }
     //throw parseex_i;
    }
 }
 
-class devruleex : public exception
-{
-	public:
-  virtual const char* what () const throw ()
-  {
-    return "Exception: invalid devrule in definition file";
-  }
-} devruleex_i;
+//class devruleex : public exception
+//{
+//	public:
+//  virtual const char* what () const throw ()
+//  {
+//    return "Exception: invalid devrule in definition file";
+//  }
+//} devruleex_i;
 
 void parser::devrule (void) // throws devruleex if finds invalid devrule
 {
@@ -377,14 +455,14 @@ try
 	smz->getsymbol (cursym);
       if (cursym.get_value() == semicolon) { // we have a ';'
 	return;
-      } else {errcount++; throw devruleex_i;} // we expected a ';'
-    } else {errcount++; throw devruleex_i;} // we expected an '='
+      } else {errcount++; throw rulesymsemicolonex_i;} // we expected a ';'
+    } else {errcount++; throw rulesymequalsex_i;} // we expected an '='
   }
  catch (exception& e)
    {
     // cout << e.what() << endl;
 	smz->print_err(e.what());
-     while (!(cursym.get_value() == semicolon)) { // iterates while cursym is not ';'
+     while (cursym.get_value() != semicolon && cursym.get_value() != endfile) { // iterates while cursym is not ';'
        smz->getsymbol (cursym);
      }
     //throw parseex_i;
