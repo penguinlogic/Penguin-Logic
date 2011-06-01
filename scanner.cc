@@ -33,7 +33,7 @@ if (!inf.eof())
 	getline(inf, current.line);
 	current.pos=0;
 	current.linenum++;
-	cout<<"line "<<current.linenum<<endl;
+	//cout<<"line "<<current.linenum<<endl;
 	}
 
 	if(current.pos<=(current.line.size()-1)){
@@ -65,6 +65,7 @@ while (current.line.size()==0 && !inf.eof())
 	getline(inf, current.line);
 	current.pos=0;
 	current.linenum++;
+	getch();
 } 
 
 while (!inf.eof() && isspace(current.ch)) getch();
@@ -98,7 +99,7 @@ skipcomments();
 
 if (inf.eof()) {
   s.set_parameters (Charsym, endfile, -1, 0);
- cout<<"THE END"<<endl;
+ //cout<<"THE END"<<endl;
 }
 
 else if (isdigit(current.ch))
@@ -110,7 +111,7 @@ else if (isdigit(current.ch))
 else if (isalpha(current.ch))
 {
 	getname ( idstr);
-	cout << "idstr: " << idstr << endl;
+	//cout << "idstr: " << idstr << endl;
 	if (idstr=="DEVICES") s.set_parameters (Section, DEVICES, -1, 0); //cout << "sgettype" << s.get_type() << endl;}
 	else if (idstr=="CONNECTIONS")s.set_parameters (Section, CONNECTIONS, -1, 0);
 	else if (idstr=="MONITOR") s.set_parameters (Section, MONITOR, -1, 0);
@@ -125,7 +126,7 @@ else if (isalpha(current.ch))
 	else if (idstr=="DATA")s.set_parameters (Inname, DATA, -1, 0);
 	else if (idstr=="SET")s.set_parameters (Inname, SET, -1, 0);
 	else if (idstr=="CLEAR")s.set_parameters(Inname, CLEAR, -1, 0);
-	else if (idstr=="CLOCK")s.set_parameters (Inname, CLOCK, -1, 0);
+	else if (idstr=="CLK")s.set_parameters (Inname, CLK, -1, 0);
 	else if (idstr=="I1")s.set_parameters (Inname, I1, -1, 0);
 	else if (idstr=="I2")s.set_parameters (Inname, I2, -1, 0);
 	else if (idstr=="I3")s.set_parameters (Inname, I3, -1, 0);
@@ -167,15 +168,21 @@ else
 	}
 getch(); 
 }
-cout<<"type: "<<s.get_type()<<" value:"<<s.get_value()<<" uint:"<<s.get_uint()<<" uname:"<<s.get_uname_id()<<endl;
+//cout<<"type: "<<s.get_type()<<" value:"<<s.get_value()<<" uint:"<<s.get_uint()<<" uname:"<<s.get_uname_id()<<endl;
 }
 
 
 void scanner::print_err(const char* error)
 {
 cout<<"Error in line "<<last.linenum<<", at character "<<last.pos<<":"<<endl;
+
 cout<<last.line<<endl;
-for (int i=0; i<last.pos-1; i++) cout<<" ";
+
+for (int i=0; i<last.pos-1; i++) {
+	if (last.line[i] == '\t') cout << '\t';
+	else cout << " ";
+} // accounts for tabs at in erroneous line
+
 cout<<"^"<<endl;
 cout<<error<<endl;
 }
