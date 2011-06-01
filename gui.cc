@@ -156,14 +156,14 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
 	EVT_BUTTON(RUN_BUTTON_ID, MyFrame::OnRunButton)
 	EVT_BUTTON(CONT_BUTTON_ID, MyFrame::OnContButton)
-	EVT_BUTTON(SWITCH_BUTTON_ID, MyFrame::OnSwitchButton)
+	EVT_BUTTON(DEVICE_BUTTON_ID, MyFrame::OnDeviceButton)
 	EVT_BUTTON(MONITOR_BUTTON_ID, MyFrame::OnMonitorButton)
 	EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
 	EVT_TEXT_ENTER(MY_TEXTCTRL_ID, MyFrame::OnText)
 END_EVENT_TABLE()
 
 MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
-		 names *names_mod, devices *devices_mod, monitor *monitor_mod, wxHelpController *m_helpController, long style):
+		 names *names_mod, devices *devices_mod, monitor *monitor_mod, long style):
   wxFrame(parent, wxID_ANY, title, pos, size, style)
   // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
   // using sizers
@@ -172,10 +172,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	nmz = names_mod;
 	dmz = devices_mod;
 	mmz = monitor_mod;
-	hpc = m_helpController;
-	if (nmz == NULL || dmz == NULL || mmz == NULL || hpc == NULL)
+	if (nmz == NULL || dmz == NULL || mmz == NULL)
 	{
-		cout << "Cannot operate GUI without names, devices and monitor classes (or help files)" << endl;
+		cout << "Cannot operate GUI without names, devices and monitor classes" << endl;
 		exit(1);
 	}
 
@@ -200,6 +199,21 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	CreateStatusBar(3);
 	SetStatusText(wxT("Ready"), 0);
 
+	// Create Help file
+	wxInitAllImageHandlers();
+	wxFileSystem::AddHandler(new wxZipFSHandler);
+	help.UseConfig(wxConfig::Get());
+    bool ret;
+    help.SetTempDir(wxT("."));
+	#ifdef _WINDOWS
+		wxString h_filename = wxT("C:/Users/Oliver Lambert/Documents/Cambridge/Project/02_Software/Penguin-Logic/help.htb");
+	#else
+		wxString h_filename = wxT("help.htb");
+	#endif
+	ret = help.AddBook(wxFileName(h_filename, wxPATH_NATIVE));
+    if (! ret)
+        wxMessageBox(wxT("Failed adding help file (help.htb) - has this file been moved or deleted?"));
+
 	// Main window layout
 	wxBoxSizer *topsizer = new wxBoxSizer(wxHORIZONTAL);
 		// Left panel
@@ -217,7 +231,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 					// Run button
 				button_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0, wxALL, 10);
 					// SWITCH button
-				button_sizer->Add(new wxButton(this, SWITCH_BUTTON_ID, wxT("Change initial switch value")), 0, wxALL, 10);
+				button_sizer->Add(new wxButton(this, DEVICE_BUTTON_ID, wxT("Change device properties")), 0, wxALL, 10);
 					// Spinner (label)
 				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Cycles:")), 0, wxALIGN_RIGHT|wxTOP|wxLEFT, 10);
 					// Spinner (device)
@@ -261,15 +275,34 @@ void MyFrame::OnDevelopment(wxCommandEvent &event)
 void MyFrame::OnOpen(wxCommandEvent &event)
   // Callback for the [File | Open circuit definition file] menu item
 {
-	MyFrame::OnDevelopment(event);		// Placeholder until feature is developed
-	/*--------------- Insert code here-----------------------*/
+	wxFileDialog dialog(this,_T("Open circuit definition file"),wxEmptyString,wxEmptyString,_T("Logic definition files (*.txt;*.ldf)|*.txt;*.ldf"));
+
+    dialog.SetDirectory(wxGetHomeDir());
+    dialog.CentreOnParent();
+
+    if (dialog.ShowModal() == wxID_OK)
+    {
+        wxString info;
+        info.Printf(_T("Full file name: %s\n")
+                    _T("Path: %s\n")
+                    _T("Name: %s"),
+                    dialog.GetPath().c_str(),
+                    dialog.GetDirectory().c_str(),
+                    dialog.GetFilename().c_str());
+        //wxMessageDialog dialog2(this, info, _T("Selected file"));
+        //dialog2.ShowModal();
+    }
 }
 
 void MyFrame::OnSave(wxCommandEvent &event)
   // Callback for the [File | Save waveforms as picture] menu item
 {
-	MyFrame::OnDevelopment(event);		// Placeholder until feature is developed
-	/*--------------- Insert code here-----------------------*/               
+	wxFileDialog dialog(this,_T("Save waveforms as picture"),wxEmptyString,wxEmptyString,_T("Portable network graphics (*.png)|*.png"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+	
+	dialog.SetFilterIndex(1);
+
+	if (dialog.ShowModal() == wxID_OK)
+		/*wxLogMessage(_T("%s, filter %d"),dialog.GetPath().c_str(), dialog.GetFilterIndex())*/;
 }
 
 void MyFrame::OnExit(wxCommandEvent &event)
@@ -281,15 +314,7 @@ void MyFrame::OnExit(wxCommandEvent &event)
 void MyFrame::OnHelpContents(wxCommandEvent &event)
   // Callback for the [Help | View Help] menu item
 {
-	if (hpc->LoadFile() == false)
-	{
-		wxMessageDialog development(this, wxT("Help file cannot be found"), wxT("Error: Feature unavailable"), wxICON_INFORMATION | wxOK);
-		development.ShowModal();    
-	}
-	else
-	hpc->DisplayContents();
-//  wxMessageDialog help(this, wxT("<Insert help here>"), wxT("Penguin Logic Help"), wxICON_INFORMATION | wxOK);
-// help.ShowModal();                  
+	help.DisplayContents();
 }
 
 void MyFrame::OnAbout(wxCommandEvent &event)
@@ -339,10 +364,10 @@ void MyFrame::OnContButton(wxCommandEvent &event)
 	}*/
 }
 
-void MyFrame::OnSwitchButton(wxCommandEvent &event)
+void MyFrame::OnDeviceButton(wxCommandEvent &event)
   // Callback for the SWITCH button
 {
-	ConfigDialog dialog(this);
+	DeviceConfigDialog dialog(this);
     dialog.ShowModal();
 }
 
@@ -407,132 +432,96 @@ void MyFrame::runnetwork(int ncycles)
 }
 
 // ----------------------------------------------------------------------------
-// ConfigDialog
+// DeviceConfigDialog
 // ----------------------------------------------------------------------------
 
-IMPLEMENT_CLASS(ConfigDialog, wxPropertySheetDialog)
+//IMPLEMENT_CLASS(DeviceConfigDialog, wxPropertySheetDialog)
 
-BEGIN_EVENT_TABLE(ConfigDialog, wxPropertySheetDialog)
+BEGIN_EVENT_TABLE(DeviceConfigDialog, wxPropertySheetDialog)
 END_EVENT_TABLE()
 
-ConfigDialog::ConfigDialog(wxWindow* win)
+DeviceConfigDialog::DeviceConfigDialog(wxWindow* win)
 {
     //SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
 
-    Create(win, wxID_ANY, _("Preferences"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    Create(win, wxID_ANY, _("Device Configuration"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
     CreateButtons(wxOK|wxCANCEL);
 
     wxBookCtrlBase* notebook = GetBookCtrl();
-		wxPanel* generalSettings = CreateDevicePropertiesPage(notebook);
-	notebook->AddPage(generalSettings, _("Device Properties"));
-	//	wxPanel* aestheticSettings = CreateAestheticSettingsPage(notebook);
-	//notebook->AddPage(aestheticSettings, _("Aesthetics"));
+		wxPanel* switchProperties = CreateSwitchPropertiesPage(notebook);
+	notebook->AddPage(switchProperties, _("Switch Properties"));
+		wxPanel* clockProperties = CreateClockPropertiesPage(notebook);
+	notebook->AddPage(clockProperties, _("Clock Properties"));
 
     LayoutDialog();
 }
 
-wxPanel* ConfigDialog::CreateDevicePropertiesPage(wxWindow* parent)
+wxPanel* DeviceConfigDialog::CreateSwitchPropertiesPage(wxWindow* parent)
+{
+	// Define options for values of switches
+	wxArrayString switchValue;
+		switchValue.Add(wxT("Off"));
+		switchValue.Add(wxT("On"));
+
+	// Define names of switches
+	wxArrayString switchNames;
+		switchNames.Add("Switch 1:");
+		switchNames.Add("Switch 2:");
+		switchNames.Add("Switch 3:");
+		
+	// Define default values of switches
+	wxArrayString switchDefaults;
+		switchDefaults.Add(switchValue.Item(1));
+		switchDefaults.Add(switchValue.Item(0));
+		switchDefaults.Add(switchValue.Item(0));
+
+	// Create layout
+	wxPanel* panel = new wxPanel(parent, wxID_ANY);
+	wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
+		wxGridSizer *item0 = new wxGridSizer(2, 10, 10);
+			// Switch 1
+			wxStaticText* field1 = new wxStaticText(panel, wxID_ANY,switchNames.Item(0));
+		item0->Add(field1, 0, wxALL, 5);
+			
+			wxComboBox* value1 = new wxComboBox(panel, ID_SWITCH_1, switchDefaults.Item(0), wxDefaultPosition, wxDefaultSize, switchValue, wxCB_READONLY);
+		item0->Add(value1, 0, wxALL, 0);
+			// Switch 2
+			wxStaticText* field2 = new wxStaticText(panel, wxID_ANY, switchNames.Item(1));
+		item0->Add(field2, 0, wxALL, 5);
+			wxComboBox* value2 = new wxComboBox(panel, ID_SWITCH_1, switchDefaults.Item(1), wxDefaultPosition, wxDefaultSize, switchValue, wxCB_READONLY);
+		item0->Add(value2, 0, wxALL, 0);
+			// Switch 3
+			wxStaticText* field3 = new wxStaticText(panel, wxID_ANY, switchNames.Item(2));
+		item0->Add(field3, 0, wxALL, 5);
+			wxComboBox* value3 = new wxComboBox(panel, ID_SWITCH_1, switchDefaults.Item(2), wxDefaultPosition, wxDefaultSize, switchValue, wxCB_READONLY);
+		item0->Add(value3, 0, wxALL, 0);
+	topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
+	panel->SetSizer(topSizer);
+    topSizer->Fit(panel);
+
+    return panel;
+}
+
+wxPanel* DeviceConfigDialog::CreateClockPropertiesPage(wxWindow* parent)
 {
     wxPanel* panel = new wxPanel(parent, wxID_ANY);
-
-    wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
-    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
-
-    //// LOAD LAST FILE
-
-    wxBoxSizer* itemSizer3 = new wxBoxSizer( wxHORIZONTAL );
-    wxCheckBox* checkBox3 = new wxCheckBox(panel, ID_LOAD_LAST_PROJECT, _("&Load last project on startup"), wxDefaultPosition, wxDefaultSize);
-    itemSizer3->Add(checkBox3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    item0->Add(itemSizer3, 0, wxGROW|wxALL, 0);
-
-    //// AUTOSAVE
-
-    wxString autoSaveLabel = _("&Auto-save every");
-    wxString minsLabel = _("mins");
-
-    wxBoxSizer* itemSizer12 = new wxBoxSizer( wxHORIZONTAL );
-    wxCheckBox* checkBox12 = new wxCheckBox(panel, ID_AUTO_SAVE, autoSaveLabel, wxDefaultPosition, wxDefaultSize);
-
-
-    wxSpinCtrl* spinCtrl12 = new wxSpinCtrl(panel, ID_AUTO_SAVE_MINS, wxEmptyString,
-        wxDefaultPosition, wxSize(40, wxDefaultCoord), wxSP_ARROW_KEYS, 1, 60, 1);
-
-    itemSizer12->Add(checkBox12, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-
-    itemSizer12->Add(spinCtrl12, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    itemSizer12->Add(new wxStaticText(panel, wxID_STATIC, minsLabel), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    item0->Add(itemSizer12, 0, wxGROW|wxALL, 0);
-
-    //// TOOLTIPS
-
-    wxBoxSizer* itemSizer8 = new wxBoxSizer( wxHORIZONTAL );
-    wxCheckBox* checkBox6 = new wxCheckBox(panel, ID_SHOW_TOOLTIPS, _("Show &tooltips"), wxDefaultPosition, wxDefaultSize);
-    itemSizer8->Add(checkBox6, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    item0->Add(itemSizer8, 0, wxGROW|wxALL, 0);
-
-    topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
+	wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
+		wxGridSizer *item0 = new wxGridSizer(2, 10, 10);
+			// Clock 1
+			wxStaticText* field1 = new wxStaticText(panel, wxID_ANY, _("Clock 1:"));
+		item0->Add(field1, 0, wxALL, 5);			
+			wxSpinCtrl* value1 = new wxSpinCtrl(panel, ID_FONT_SIZE, wxT("5"), wxDefaultPosition, wxDefaultSize);
+		item0->Add(value1, 0, wxALL, 5);
+			// Clock 2
+			wxStaticText* field2 = new wxStaticText(panel, wxID_ANY, _("Clock 2:"));
+		item0->Add(field2, 0, wxALL, 5);			
+			wxSpinCtrl* value2 = new wxSpinCtrl(panel, ID_FONT_SIZE, wxT("5"), wxDefaultPosition, wxDefaultSize);
+		item0->Add(value2, 0, wxALL, 5);
+	topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
+	topSizer->AddSpacer(5);
 
     panel->SetSizer(topSizer);
     topSizer->Fit(panel);
 
     return panel;
 }
-
-/*wxPanel* ConfigDialog::CreateAestheticSettingsPage(wxWindow* parent)
-{
-    wxPanel* panel = new wxPanel(parent, wxID_ANY);
-
-    wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
-    wxBoxSizer *item0 = new wxBoxSizer( wxVERTICAL );
-
-    //// PROJECT OR GLOBAL
-    wxString globalOrProjectChoices[2];
-    globalOrProjectChoices[0] = _("&New projects");
-    globalOrProjectChoices[1] = _("&This project");
-
-    wxRadioBox* projectOrGlobal = new wxRadioBox(panel, ID_APPLY_SETTINGS_TO, _("&Apply settings to:"),
-        wxDefaultPosition, wxDefaultSize, 2, globalOrProjectChoices);
-    item0->Add(projectOrGlobal, 0, wxGROW|wxALL, 5);
-
-    projectOrGlobal->SetSelection(0);
-
-    //// BACKGROUND STYLE
-    wxArrayString backgroundStyleChoices;
-    backgroundStyleChoices.Add(wxT("Colour"));
-    backgroundStyleChoices.Add(wxT("Image"));
-    wxStaticBox* staticBox3 = new wxStaticBox(panel, wxID_ANY, _("Background style:"));
-
-    wxBoxSizer* styleSizer = new wxStaticBoxSizer( staticBox3, wxVERTICAL );
-    item0->Add(styleSizer, 0, wxGROW|wxALL, 5);
-
-    wxBoxSizer* itemSizer2 = new wxBoxSizer( wxHORIZONTAL );
-
-    wxChoice* choice2 = new wxChoice(panel, ID_BACKGROUND_STYLE, wxDefaultPosition, wxDefaultSize, backgroundStyleChoices);
-
-    itemSizer2->Add(new wxStaticText(panel, wxID_ANY, _("&Window:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-    itemSizer2->Add(5, 5, 1, wxALL, 0);
-    itemSizer2->Add(choice2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-
-    styleSizer->Add(itemSizer2, 0, wxGROW|wxALL, 5);
-
-#if wxUSE_SPINCTRL
-    //// FONT SIZE SELECTION
-
-    wxStaticBox* staticBox1 = new wxStaticBox(panel, wxID_ANY, _("Tile font size:"));
-    wxBoxSizer* itemSizer5 = new wxStaticBoxSizer( staticBox1, wxHORIZONTAL );
-
-    wxSpinCtrl* spinCtrl = new wxSpinCtrl(panel, ID_FONT_SIZE, wxEmptyString, wxDefaultPosition,
-        wxSize(80, wxDefaultCoord));
-    itemSizer5->Add(spinCtrl, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-
-    item0->Add(itemSizer5, 0, wxGROW|wxLEFT|wxRIGHT, 5);
-#endif
-
-    topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
-    topSizer->AddSpacer(5);
-
-    panel->SetSizer(topSizer);
-    topSizer->Fit(panel);
-
-    return panel;
-}*/

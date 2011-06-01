@@ -1,0 +1,47 @@
+﻿;Created with Fast-Help Corporate Edition on 01/06/2011 19:42:03
+[OPTIONS]
+Binary Index=No
+Compatibility=1.1 or later
+Compiled file=help.chm
+Contents file=help.hhc
+Default Font=Arial,8,1
+Default Window=Main
+Default topic=Overview.html
+Display compile notes=No
+Display compile progress=No
+Error log file=help.err
+Index file=help.hhk
+Binary TOC=No
+Flat=No
+Full-text search=Yes
+Language=0x0809 English (United Kingdom)
+TITLE=Penguin Logic Help
+ 
+[WINDOWS]
+Main="Penguin Logic Help","help.hhc","help.hhk","","","","","","",0x60520,200,0x300E,[0,0,600,600],0xC40000,0x0,,,0,,0
+Second="Your Title goes here","","","","","","","","",0x2000,200,0x0,[100,80,400,480],0xC00000,0x80,,,0,,0
+ 
+[FILES]
+FHUtilities.js
+FHNonscroll.js
+Images/BrowseBlueLeft.png
+Images/BrowseBlueRight.png
+FHFlyoverPopups.js
+FHFlyoverPopupStyle.css
+
+Overview.html
+CreatingADefinitionFile.html
+RunningTheProgram.html
+ObtainDesiredOutput.html
+ 
+[MAP]
+#define Overview 10001
+#define CreatingADefinitionFile 10002
+#define RunningTheProgram 10003
+#define ObtainDesiredOutput 10004
+ 
+[ALIAS]
+ 
+[TEXT POPUPS]
+ 
+[MERGE FILES]

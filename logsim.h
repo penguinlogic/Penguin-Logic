@@ -7,8 +7,6 @@
 #include "monitor.h"
 #include "network.h"
 #include "parser.h"
-#include "wx/help.h" // Required for help file
-#include "wx/fs_zip.h"	// Required for help file
 
 class MyApp: public wxApp
 {
@@ -21,7 +19,6 @@ class MyApp: public wxApp
   monitor *mmz;  // pointer to the monitor class
   scanner *smz;  // pointer to the scanner class
   parser *pmz;   // pointer to the parser class
-  wxHelpController *m_helpController; // pointer to the help file
 };
 
 #endif /* logsim_h */
