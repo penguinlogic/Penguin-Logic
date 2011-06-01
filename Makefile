@@ -62,4 +62,4 @@ userint.o: userint.h names.h network.h devices.h monitor.h
 #guitest.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h
 #guitest.o: /usr/include/stdint.h /usr/include/bits/wchar.h
 #guitest.o: /usr/include/GL/glu.h
-symbol.o: symbol.h
+symbol.o: symbol.h names.h
