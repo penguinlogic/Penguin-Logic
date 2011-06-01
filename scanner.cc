@@ -7,22 +7,11 @@ inf.open(defname);
 if(!inf) cout<<"unable to open file"<<endl;
 
 
-
-
 else cout<<defname<<" was opened successfully"<<endl;
 current.linenum=1;
 current.pos=0;
 getline(inf, current.line);
 getch();
-}
-
-/* performs assignment operation */
-character character::operator= (character rhs) {
-  ch = rhs.ch;
-  pos = rhs.pos;
-  linenum = rhs.linenum;
-  line = rhs.line;
-  return *this;
 }
 
 
@@ -116,46 +105,48 @@ else if (isalpha(current.ch))
 {
 	getname ( idstr);
 	//cout << "idstr: " << idstr << endl;
-	if (idstr=="DEVICES") s.set_parameters (Section, DEVICES, -1, 0); //cout << "sgettype" << s.get_type() << endl;}
-	else if (idstr=="CONNECTIONS")s.set_parameters (Section, CONNECTIONS, -1, 0);
-	else if (idstr=="MONITOR") s.set_parameters (Section, MONITOR, -1, 0);
-	else if (idstr=="CLOCK")s.set_parameters (Devname, CLOCK, -1, 0);
-	else if (idstr=="SWITCH")s.set_parameters(Devname, SWITCH, -1, 0);
-	else if (idstr=="AND")s.set_parameters (Devname, AND, -1, 0);
-	else if (idstr=="NAND")s.set_parameters (Devname, NAND, -1, 0);
-	else if (idstr=="OR")s.set_parameters(Devname, OR, -1, 0);
-	else if (idstr=="NOR")s.set_parameters (Devname, NOR, -1, 0);
-	else if (idstr=="DTYPE")s.set_parameters (Devname, DTYPE, -1, 0);
-	else if (idstr=="XOR")s.set_parameters (Devname, XOR, -1, 0);
-	else if (idstr=="DATA")s.set_parameters (Inname, DATA, -1, 0);
-	else if (idstr=="SET")s.set_parameters (Inname, SET, -1, 0);
-	else if (idstr=="CLEAR")s.set_parameters(Inname, CLEAR, -1, 0);
-	else if (idstr=="CLK")s.set_parameters (Inname, CLK, -1, 0);
-	else if (idstr=="I1")s.set_parameters (Inname, I1, -1, 0);
-	else if (idstr=="I2")s.set_parameters (Inname, I2, -1, 0);
-	else if (idstr=="I3")s.set_parameters (Inname, I3, -1, 0);
-	else if (idstr=="I4")s.set_parameters (Inname, I4, -1, 0);
-	else if (idstr=="I5")s.set_parameters(Inname, I5, -1, 0);
-	else if (idstr=="I6")s.set_parameters(Inname, I6, -1, 0);
-	else if (idstr=="I7")s.set_parameters(Inname, I7, -1, 0);
-	else if (idstr=="I8")s.set_parameters(Inname, I8, -1, 0);
-	else if (idstr=="I9")s.set_parameters(Inname, I9, -1, 0);
-	else if (idstr=="I10")s.set_parameters(Inname, I10, -1, 0);
-	else if (idstr=="I11")s.set_parameters(Inname, I11, -1, 0);
-	else if (idstr=="I12")s.set_parameters(Inname, I12, -1, 0);
-	else if (idstr=="I13")s.set_parameters(Inname, I13, -1, 0);
-	else if (idstr=="I14")s.set_parameters(Inname, I14, -1, 0);
-	else if (idstr=="I15")s.set_parameters(Inname, I15, -1, 0);
-	else if (idstr=="I16")s.set_parameters(Inname, I16, -1, 0);
-	else if (idstr=="period")s.set_parameters(Devswitch, period, -1, 0);
-	else if (idstr=="initialvalue")s.set_parameters(Devswitch, initialvalue, -1, 0);
-	else if (idstr=="numinputs") s.set_parameters(Devswitch, numinputs, -1, 0);
-	else if (idstr=="Q")s.set_parameters (Outname, Q, -1, 0);
-	else if (idstr=="QBAR")s.set_parameters(Outname, QBAR, -1, 0);
-	else{
-		name id = names_mod.lookup(idstr);	
-		s.set_parameters (Uname, novalue, -1, id);
-}		
+	if (idstr=="DEVICES") s.set_parameters (Section, DEVICES, -1, names_mod.lookup(idstr)); //cout << "sgettype" << s.get_type() << endl;}
+	else if (idstr=="CONNECTIONS")s.set_parameters (Section, CONNECTIONS, -1, names_mod.lookup(idstr));
+	else if (idstr=="MONITOR") s.set_parameters (Section, MONITOR, -1, names_mod.lookup(idstr));
+	
+	else if (idstr=="CLOCK")s.set_parameters (Devname, CLOCK, -1, names_mod.lookup(idstr));
+	else if (idstr=="SWITCH")s.set_parameters(Devname, SWITCH, -1, names_mod.lookup(idstr));
+	else if (idstr=="AND")s.set_parameters (Devname, AND, -1, names_mod.lookup(idstr));
+	else if (idstr=="NAND")s.set_parameters (Devname, NAND, -1, names_mod.lookup(idstr));
+	else if (idstr=="OR")s.set_parameters(Devname, OR, -1, names_mod.lookup(idstr));
+	else if (idstr=="NOR")s.set_parameters (Devname, NOR, -1, names_mod.lookup(idstr));
+	else if (idstr=="DTYPE")s.set_parameters (Devname, DTYPE, -1, names_mod.lookup(idstr));
+	else if (idstr=="XOR")s.set_parameters (Devname, XOR, -1, names_mod.lookup(idstr));
+
+	else if (idstr=="DATA")s.set_parameters (Inname, DATA, -1, names_mod.lookup(idstr));
+	else if (idstr=="SET")s.set_parameters (Inname, SET, -1, names_mod.lookup(idstr));
+	else if (idstr=="CLEAR")s.set_parameters(Inname, CLEAR, -1, names_mod.lookup(idstr));
+	else if (idstr=="CLK")s.set_parameters (Inname, CLK, -1, names_mod.lookup(idstr));
+	else if (idstr=="I1")s.set_parameters (Inname, I1, -1, names_mod.lookup(idstr));
+	else if (idstr=="I2")s.set_parameters (Inname, I2, -1, names_mod.lookup(idstr));
+	else if (idstr=="I3")s.set_parameters (Inname, I3, -1, names_mod.lookup(idstr));
+	else if (idstr=="I4")s.set_parameters (Inname, I4, -1, names_mod.lookup(idstr));
+	else if (idstr=="I5")s.set_parameters(Inname, I5, -1, names_mod.lookup(idstr));
+	else if (idstr=="I6")s.set_parameters(Inname, I6, -1, names_mod.lookup(idstr));
+	else if (idstr=="I7")s.set_parameters(Inname, I7, -1, names_mod.lookup(idstr));
+	else if (idstr=="I8")s.set_parameters(Inname, I8, -1, names_mod.lookup(idstr));
+	else if (idstr=="I9")s.set_parameters(Inname, I9, -1, names_mod.lookup(idstr));
+	else if (idstr=="I10")s.set_parameters(Inname, I10, -1, names_mod.lookup(idstr));
+	else if (idstr=="I11")s.set_parameters(Inname, I11, -1, names_mod.lookup(idstr));
+	else if (idstr=="I12")s.set_parameters(Inname, I12, -1, names_mod.lookup(idstr));
+	else if (idstr=="I13")s.set_parameters(Inname, I13, -1, names_mod.lookup(idstr));
+	else if (idstr=="I14")s.set_parameters(Inname, I14, -1, names_mod.lookup(idstr));
+	else if (idstr=="I15")s.set_parameters(Inname, I15, -1, names_mod.lookup(idstr));
+	else if (idstr=="I16")s.set_parameters(Inname, I16, -1, names_mod.lookup(idstr));
+
+	else if (idstr=="period")s.set_parameters(Devswitch, period, -1, names_mod.lookup(idstr));
+	else if (idstr=="initialvalue")s.set_parameters(Devswitch, initialvalue, -1, names_mod.lookup(idstr));
+	else if (idstr=="numinputs") s.set_parameters(Devswitch, numinputs, -1, names_mod.lookup(idstr));
+
+	else if (idstr=="Q")s.set_parameters (Outname, Q, -1, names_mod.lookup(idstr));
+	else if (idstr=="QBAR") s.set_parameters(Outname, QBAR, -1, names_mod.lookup(idstr));
+
+	else s.set_parameters (Uname, novalue, -1, names_mod.lookup(idstr));		
 }
 
 else
