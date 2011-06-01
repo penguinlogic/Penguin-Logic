@@ -5,6 +5,10 @@ scanner::scanner (names* names_mod, const char*defname)
 {
 inf.open(defname);
 if(!inf) cout<<"unable to open file"<<endl;
+
+
+
+
 else cout<<defname<<" was opened successfully"<<endl;
 current.linenum=1;
 current.pos=0;
@@ -65,6 +69,7 @@ while (current.line.size()==0 && !inf.eof())
 	getline(inf, current.line);
 	current.pos=0;
 	current.linenum++;
+	getch();
 } 
 
 while (!inf.eof() && isspace(current.ch)) getch();
