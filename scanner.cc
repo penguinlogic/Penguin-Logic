@@ -14,6 +14,13 @@ getline(inf, current.line);
 getch();
 }
 
+character character::operator= (character rhs)
+{
+line = rhs.line;
+ch = rhs.ch;
+pos = rhs.pos;
+linenum = rhs.linenum;
+}
 
 void scanner::getch()
 {
