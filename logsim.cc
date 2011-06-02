@@ -7,7 +7,7 @@
 	#include "guicon.h"  
 #endif
 
-// #define USE_GUI
+#define USE_GUI
 
 IMPLEMENT_APP(MyApp)
   
@@ -31,7 +31,7 @@ bool MyApp::OnInit()
   mmz = new monitor(nmz, netz);
   smz = new scanner(nmz, wxString(argv[1]).mb_str());
 //cout << "pre parser constructor" << endl;
-  pmz = new parser(netz, dmz, mmz, smz);
+  pmz = new parser(netz, dmz, mmz, smz, nmz);
 //  pmz = new parser(smz);
 //cout << "finished constructing parser" << endl;
 
@@ -39,9 +39,11 @@ bool MyApp::OnInit()
 #ifdef USE_GUI
     // glutInit cannot cope with Unicode command line arguments, so we pass
     // it some fake ASCII ones instead
-    char **tmp1; int tmp2 = 0; glutInit(&tmp2, tmp1);
+	char *a[2]={"dummy","dummy"};
+    char **tmp1=(char**)a; int tmp2 = 0; glutInit(&tmp2, tmp1);
     // Construct the GUI
     MyFrame *frame = new MyFrame(NULL, wxT("Logic simulator"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz);
+	frame->SetBackgroundColour(wxColour(204, 204, 255));
     frame->Show(true);
     return(true); // enter the GUI event loop
 #else
@@ -50,5 +52,11 @@ bool MyApp::OnInit()
     umz.userinterface();
 #endif /* USE_GUI */
   }
+/*#if defined(_WINDOWS) && defined(_DEBUG)
+		cout << "Press a letter and then <ENTER> to quit" <<endl;
+		char a;
+		cin >> a;
+#endif*/
+
   return(false); // exit the application
 }

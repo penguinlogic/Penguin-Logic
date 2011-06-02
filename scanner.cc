@@ -29,7 +29,7 @@ if (!inf.eof())
 	//cout<<"line "<<current.linenum<<endl;
 	}
 
-	if(current.pos<=(current.line.size()-1)){
+	if(current.pos<(current.line.size())){
 	current.ch=current.line[current.pos];
 	current.pos++;
 	}

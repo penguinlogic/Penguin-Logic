@@ -44,6 +44,11 @@ void names::writename (name id)		/* Prints out the given name on the console    
 cout<< nametable[id];
 }
 
+namestring names::getname(name id)
+{
+	return nametable[id];
+}
+
 
 int names::namelength (name id)		 /* Returns length ie number of characters in given name                */
 {

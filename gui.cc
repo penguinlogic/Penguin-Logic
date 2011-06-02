@@ -31,7 +31,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   // trace is displayed.
 {
 	float y;
-	int i;
+	//int i;
 	asignal s;
 
 	if (cycles >= 0)
@@ -45,23 +45,43 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	const int CANVAS_HEIGHT=1000;
+	const int CANVAS_WIDTH =1400;
+	const int SIG_LOW = 10;
+	const int SIG_HIGH = 30;
+	const int SEPARATION = 50;
+	const int INDENT = 100;
+	const int LENGTH = 20;
+
+	for(int i=0; i<mmz->moncount(); i++)
 	if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0))	// draw the first monitor signal, get trace from monitor class
 	{
-		glColor3f(1.0, 0.0, 0.0);
-		glBegin(GL_LINE_STRIP);
-		for (i=0; i<cyclesdisplayed; i++)
+		for(int m=0; m < mmz->moncount(); m++)
 		{
-			if (mmz->getsignaltrace(0, i, s))
+			name n1, n2;
+			mmz->getmonname(m,n1, n2);
+			wxString mon_name = wxString(nmz->getname(n1));
+			glColor3f(0.0, 0.0, 1.0);
+			glRasterPos2f(5, CANVAS_HEIGHT-(m+1)*SEPARATION + SEPARATION/2);
+			for (unsigned int j = 0; j < mon_name.Len(); j++)
+				glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mon_name[j]);
+			
+			glColor3f(1.0, 0.0, 0.0);
+			glBegin(GL_LINE_STRIP);
+			for (i=0; i<cyclesdisplayed; i++)
 			{
-				if (s==low)
-					y = 10.0;
-				if (s==high)
-					y = 30.0;
-				glVertex2f(20*i+10.0, y); 
-				glVertex2f(20*i+30.0, y);
+				if (mmz->getsignaltrace(m, i, s))
+				{
+					if (s==low)
+						y = CANVAS_HEIGHT-(m+1)*SEPARATION + SIG_LOW;
+					if (s==high)
+						y = CANVAS_HEIGHT-(m+1)*SEPARATION + SIG_HIGH;
+					glVertex2f(LENGTH*i+INDENT, y); 
+					glVertex2f(LENGTH*i+LENGTH+INDENT, y);
+				}
 			}
+			glEnd();
 		}
-		glEnd();
 	}
 
 	else	// draw an artificial trace
@@ -267,9 +287,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 					// Insert tree structure here
 				panel->SetSizer(info_sizer);
 					info_sizer->Fit(panel);
-		right_sizer->Add(sp, 1, wxEXPAND | wxALL, 10);
-	topsizer->Add(right_sizer, 1, wxEXPAND | wxALL, 10);
-
+		right_sizer->Add(sp, 1, wxALL, 10);
+	topsizer->Add(right_sizer, 0, wxEXPAND|wxALL, 10);
+	
 	SetSizeHints(700, 400);
 	SetSizer(topsizer);
 }

@@ -10,7 +10,7 @@
 #include "symbol.h"
 #define stringify( name ) # name
 
-//#include <wx/string.h>
+#include <wx/string.h>
 #include "names.h"
 
 using namespace std;
