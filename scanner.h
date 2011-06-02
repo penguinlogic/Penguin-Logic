@@ -15,19 +15,18 @@
 
 using namespace std;
 
-class character
+struct character
 {public:
 string line;
 char ch;
 int pos;
 int linenum;
-character operator= (character rhs); // allows assignment
 };
 
 class scanner
 {
 private:
-names names_mod;
+names* nmz;
 ifstream inf;
 character current;
 character last;

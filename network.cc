@@ -153,11 +153,15 @@ void network::makeconnection (name idev, name inp, name odev, name outp, bool& o
   outplink o;
   inplink i;
   din = finddevice (idev);
+  if(din == NULL) cout<<"idev error"<<endl;
   dout = finddevice (odev);
+  if(dout == NULL) cout<<"odev error"<<endl;
   ok = ((din != NULL) && (dout != NULL));
   if (ok) {
     o = findoutput (dout, outp);
+    if(o == NULL) cout<<"outp error"<<endl;
     i = findinput (din, inp);
+    if(i == NULL) cout<<"inp error"<<endl;
     ok = ((o != NULL) && (i != NULL));
     if (ok)
       i->connect = o;
