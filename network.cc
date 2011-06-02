@@ -10,7 +10,7 @@ using namespace std;
  */
 devlink network::devicelist (void)
 {
-  return devs;
+	return devs;
 }
 
 
@@ -22,16 +22,17 @@ devlink network::devicelist (void)
  */
 devlink network::finddevice (name id)
 {
-  devlink d;
-  bool found;
-  found = false;
-  d = devs;
-  while ((d != NULL) && (! found)) {
-    found = (d->id == id);
-    if (! found)
-      d = d->next;
-  }
-  return d;
+	devlink d;
+	bool found;
+	found = false;
+	d = devs;
+	while ((d != NULL) && (! found))
+	{
+		found = (d->id == id);
+		if (! found)
+			d = d->next;
+	}
+	return d;
 }
 
 

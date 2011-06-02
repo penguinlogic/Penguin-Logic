@@ -73,6 +73,18 @@ void devices::setswitch (name sid, asignal level, bool& ok)
   }
 }
 
+void devices::setclock (name cid, int freq, bool& ok)
+{
+	devlink d;
+	d = netz->finddevice(cid);
+	ok = (d != NULL);
+	if(ok)
+	{
+		ok = (d->kind == aclock);
+		if(ok)
+			d->frequency = freq;
+	}
+}
 
 /***********************************************************************
  *

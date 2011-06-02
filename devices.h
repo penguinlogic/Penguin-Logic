@@ -39,6 +39,10 @@ public:
   void setswitch (name sid, asignal level, bool& ok);
     /* Sets the state of the named switch. 'ok' returns false if switch    */
     /* not found.                                                          */
+
+  void setclock (name cid, int freq, bool& ok);
+    /* Sets the period of the named clock. 'ok' returns false if switch    */
+    /* not found.														   */
  
   void executedevices (bool& ok);
     /* Executes all devices in the network to simulate one complete clock  */

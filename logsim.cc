@@ -42,7 +42,7 @@ bool MyApp::OnInit()
 	char *a[2]={"dummy","dummy"};
     char **tmp1=(char**)a; int tmp2 = 0; glutInit(&tmp2, tmp1);
     // Construct the GUI
-    MyFrame *frame = new MyFrame(NULL, wxT("Logic simulator"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz);
+    MyFrame *frame = new MyFrame(NULL, wxT("Logic simulator"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz, netz);
 	frame->SetBackgroundColour(wxColour(204, 204, 255));
     frame->Show(true);
     return(true); // enter the GUI event loop
@@ -52,11 +52,11 @@ bool MyApp::OnInit()
     umz.userinterface();
 #endif /* USE_GUI */
   }
-/*#if defined(_WINDOWS) && defined(_DEBUG)
+#if defined(_WINDOWS) && defined(_DEBUG)
 		cout << "Press a letter and then <ENTER> to quit" <<endl;
 		char a;
 		cin >> a;
-#endif*/
+#endif
 
   return(false); // exit the application
 }

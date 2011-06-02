@@ -36,6 +36,7 @@ struct devicerec {
 typedef devicerec* devlink;
 
 class network {
+private:
   names* nmz;  // the instatiation of the names class that we are going to use.
 
  public:
@@ -48,11 +49,11 @@ class network {
  
   inplink findinput (devlink dev, name id);
     /* Returns link to input of device pointed to by dev with specified    */
-    /* name.  Returns NULL if not found.                                    */
+    /* name.  Returns NULL if not found.                                   */
  
   outplink findoutput (devlink dev, name id);
     /* Returns link to output of device pointed to by dev with specified   */
-    /* name.  Returns NULL if not found.                                    */
+    /* name.  Returns NULL if not found.                                   */
  
   void adddevice (devicekind dkind, name did, devlink& dev);
     /* Adds a device to the device list with given name and returns a link */

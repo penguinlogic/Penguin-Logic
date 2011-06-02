@@ -52,7 +52,10 @@ namestring names::getname(name id)
 
 int names::namelength (name id)		 /* Returns length ie number of characters in given name                */
 {
-return nametable[id].length();
+	if(id<nametable.size())
+		return nametable[id].length();
+	else
+		return -1;
 }
 
 
