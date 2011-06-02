@@ -229,22 +229,22 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 			// Button panel
 			wxFlexGridSizer *button_sizer = new wxFlexGridSizer(2,0,0,0);
 					// Run button
-				button_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0, wxALL, 10);
-					// SWITCH button
-				button_sizer->Add(new wxButton(this, DEVICE_BUTTON_ID, wxT("Change device properties")), 0, wxALL, 10);
+				button_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// Spinner (label)
-				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Cycles:")), 0, wxALIGN_RIGHT|wxTOP|wxLEFT, 10);
+				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Cycles:")), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
 					// Spinner (device)
-				spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString(wxT("10")));
-				button_sizer->Add(spin, 0 , wxALL, 10);
+					spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString(wxT("10")));
+				button_sizer->Add(spin, 0 , wxALIGN_CENTER_VERTICAL|wxALL, 10);
+					// DEVICE button
+				button_sizer->Add(new wxButton(this, DEVICE_BUTTON_ID, wxT("Change device properties")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// Continue button
-				button_sizer->Add(new wxButton(this, CONT_BUTTON_ID, wxT("Continue")), 0, wxALL, 10);
+				button_sizer->Add(new wxButton(this, CONT_BUTTON_ID, wxT("Continue")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
+					// Static text (placeholder)
+				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("")), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
+					// Static text (placeholder)
+				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("")), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
 					// MONITOR button
-				button_sizer->Add(new wxButton(this, MONITOR_BUTTON_ID, wxT("Change monitor points")), 0, wxALL, 10);
-					// Free text field (label)
-				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Text:")), 0, wxALIGN_RIGHT|wxTOP|wxLEFT, 10);
-					// Free text field (device)
-				button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
+				button_sizer->Add(new wxButton(this, MONITOR_BUTTON_ID, wxT("Change monitor points")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
 			left_sizer->Add(button_sizer, 0, wxEXPAND | wxALL, 10);
 	topsizer->Add(left_sizer, 1, wxEXPAND | wxALL, 10);
 		//Right panel
@@ -254,21 +254,20 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 				const int px_size = 400;	// Canvas size
 				const int py_size = 1000;	// Canvas size
 				sp->SetScrollbars(p_inc, p_inc, px_size/p_inc, py_size/p_inc);
-					MyGLCanvas *canvas2 = new MyGLCanvas(sp, wxID_ANY, monitor_mod, names_mod, wxPoint(-1, -1), wxSize(px_size,py_size));
-				// Run button
-				new wxButton(sp, RUN_BUTTON_ID, wxT("Run"));
+				wxPanel* panel = new wxPanel(sp, wxID_ANY);
 				// Button2 panel
-				//wxBoxSizer *info_sizer = new wxBoxSizer(wxVERTICAL);
-				//	// Buttons
-				//	wxBoxSizer *deffile_sizer = new wxBoxSizer(wxHORIZONTAL);
-				//		wxStaticText* label = new wxStaticText(this, wxID_ANY, wxT("Definition file name:"));
-				//	deffile_sizer->Add(label, 0, wxEXPAND|wxALL,10);
-				//		wxTextCtrl* value = new wxTextCtrl(this, MY_TEXTCTRL_ID, wxT("grammar_eg1.txt"), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-				//	deffile_sizer->Add(value, 0, wxEXPAND|wxALL,10);
-				//info_sizer->Add(deffile_sizer, 0, wxEXPAND | wxALL, 10);
-		right_sizer->Add(sw, 1, wxEXPAND | wxALL, 10);
-		// Run button
-		right_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0, wxALL, 10);
+					wxBoxSizer *info_sizer = new wxBoxSizer(wxVERTICAL);
+						// Buttons
+						wxBoxSizer *deffile_sizer = new wxBoxSizer(wxHORIZONTAL);
+							wxStaticText* label = new wxStaticText(panel, wxID_ANY, wxT("Definition file name:"));
+						deffile_sizer->Add(label, 1,wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
+							wxTextCtrl* value = new wxTextCtrl(panel, MY_TEXTCTRL_ID, wxT("grammar_eg1.txt"), wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+						deffile_sizer->Add(value, 1, wxALIGN_CENTER_VERTICAL ,0);
+					info_sizer->Add(deffile_sizer, 0, wxEXPAND|wxALL,5);
+					// Insert tree structure here
+				panel->SetSizer(info_sizer);
+					info_sizer->Fit(panel);
+		right_sizer->Add(sp, 1, wxEXPAND | wxALL, 10);
 	topsizer->Add(right_sizer, 1, wxEXPAND | wxALL, 10);
 
 	SetSizeHints(700, 400);
