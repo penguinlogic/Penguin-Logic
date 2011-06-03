@@ -22,6 +22,14 @@ private:
   /* also declare internal functions                     */
   symbol cursym;
   int errcount;
+  symbol section_var; // tracks which Section (DEVICES, CONNECTION, MONITOR) we
+                  // are in for semantic error checking
+  vector<name> uname_list;//holds a list of device unames declared in DEVICES
+                          // for various error checking
+  vector<name> idev_conn_list;//holds a list of device unames which have been connected
+                         //to avoid duplicate input connections
+  vector<name> inp_conn_list;//holds a list of input pin unames to be used in conjunction with
+                             // the above
 
   void uint (int& uint_var); // throws uintex if not given a valid uint
   //void boolrule (void); // throws boolruleex if not given a valid bool

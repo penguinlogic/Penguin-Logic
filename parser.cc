@@ -39,7 +39,8 @@ parser::parser (network* network_mod, devices* devices_mod,
  // cursym = *new symbol();
 	symbol cursym;
 	errcount = 0;
-
+	section_var.set_parameters(Section, DEVICES, -1, -1); // Used in section()
+	                                                      // to ensure correct ordering
 }
 /***************************************************************************************/
 class parseex : public exception // thrown by catch statements to indicate failed
@@ -309,13 +310,24 @@ try
    }
 }
 
+/***************************************************************************************/
+class undefunameex : public exception
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: device not defined in DEVICES";
+  }
+} undefunameex_i;
+
+
 /**************************************************************************************/
 class unameex : public exception
 {
 	public:
   virtual const char* what () const throw ()
   {
-    return "Exception: expected a uname";
+    return "Exception: expected a user-defined name, as assigned in DEVICES";
   }
 } unameex_i;
 
@@ -324,8 +336,15 @@ void parser::uname (name &did_var) // throws unameex if not given a valid uname
 {
 try
   {
-//    cout<<"running uname"<<endl;
     if (cursym.get_type() != Uname) {errcount++; throw unameex_i;} // didn't get a uname
+	if (DEVICES != section_var.get_syntaxvalue()) {
+			for(int i = 0; i < uname_list.size(); i++) {
+				if (cursym.get_name_id() == uname_list[i]) {did_var = cursym.get_name_id(); return;}
+			}
+			errcount++;
+			throw undefunameex_i; // we get here if we're in CONN. or MON. and find a uname
+			                      // not defined in DEVICES
+			}
 	else did_var = cursym.get_name_id();
   }
  catch (exception& e)
@@ -404,6 +423,13 @@ try
 	  smz->getsymbol (cursym);
     } 
 	if (cursym.get_syntaxvalue() == semicolon) { // cursym is ';'
+	// checks to make sure unames have been defined in DEVICES
+	int valid_dev_count = 0;
+	for (int i = 0; i < uname_list.size(); i++) {
+		if (dev == uname_list[i]) valid_dev_count++;
+	}
+	if (0 == valid_dev_count) {errcount++; throw undefunameex_i;}//we found a device not initialised in DEVICES
+    if (0 == errcount) {
 	mmz->makemonitor(dev, outp, ok);      
 	if (ok){
 	cout<<"Monitor set at ";
@@ -412,6 +438,7 @@ try
 	cout<<endl;
 	return;
 	}else {errcount++; throw makemonex_i;}
+	}
     } else {errcount++; throw rulesymsemicolonex_i;} // didn't get a '.' or ';'
   }
  catch (exception& e) // Only catches an error in monrule syntax. Does not
@@ -432,15 +459,34 @@ class makeconex : public exception
 	public:
   virtual const char* what () const throw ()
   {
-    return "Exception: Error setting connection";
+    return "Exception: Connection failed - input pin/device mismatch";
   }
 } makeconex_i;
 
 /***************************************************************************************/
+class badoutpex : public exception
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: Output pin name not valid for given device";
+  }
+} badoutpex_i;
+/***************************************************************************************/
+class idevalreadyusedex : public exception
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: Input pin already connected";
+  }
+} idevalreadyusedex_i;
+/***************************************************************************************/
+
 void parser::connrule (void) // throws connruleex if finds invalid connrule
 {
 try
-  {;
+  {
     name odev, idev, inp;
     name outp=blankname;
 	bool ok;
@@ -449,17 +495,30 @@ try
     if (cursym.get_syntaxvalue() == dot) { // cursym is '.'
     smz->getsymbol (cursym);
     outname(outp);
-    } else if (cursym.get_syntaxvalue() == rarrow) { // cursym is '>'
+	if (outp != blankname && dtype != netz->finddevice(odev)->kind) {errcount++; throw badoutpex_i;}
+	// (above) we got an output of Q or QBAR with a non-DTYPE device
+	smz->getsymbol(cursym);
+    }
+	if (cursym.get_syntaxvalue() == rarrow) { // cursym is '>'
     smz->getsymbol (cursym);
     uname(idev);
     smz->getsymbol (cursym);
     if (cursym.get_syntaxvalue() == dot) { // cursym is '.'
       smz->getsymbol (cursym);
       inname(inp);
-      smz->getsymbol (cursym);
+	  smz->getsymbol (cursym);
       if (cursym.get_syntaxvalue() == semicolon) { // cursym is ';'
+	for (int i = 0; i < idev_conn_list.size(); i++) {
+		if (idev == idev_conn_list[i] && inp == inp_conn_list[i]) {errcount++; throw idevalreadyusedex_i;}
+	}
+
+	if (0 == errcount) {
 	netz->makeconnection (idev, inp, odev, outp, ok);
 	if (ok){
+	idev_conn_list.push_back(idev); // append uname id of input device once successfully connected
+	inp_conn_list.push_back(inp); // append uname id of input pin once successfully connected
+	                           // we can now check that future connections do not connect
+							   // input pins that have already been used
 	cout<<"Connection made between ";
 	nmz->writename(odev);
 	if (outp !=blankname) {cout<<"."; nmz->writename(outp);}
@@ -468,8 +527,12 @@ try
 	cout<<endl;
 	return;
 	
-	}else {errcount++; throw makeconex_i;}; //connection error
-      } else {errcount++; throw rulesymsemicolonex_i;} // we expected a ';'
+	}else { //connection error
+		errcount++;
+		throw makeconex_i;
+	}
+	}
+    } else {errcount++; throw rulesymsemicolonex_i;} // we expected a ';'
     } else {errcount++; throw rulesymdotex_i;} // we expected a '.'
     } else {errcount++; throw rulesymrarrowex_i;} // we expected a '>'
   }
@@ -494,6 +557,15 @@ class makedevex : public exception
   }
 } makedevex_i;
 /***************************************************************************************/
+class dupunameex : public exception
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: Duplicate device name. Subsequent devices will not be created";
+  }
+} dupunameex_i;
+/***************************************************************************************/
 void parser::devrule (void) // throws devruleex if finds invalid devrule
 {
 try
@@ -507,9 +579,16 @@ try
     if (cursym.get_syntaxvalue() == equals) { // we have an '='
 	smz->getsymbol (cursym);     
 	uname(did_var);
+	for(int i = 0; i < uname_list.size(); i++) {
+	if (did_var == uname_list[i]) {errcount++; throw dupunameex_i;}	// we found a duplicate uname
+	}
+
 	smz->getsymbol (cursym);
       if (cursym.get_syntaxvalue() == semicolon) { // we have a ';'
+	if (0 == errcount) {
 	dmz->makedevice(devkind_var, did_var, variant_var, ok); 
+	uname_list.push_back(did_var); // adds uname id to uname_list vector so we can check elsewhere
+	                               // for duplicate/undefined unames
 	if (ok){
 	dmz->writedevice(devkind_var);
 	cout<<": ";	
@@ -518,6 +597,7 @@ try
 	return;
 	}	
 	else {errcount++; throw makedevex_i;}	//could not construct device
+	}
 	} else {errcount++; throw rulesymsemicolonex_i;} // we expected a ';'
     } else {errcount++; throw rulesymequalsex_i;} // we expected an '='
   }
@@ -550,6 +630,15 @@ class lbrakex : public sectionex
   }
 } lbrakex_i;
 /***************************************************************************************/
+class sectionorderex : public sectionex
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: Sections in wrong order";
+  }
+} sectionorderex_i;
+/***************************************************************************************/
 class rbrakex : public sectionex
 {
 	public:
@@ -565,7 +654,8 @@ try
   {
     smz->getsymbol (cursym);
      if (cursym.get_syntaxvalue() == endfile) return;
-     if (cursym.get_syntaxvalue() == DEVICES) { // cursym is 'DEVICES'     	
+     if (cursym.get_syntaxvalue() == DEVICES) { // cursym is 'DEVICES'
+		 if (DEVICES != section_var.get_syntaxvalue()) {errcount++; throw sectionorderex_i;} // check DEVICES comes first
 	smz->getsymbol (cursym);
       if (cursym.get_syntaxvalue() == lbrak) { // cursym is '{'	
 	smz->getsymbol (cursym);
@@ -574,8 +664,10 @@ try
 	  smz->getsymbol (cursym);
 	}
       } else {errcount++; throw lbrakex_i;} // we expected an '{'
+		section_var.set_parameters(Section, CONNECTIONS, -1, -1); // increment section_var ready for next section
 
     } else if (cursym.get_syntaxvalue() == CONNECTIONS) { // cursym is 'CONNECTIONS'
+		 if (CONNECTIONS != section_var.get_syntaxvalue()) {errcount++; throw sectionorderex_i;} // check CONNECTIONS comes second
       smz->getsymbol (cursym);
       if (cursym.get_syntaxvalue() == lbrak) { // cursym is '{'
 	smz->getsymbol (cursym);
@@ -584,8 +676,10 @@ try
 	  smz->getsymbol (cursym);
 	}
       } else {errcount++; throw lbrakex_i;} // we expected an '{'
+		section_var.set_parameters(Section, MONITOR, -1, -1); // increment section_var ready for next section
 
     } else if (cursym.get_syntaxvalue() == MONITOR) { // cursym is 'MONITOR'
+		 if (MONITOR != section_var.get_syntaxvalue()) {errcount++; throw sectionorderex_i;} // check MONITOR comes last 
       smz->getsymbol (cursym);
       if (cursym.get_syntaxvalue() == lbrak) { // cursym is '{'
 	smz->getsymbol (cursym);
@@ -595,6 +689,7 @@ try
 	  smz->getsymbol (cursym);
 	}
       } else {errcount++; throw lbrakex_i;} // we expected an '{'
+		section_var.set_parameters(Section, novalue, -1, -1); // set section_var to null now we've done all sections
     } else {errcount++; throw sectionex_i;} // didn't get a valid section keyword
   }
 catch (sectionex& e)
@@ -626,11 +721,11 @@ void parser::parsedeffile (void)
   } while (!(cursym.get_syntaxvalue() == endfile)); // i.e. while not eof
   bool ok;
   netz->checknetwork(ok);
-  if (!ok){errcount++; throw checknetworkex_i;}
+  if (!ok){throw checknetworkex_i;}
 
 }
 catch (exception& e) {
-	cout << "parsedeffileexception: " << e.what() << endl;
+	cout << "Parse error: " << e.what() << endl;
 	//throw;
 }
 }
