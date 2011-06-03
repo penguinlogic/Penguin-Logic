@@ -1,13 +1,13 @@
 #include "logsim.h"
 #include "userint.h"
-#include "gui.h"
-#include <GL/glut.h>
+//#include "gui.h"
+//#include <GL/glut.h>
 
 #if defined(_WINDOWS) && defined(_DEBUG)
 	#include "guicon.h"  
 #endif
 
-#define USE_GUI
+//#define USE_GUI
 
 IMPLEMENT_APP(MyApp)
   
