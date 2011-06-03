@@ -381,4 +381,5 @@ static char * wx_icon_xpm[] = {
 "                      G@H@                                      ",
 "                                                                ",
 "                                                                ",
-"                                                                "};
+"                                                                "
+};
