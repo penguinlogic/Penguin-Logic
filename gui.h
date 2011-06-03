@@ -70,7 +70,7 @@ class MyFrame: public wxFrame
 public:
 	MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, 
 		names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, 
-		network *network_mod = NULL, long style = wxDEFAULT_FRAME_STYLE); // constructor
+		network *network_mod = NULL, wxString deffilename = wxEmptyString, long style = wxDEFAULT_FRAME_STYLE); // constructor
 private:
 		// PRIVATE VARIABLES
 	MyGLCanvas *canvas;								// GL drawing area widget to draw traces
@@ -81,6 +81,7 @@ private:
 	network *netz;									// pointer to network class
 	wxHtmlHelpController help;						// Create help controller
 	int cyclescompleted;							// how many simulation cycles have been completed
+	wxString defname;								// name of definition files
 		// EVENT HANDLERS
 	void runnetwork(int ncycles);					// function to run the logic network
 	void OnDevelopment(wxCommandEvent& event);		// callback for functions under development

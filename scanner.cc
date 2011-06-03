@@ -1,13 +1,11 @@
 #include "scanner.h"
 
 /***************************************************************************************/
-scanner::scanner (names* names_mod, const char*defname)
+scanner::scanner (names* names_mod, const char*defname, bool &ok)
 {
 inf.open(defname);
-if(!inf) cout<<"unable to open file"<<endl;
-
-
-else cout<<defname<<" was opened successfully"<<endl;
+if(!inf){ ok= false; cout<<"Error: Unable to open file '"<<defname<<"'"<<endl;}
+else {ok=true; cout<<defname<<" was opened successfully"<<endl;}
 nmz=names_mod;
 current.linenum=1;
 current.pos=0;
@@ -87,6 +85,8 @@ void scanner::getname (namestring &str)
 /***************************************************************************************/
 void scanner::getsymbol (symbol& s)
 {
+s.set_parameters(notype, novalue, -1,-1);
+
 skipspaces();
 skipcomments();
 
