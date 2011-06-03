@@ -33,16 +33,15 @@ character last;
 bool eofile;
 namestring idstr;
 int num;
-
-public:	
-scanner(names* names_mod, const char* defname); // Constructor
-
-void getsymbol (symbol &s); //gets next symbol object
 void skipspaces ();
 void skipcomments();
 void getch();
 void getnumber (int &number);
 void getname (namestring &str);
+
+public:	
+scanner(names* names_mod, const char* defname); // Constructor
+void getsymbol (symbol &s); //gets next symbol object
 void print_err(const char* error);
 
 };
