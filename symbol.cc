@@ -12,9 +12,9 @@ class symbolconstructorexception : public exception {
 
 symbol::symbol () {
   type_var = notype;
-  value_var = novalue;
+  syntaxvalue_var = novalue;
   uint_var = -1;
-  uname_id_var = 0;
+  name_id_var = 0;
 }
 
 
@@ -22,15 +22,15 @@ symbol::symbol () {
 class get_symboldataexception : public exception {
   virtual const char* what () const throw ()
   {
-    return "Exception: Type or Value requested from Symbol object has not been initialised";
+    return "Exception: Type or syntaxvalue requested from Symbol object has not been initialised";
   }
 } get_symboldataexception_i;
 
-void symbol::set_parameters (type in_type, value in_value, int in_uint, name in_uname_id){
+void symbol::set_parameters (type in_type, syntaxvalue in_syntaxvalue, int in_uint, name in_name_id){
 type_var=in_type;
-value_var=in_value;
+syntaxvalue_var=in_syntaxvalue;
 uint_var=in_uint;
-uname_id_var=in_uname_id;
+name_id_var=in_name_id;
 }
 /* Returns the type of symbol held in the object*/
 type symbol::get_type () {
@@ -45,11 +45,11 @@ type symbol::get_type () {
   }
 }
 
-/* Returns the value of symbol held in the object (for
+/* Returns the syntaxvalue of symbol held in the object (for
 all except unames
 */
-value symbol::get_value () {
-      return value_var;
+syntaxvalue symbol::get_syntaxvalue () {
+      return syntaxvalue_var;
 }
 
 /* returns uint if there is one */
@@ -57,18 +57,18 @@ int symbol::get_uint () {
       return uint_var;
 }
 
-/* returns uname if there is one */
-name symbol::get_uname_id () 
+/* returns name id if there is one */
+name symbol::get_name_id () 
 {
-      return uname_id_var;
+      return name_id_var;
 }
 
 /* performs equality operation */
 bool symbol::operator== (symbol rhs) {
   if (type_var == rhs.get_type() &&
-      value_var == rhs.get_value() &&
+      syntaxvalue_var == rhs.get_syntaxvalue() &&
       uint_var == rhs.get_uint() &&
-      uname_id_var == rhs.get_uname_id() )
+      name_id_var == rhs.get_name_id() )
     return true;
 
   return false;
@@ -77,9 +77,9 @@ bool symbol::operator== (symbol rhs) {
 /* performs inequality operation */
 bool symbol::operator!= (symbol rhs) {
   if (type_var == rhs.get_type() &&
-      value_var == rhs.get_value() &&
+      syntaxvalue_var == rhs.get_syntaxvalue() &&
       uint_var == rhs.get_uint() &&
-      uname_id_var == rhs.get_uname_id() )
+      name_id_var == rhs.get_name_id() )
     return false;
 
   return true;
@@ -88,8 +88,8 @@ bool symbol::operator!= (symbol rhs) {
 /* performs assignment operation */
 symbol symbol::operator= (symbol rhs) {
   type_var = rhs.get_type();
-  value_var = rhs.get_value();
+  syntaxvalue_var = rhs.get_syntaxvalue();
   uint_var = rhs.get_uint();
-  uname_id_var = rhs.get_uname_id();
+  name_id_var = rhs.get_name_id();
   return *this;
 }

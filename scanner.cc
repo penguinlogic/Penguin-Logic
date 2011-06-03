@@ -1,6 +1,6 @@
 #include "scanner.h"
 
-
+/***************************************************************************************/
 scanner::scanner (names* names_mod, const char*defname)
 {
 inf.open(defname);
@@ -35,7 +35,7 @@ if (!inf.eof())
 	}
 }
 }
-
+/***************************************************************************************/
 
 void scanner::getnumber (int &number)
 {
@@ -49,7 +49,7 @@ void scanner::getnumber (int &number)
 	getch();
     }
 }
-
+/***************************************************************************************/
 void scanner::skipspaces ()
 {
 
@@ -63,7 +63,7 @@ while (current.line.size()==0 && !inf.eof())
 
 while (!inf.eof() && isspace(current.ch)) getch();
 }
-
+/***************************************************************************************/
 void scanner::skipcomments()
 {
 if (current.ch=='/')
@@ -73,7 +73,7 @@ if (current.ch=='/')
 	skipspaces();
 }
 }
-
+/***************************************************************************************/
 void scanner::getname (namestring &str)
 {
 	str.clear();
@@ -84,70 +84,46 @@ void scanner::getname (namestring &str)
 
 }
 
-
+/***************************************************************************************/
 void scanner::getsymbol (symbol& s)
 {
 skipspaces();
 skipcomments();
 
 if (inf.eof()) {
-  s.set_parameters (Charsym, endfile, -1, 0);
+  s.set_parameters (Charsym, endfile, -1, -1);
  //cout<<"THE END"<<endl;
 }
 
 else if (isdigit(current.ch))
 {	
 	getnumber (num);
-	s.set_parameters (Uint, novalue, num, 0);
+	s.set_parameters (Uint, novalue, num, -1);
 }
 
 else if (isalpha(current.ch))
 {
-	getname ( idstr);
-	//cout << "idstr: " << idstr << endl;
-	if (idstr=="DEVICES") s.set_parameters (Section, DEVICES, -1, nmz->lookup(idstr)); //cout << "sgettype" << s.get_type() << endl;}
-	else if (idstr=="CONNECTIONS")s.set_parameters (Section, CONNECTIONS, -1, nmz->lookup(idstr));
-	else if (idstr=="MONITOR") s.set_parameters (Section, MONITOR, -1, nmz->lookup(idstr));
-	
-	else if (idstr=="CLOCK")s.set_parameters (Devname, CLOCK, -1, nmz->lookup(idstr));
-	else if (idstr=="SWITCH")s.set_parameters(Devname, SWITCH, -1, nmz->lookup(idstr));
-	else if (idstr=="AND")s.set_parameters (Devname, AND, -1, nmz->lookup(idstr));
-	else if (idstr=="NAND")s.set_parameters (Devname, NAND, -1, nmz->lookup(idstr));
-	else if (idstr=="OR")s.set_parameters(Devname, OR, -1, nmz->lookup(idstr));
-	else if (idstr=="NOR")s.set_parameters (Devname, NOR, -1, nmz->lookup(idstr));
-	else if (idstr=="DTYPE")s.set_parameters (Devname, DTYPE, -1, nmz->lookup(idstr));
-	else if (idstr=="XOR")s.set_parameters (Devname, XOR, -1, nmz->lookup(idstr));
+getname (idstr);
 
-	else if (idstr=="DATA")s.set_parameters (Inname, DATA, -1, nmz->lookup(idstr));
-	else if (idstr=="SET")s.set_parameters (Inname, SET, -1, nmz->lookup(idstr));
-	else if (idstr=="CLEAR")s.set_parameters(Inname, CLEAR, -1, nmz->lookup(idstr));
-	else if (idstr=="CLK")s.set_parameters (Inname, CLK, -1, nmz->lookup(idstr));
-	else if (idstr=="I1")s.set_parameters (Inname, I1, -1, nmz->lookup(idstr));
-	else if (idstr=="I2")s.set_parameters (Inname, I2, -1, nmz->lookup(idstr));
-	else if (idstr=="I3")s.set_parameters (Inname, I3, -1, nmz->lookup(idstr));
-	else if (idstr=="I4")s.set_parameters (Inname, I4, -1, nmz->lookup(idstr));
-	else if (idstr=="I5")s.set_parameters(Inname, I5, -1, nmz->lookup(idstr));
-	else if (idstr=="I6")s.set_parameters(Inname, I6, -1, nmz->lookup(idstr));
-	else if (idstr=="I7")s.set_parameters(Inname, I7, -1, nmz->lookup(idstr));
-	else if (idstr=="I8")s.set_parameters(Inname, I8, -1, nmz->lookup(idstr));
-	else if (idstr=="I9")s.set_parameters(Inname, I9, -1, nmz->lookup(idstr));
-	else if (idstr=="I10")s.set_parameters(Inname, I10, -1, nmz->lookup(idstr));
-	else if (idstr=="I11")s.set_parameters(Inname, I11, -1, nmz->lookup(idstr));
-	else if (idstr=="I12")s.set_parameters(Inname, I12, -1, nmz->lookup(idstr));
-	else if (idstr=="I13")s.set_parameters(Inname, I13, -1, nmz->lookup(idstr));
-	else if (idstr=="I14")s.set_parameters(Inname, I14, -1, nmz->lookup(idstr));
-	else if (idstr=="I15")s.set_parameters(Inname, I15, -1, nmz->lookup(idstr));
-	else if (idstr=="I16")s.set_parameters(Inname, I16, -1, nmz->lookup(idstr));
+//cout << "idstr: " << idstr << endl;
 
-	else if (idstr=="period")s.set_parameters(Devswitch, period, -1, nmz->lookup(idstr));
-	else if (idstr=="initialvalue")s.set_parameters(Devswitch, initialvalue, -1, nmz->lookup(idstr));
-	else if (idstr=="numinputs") s.set_parameters(Devswitch, numinputs, -1, nmz->lookup(idstr));
+if (idstr=="DEVICES") s.set_parameters (Section, DEVICES, -1, -1);
+else if (idstr=="CONNECTIONS") s.set_parameters (Section, CONNECTIONS, -1, -1);
+else if (idstr=="MONITOR") s.set_parameters (Section, MONITOR, -1, -1);
 
-	else if (idstr=="Q")s.set_parameters (Outname, Q, -1, nmz->lookup(idstr));
-	else if (idstr=="QBAR") s.set_parameters(Outname, QBAR, -1, nmz->lookup(idstr));
+else if (idstr=="period") s.set_parameters(Devswitch, period, -1, -1);
+else if (idstr=="initialvalue")s.set_parameters(Devswitch, initialvalue, -1, -1);
+else if (idstr=="numinputs") s.set_parameters(Devswitch, numinputs, -1, -1);
 
-	else s.set_parameters (Uname, novalue, -1, nmz->lookup(idstr));		
+else if (idstr=="CLOCK"||idstr=="SWITCH"||idstr=="AND"||idstr=="NAND"||idstr=="OR"||idstr=="NOR"||idstr=="DTYPE"||idstr=="XOR") s.set_parameters (Devname, novalue, -1, nmz->lookup(idstr));
+
+else if (idstr=="DATA"||idstr=="SET"||idstr=="CLEAR"||idstr=="CLK"||idstr=="I1"||idstr=="I2"||idstr=="I3"||idstr=="I4"||idstr=="I5"||idstr=="I6"||idstr=="I7"||idstr=="I8"||idstr=="I9"||idstr=="I10"||idstr=="I11"||idstr=="I12"||idstr=="I13"||idstr=="I14"||idstr=="I15"||idstr=="I16") s.set_parameters (Inname, novalue, -1, nmz->lookup(idstr));
+
+else if (idstr=="Q"||idstr=="QBAR") s.set_parameters (Outname, novalue, -1, nmz->lookup(idstr));
+
+else s.set_parameters (Uname, novalue, -1, nmz->lookup(idstr));	
 }
+
 
 else
 {
@@ -166,7 +142,7 @@ getch();
 //cout<<"type: "<<s.get_type()<<" value:"<<s.get_value()<<" uint:"<<s.get_uint()<<" uname:"<<s.get_uname_id()<<endl;
 }
 
-
+/***************************************************************************************/
 void scanner::print_err(const char* error)
 {
 cout<<"Error in line "<<last.linenum<<", at character "<<last.pos<<":"<<endl;
