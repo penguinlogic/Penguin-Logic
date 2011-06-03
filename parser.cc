@@ -27,15 +27,15 @@ bool parser::readin (void)
 }
 
 parser::parser (network* network_mod, devices* devices_mod,
-		monitor* monitor_mod, scanner* scanner_mod)
+		monitor* monitor_mod, scanner* scanner_mod, names* names_mod)
 {
 //cout << "parser constructor" << endl;
   netz = network_mod;  /* make internal copies of these class pointers */
   dmz = devices_mod;   /* so we can call functions from these classes  */
   mmz = monitor_mod;   /* eg. to call makeconnection from the network  */
   smz = scanner_mod;   /* class you say:                               */
-                       /* netz->makeconnection (i1, i2, o1, o2, ok);   */
-
+                      /* netz->makeconnection (i1, i2, o1, o2, ok);   */
+ nmz = names_mod;
  // cursym = *new symbol();
 	symbol cursym;
 	errcount = 0;
@@ -204,8 +204,7 @@ try
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 			  devkind_var = aclock;
 			  variant_var = cursym.get_uint();
-			
-	  		  return; // we have a valid CLOCK
+				  return; // we have a valid CLOCK
 	      } else {errcount++; throw uintex_i;} // expected a uint
 	    } else {errcount++; throw swperiodex_i;} // expected 'period'
 	  } else {errcount++; throw devdashex_i;} // expected '-'
@@ -395,9 +394,8 @@ void parser::monrule (void) // throws monruleex if finds invalid monrule
 try
   {
 	name dev;
-	name outp;
+	name outp=blankname;
 	bool ok;
-    //cout<<"testing monrule"<<endl;
     uname(dev);
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
@@ -407,8 +405,13 @@ try
     } 
 	if (cursym.get_value() == semicolon) { // cursym is ';'
 	mmz->makemonitor(dev, outp, ok);      
-	if (ok) return;
-	else {errcount++; throw makemonex_i;}
+	if (ok){
+	cout<<"Monitor set at ";
+	nmz->writename(dev);
+	if (outp !=blankname) {cout<<"."; nmz->writename(outp);}
+	cout<<endl;
+	return;
+	}else {errcount++; throw makemonex_i;}
     } else {errcount++; throw rulesymsemicolonex_i;} // didn't get a '.' or ';'
   }
  catch (exception& e) // Only catches an error in monrule syntax. Does not
@@ -437,9 +440,9 @@ class makeconex : public exception
 void parser::connrule (void) // throws connruleex if finds invalid connrule
 {
 try
-  {
-//    cout<<"testing conrule 1"<<endl;
-    name odev, idev, outp, inp;
+  {;
+    name odev, idev, inp;
+    name outp=blankname;
 	bool ok;
     uname(odev);
     smz->getsymbol (cursym);
@@ -448,7 +451,6 @@ try
     outname(outp);
     } else if (cursym.get_value() == rarrow) { // cursym is '>'
     smz->getsymbol (cursym);
-//    cout<<"testing conrule 2"<<endl;
     uname(idev);
     smz->getsymbol (cursym);
     if (cursym.get_value() == dot) { // cursym is '.'
@@ -457,8 +459,16 @@ try
       smz->getsymbol (cursym);
       if (cursym.get_value() == semicolon) { // cursym is ';'
 	netz->makeconnection (idev, inp, odev, outp, ok);
-	if (ok) return;
-	else {errcount++; throw makeconex_i;}; //connection error
+	if (ok){
+	cout<<"Connection made between ";
+	nmz->writename(odev);
+	if (outp !=blankname) {cout<<"."; nmz->writename(outp);}
+	cout<<" and ";
+	nmz->writename(idev); cout<<"."; nmz->writename(inp);
+	cout<<endl;
+	return;
+	
+	}else {errcount++; throw makeconex_i;}; //connection error
       } else {errcount++; throw rulesymsemicolonex_i;} // we expected a ';'
     } else {errcount++; throw rulesymdotex_i;} // we expected a '.'
     } else {errcount++; throw rulesymrarrowex_i;} // we expected a '>'
@@ -488,7 +498,6 @@ void parser::devrule (void) // throws devruleex if finds invalid devrule
 {
 try
   {
-//    cout<<"starting devrule"<<endl;
     devicekind devkind_var;
     int variant_var;	
     name did_var;
@@ -496,13 +505,18 @@ try
     device(devkind_var, variant_var);
     smz->getsymbol (cursym);
     if (cursym.get_value() == equals) { // we have an '='
-//	cout<<"= found, starting uname"<<endl; 
 	smz->getsymbol (cursym);     
 	uname(did_var);
 	smz->getsymbol (cursym);
       if (cursym.get_value() == semicolon) { // we have a ';'
 	dmz->makedevice(devkind_var, did_var, variant_var, ok); 
-	if (ok) return;
+	if (ok){
+	dmz->writedevice(devkind_var);
+	cout<<": ";	
+	nmz->writename(did_var);
+	cout<<" made"<<endl;	
+	return;
+	}	
 	else {errcount++; throw makedevex_i;}	//could not construct device
 	} else {errcount++; throw rulesymsemicolonex_i;} // we expected a ';'
     } else {errcount++; throw rulesymequalsex_i;} // we expected an '='
@@ -594,17 +608,26 @@ catch (sectionex& e)
    }
 }
 /***************************************************************************************/
+class checknetworkex : public exception
+{
+	public:
+  virtual const char* what () const throw ()
+  {
+    return "Exception: Some inputs not connected to outputs";
+  }
+} checknetworkex_i;
+
+/***************************************************************************************/
 void parser::parsedeffile (void)
 {
 	try {
   do {
-//cout << "start parsedeffile" << endl;
-    /*   cout << "type_var: " << cursym.get_type() << endl;
-    cout << "value_var: " << cursym.get_value() << endl;
-    cout << "uint_var: " << cursym.get_uint() << endl;
-    cout << "uname_var: " << cursym.get_uname() << endl; */
-    section();
+   section();
   } while (!(cursym.get_value() == endfile)); // i.e. while not eof
+  bool ok;
+  netz->checknetwork(ok);
+  if (!ok){errcount++; throw checknetworkex_i;}
+
 }
 catch (exception& e) {
 	cout << "parsedeffileexception: " << e.what() << endl;

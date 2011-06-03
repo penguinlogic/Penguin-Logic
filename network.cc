@@ -10,7 +10,7 @@ using namespace std;
  */
 devlink network::devicelist (void)
 {
-  return devs;
+	return devs;
 }
 
 
@@ -22,16 +22,17 @@ devlink network::devicelist (void)
  */
 devlink network::finddevice (name id)
 {
-  devlink d;
-  bool found;
-  found = false;
-  d = devs;
-  while ((d != NULL) && (! found)) {
-    found = (d->id == id);
-    if (! found)
-      d = d->next;
-  }
-  return d;
+	devlink d;
+	bool found;
+	found = false;
+	d = devs;
+	while ((d != NULL) && (! found))
+	{
+		found = (d->id == id);
+		if (! found)
+			d = d->next;
+	}
+	return d;
 }
 
 
@@ -153,11 +154,15 @@ void network::makeconnection (name idev, name inp, name odev, name outp, bool& o
   outplink o;
   inplink i;
   din = finddevice (idev);
+  if(din == NULL) cout<<"idev error"<<endl;
   dout = finddevice (odev);
+  if(dout == NULL) cout<<"odev error"<<endl;
   ok = ((din != NULL) && (dout != NULL));
   if (ok) {
     o = findoutput (dout, outp);
+    if(o == NULL) cout<<"outp error"<<endl;
     i = findinput (din, inp);
+    if(i == NULL) cout<<"inp error"<<endl;
     ok = ((o != NULL) && (i != NULL));
     if (ok)
       i->connect = o;

@@ -13,8 +13,8 @@ BEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
 	EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
 END_EVENT_TABLE()
   
-MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod,
-						const wxPoint& pos, const wxSize& size, long style, const wxString& name):
+MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod, 
+const wxPoint& pos, const wxSize& size, long style, const wxString& name):
 wxGLCanvas(parent, id, pos, size, style, name)
   // Constructor - initialises private variables
 {
@@ -30,8 +30,8 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   // When the simulator is run, the number of cycles is passed as a parameter and the first monitor
   // trace is displayed.
 {
-	float y;
-	int i;
+	float y=0;
+	//int i;
 	asignal s;
 
 	if (cycles >= 0)
@@ -45,30 +45,63 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	const int CANVAS_HEIGHT=1000;
+	const int CANVAS_WIDTH =1400;
+	const int SIG_LOW = 10;
+	const int SIG_HIGH = 30;
+	const int SEPARATION = 50;
+	const int INDENT = 100;
+	const int LENGTH = 20;
+
+
 	if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0))	// draw the first monitor signal, get trace from monitor class
 	{
-		glColor3f(1.0, 0.0, 0.0);
-		glBegin(GL_LINE_STRIP);
-		for (i=0; i<cyclesdisplayed; i++)
+		for(int m=mmz->moncount()-1; m>=0; m--)
 		{
-			if (mmz->getsignaltrace(0, i, s))
+			// Get name of monitor
+			name n1, n2;
+			mmz->getmonname(m,n1, n2);
+			wxString mon_name = wxString(nmz->getname(n1));
+			if(n2 != -1)	// If device has more than 1 output, append output name
 			{
-				if (s==low)
-					y = 10.0;
-				if (s==high)
-					y = 30.0;
-				glVertex2f(20*i+10.0, y); 
-				glVertex2f(20*i+30.0, y);
+				mon_name.Append(".");
+				mon_name.Append(nmz->getname(n2));
 			}
+
+			// Display name of monitor
+			glColor3f(0.0, 0.0, 1.0);
+			glRasterPos2f(5, CANVAS_HEIGHT-(m+1)*SEPARATION + SEPARATION/2);
+			for (unsigned int i = 0; i < mon_name.Len(); i++) // Display each character in turn
+				glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mon_name[i]);
+			
+			// Plot waveform for monitor
+			glColor3f(1.0, 0.0, 0.0);
+			glBegin(GL_LINE_STRIP);
+			for (int i=0; i<cyclesdisplayed; i++)
+			{
+				if (mmz->getsignaltrace(m, i, s))
+				{
+					if (s==low)
+						y = CANVAS_HEIGHT-(m+1)*SEPARATION + SIG_LOW;
+					else if (s==high)
+						y = CANVAS_HEIGHT-(m+1)*SEPARATION + SIG_HIGH;
+					else
+						cout << "signal neither high nor low" << endl;
+					glVertex2f(LENGTH*i+INDENT, y); 
+					glVertex2f(LENGTH*i+LENGTH+INDENT, y);
+				}
+				else
+					cout << "Couldn't get signal trace" << endl;
+			}
+			glEnd();
 		}
-		glEnd();
 	}
 
 	else	// draw an artificial trace
 	{
 		glColor3f(0.0, 1.0, 0.0);
 		glBegin(GL_LINE_STRIP);
-		for (i=0; i<5; i++)
+		for (int i=0; i<5; i++)
 		{
 			if (i%2)
 				y = 10.0;
@@ -163,7 +196,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 END_EVENT_TABLE()
 
 MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
-		 names *names_mod, devices *devices_mod, monitor *monitor_mod, long style):
+		 names *names_mod, devices *devices_mod, monitor *monitor_mod, network *network_mod, long style):
   wxFrame(parent, wxID_ANY, title, pos, size, style)
   // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
   // using sizers
@@ -172,6 +205,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	nmz = names_mod;
 	dmz = devices_mod;
 	mmz = monitor_mod;
+	netz = network_mod;
 	if (nmz == NULL || dmz == NULL || mmz == NULL)
 	{
 		cout << "Cannot operate GUI without names, devices and monitor classes" << endl;
@@ -267,9 +301,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 					// Insert tree structure here
 				panel->SetSizer(info_sizer);
 					info_sizer->Fit(panel);
-		right_sizer->Add(sp, 1, wxEXPAND | wxALL, 10);
-	topsizer->Add(right_sizer, 1, wxEXPAND | wxALL, 10);
-
+		right_sizer->Add(sp, 1, wxALL, 10);
+	topsizer->Add(right_sizer, 0, wxEXPAND|wxALL, 10);
+	
 	SetSizeHints(700, 400);
 	SetSizer(topsizer);
 }
@@ -338,61 +372,197 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
 {
     int n, ncycles;
     cyclescompleted = 0;
-    mmz->resetmonitor ();
+    mmz->resetmonitor();
     runnetwork(spin->GetValue());
 	canvas->Render(wxT("Run button pressed"), cyclescompleted);
 	SetStatusText(wxT("Run button pressed"), 1);
-	/*
-	rdnumber (ncycles, 1, maxcycles);
-    if (cmdok)
-	{
-      mmz->resetmonitor ();
-      cout << "Running for " << ncycles << " cycles" << endl;
-      runnetwork(ncycles);
-	}*/
 }
 
 void MyFrame::OnContButton(wxCommandEvent &event)
   // Callback for the push button
 {
-    int ncycles;
-    mmz->resetmonitor ();
-    runnetwork(spin->GetValue());
-	canvas->Render(wxT("Continue button pressed"), cyclescompleted);
+   int ncycles = spin->GetValue();
 	SetStatusText(wxT("Continue button pressed"), 1);
-	/*
-	if (cmdok)
+	if (cyclescompleted > 0)
 	{
-      if (cyclescompleted > 0)
-	  {
-        if ((ncycles + cyclescompleted) > maxcycles)
-	      ncycles = maxcycles - cyclescompleted;
-        cout << "Continuing for " << ncycles << " cycles" << endl;
-        runnetwork (ncycles);
-      }
-	  else
-        cout << "Error: nothing to continue!" << endl;
-	}*/
+		if ((ncycles + cyclescompleted) > maxcycles)
+			ncycles = maxcycles - cyclescompleted;
+		runnetwork (spin->GetValue());
+    }
+	else
+		SetStatusText(wxT("Error: nothing to continue!"), 1);
+	canvas->Render(wxT("Continue button pressed"), cyclescompleted);
 }
 
 void MyFrame::OnDeviceButton(wxCommandEvent &event)
   // Callback for the SWITCH button
 {
-	DeviceConfigDialog dialog(this);
-    dialog.ShowModal();
+	// Get list of devices
+	devlink d;
+	
+	//-----SWITCHES----//
+	// Define options for values of switches
+	wxArrayString switchValue;
+		switchValue.Add(wxT("Off"));
+		switchValue.Add(wxT("On"));
+	
+	wxString postSwitch = ":";
+	vector<switchProp> switchTable;
+	switchTable.empty();
+	// Create switchTable
+	switchProp switchtemp;
+	for (d = netz->devicelist(); d != NULL; d = d->next)
+	{
+		if (d->kind == aswitch)
+		{
+			switchtemp.Name = wxString(nmz->getname(d->id));
+			switchtemp.Name.Append(postSwitch);
+			if(d->swstate==low)
+				switchtemp.Value = switchValue.Item(0);
+			else if(d->swstate==high)
+				switchtemp.Value = switchValue.Item(1);
+			switchtemp.ID = d->id;
+			switchTable.push_back(switchtemp);
+		}
+	}
+	
+
+	//-----CLOCKS----//
+	wxString postClock = ":";
+	vector<clockProp> clockTable;
+
+	// Create clockTable
+	clockProp clocktemp;
+	for (d = netz->devicelist(); d != NULL; d = d->next)
+	{
+		if (d->kind == aclock)
+		{
+			clocktemp.Name = wxString(nmz->getname(d->id));
+			clocktemp.Name.Append(postClock);
+			clocktemp.Value = wxString::Format(wxT("%i"),d->frequency);
+			clocktemp.ID = d->id;
+			clockTable.push_back(clocktemp);
+		}
+	}
+
+
+	//----CREATE DIALOG-----//
+	MyDeviceConfigDialog dialog(this, wxID_ANY, _("Device Configuration"), wxDefaultPosition,
+					wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER,
+					_("Device Configuration"), nmz, dmz, mmz, netz, switchTable, clockTable);
+    
+	
+	// Get return values
+	if(dialog.ShowModal()==wxID_OK)
+	{
+		SetStatusText(wxT("Device config settings applied"), 1);
+		
+		// Set new switch values
+		bool ok=false;
+		for(unsigned int i=0; i<switchTable.size(); i++)
+		{
+			if(switchTable[i].value_box->GetValue()==switchValue.Item(0))
+			{
+				dmz->setswitch(switchTable[i].ID, low, ok);
+				if(!ok)
+					cout << "Error setting switch value" << endl;
+			}
+			else if (switchTable[i].value_box->GetValue()==switchValue.Item(1))
+			{
+				dmz->setswitch(switchTable[i].ID, high, ok);
+				if(!ok)
+					cout << "Error setting switch value" << endl;
+			}
+			else
+				cout << "Error setting switch value" << endl;
+		}
+
+		ok=false;
+		// Set new clock values
+		for(unsigned int i=0; i<clockTable.size(); i++)
+		{
+			dmz->setclock(clockTable[i].ID, clockTable[i].value_box->GetValue(), ok);
+			if(!ok)
+				cout << "Error setting clock value" << endl;
+		}
+	}
 }
 
 void MyFrame::OnMonitorButton(wxCommandEvent &event)
   // Callback for the MONITOR BUTTON
 {
-	//  Add all potential monitor points (i.e. all outputs)
-	wxArrayString choices;
-	choices.Add(wxT("monitor1"));
-	choices.Add(wxT("monitor2"));
+	// Define structure for table of outputs
+	struct monProp
+	{
+		int DevID;
+		int OutID;
+		wxString DevName;
+		wxString OutName;
+		int MonID;
+		bool Selected;
+	};
+	
+	//  Create table of all outputs
+	devlink d;
+	vector<monProp> monTable;
+	monProp montemp;
+	outplink o;
+	for (d = netz->devicelist(); d != NULL; d = d->next)
+	{
+		o = d->olist;
+		while (o != NULL)
+		{
+			montemp.DevID = d->id;
+			montemp.OutID = o->id;
+			montemp.DevName = nmz->getname(montemp.DevID);
+			montemp.Selected = false;
+			monTable.push_back(montemp);
+			o = o->next;
+		}
+	}
 
-	// Choose monitor points which are already selected
-	wxArrayInt selections;
-	selections.Empty();
+	// Put relavent details into array string to feed into checkbox dialog
+	wxArrayString choices; // Array of possible monitors
+	wxArrayInt selections; // Array of selected monitors
+	wxString str;
+	for (int i=monTable.size()-1; i>-1; i--)
+	{
+		// Add all elements in monTable to choices
+		str.Empty();
+		str = monTable[i].DevName;
+		if(monTable[i].OutID !=-1)
+		{
+			monTable[i].OutName = nmz->getname(monTable[i].OutID);
+			str.Append(wxT("."));
+			str.Append(monTable[i].OutName);
+		}
+		choices.Add(str);
+	}
+
+	// Find location of each current monitor in "choices" and add to "selections"
+	for(int i=0; i<(mmz->moncount()); i++)
+	{
+		// Get details of nth monitor
+		name DevID, OutID;
+		mmz->getmonname(i, DevID, OutID);
+		// Compute monitor name in "choices" format
+		str.Empty();
+		str = nmz->getname(DevID);
+		if(OutID !=-1)
+		{
+			str.Append(wxT("."));
+			str.Append(nmz->getname(OutID));
+		}
+		// Find number of monitors in "choices" array
+		for (unsigned int i=0; i<choices.size(); i++)
+		{
+			if (!str.compare(choices[i]))
+			{
+				selections.push_back(i);
+				monTable[monTable.size()-i-1].Selected = true;
+			}
+		}
+	}
 	
 	// Create dialog box
 	wxString MonMsg = wxT("Please select the required monitor points and select OK");
@@ -400,10 +570,45 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 	wxMultiChoiceDialog monitor(this, MonMsg, MonCap, choices);
 	monitor.SetSelections(selections);
 	
+	// If OK is clicked, process results
+	bool Selected, ok;
+	int monIndex;
 	if(monitor.ShowModal() == wxID_OK)
 	{
-		monitor.GetSelections(); // Sets the selections which are required
-	};
+		selections = monitor.GetSelections(); // Gets the new selections
+		for(unsigned int i=0; i<choices.size(); i++)
+		{
+			// Find out if it's meant to be selected now
+			Selected = false;
+			for(unsigned int j=0; j<selections.size();j++)
+			{
+				if(selections[j]==i)
+					Selected = true;
+			}
+			// Find out if it was selected before
+			monIndex = monTable.size()-i-1;
+			if(Selected)
+			{// If it wasn't selected and should be now, make a new monitor
+				if(monTable[monIndex].Selected == false)
+				{
+					ok = false;
+					mmz->makemonitor(monTable[monIndex].DevID,monTable[monIndex].OutID,ok);
+					if(!ok)
+						cout << "Failed to make monitor" << endl;
+				}
+			}
+			else
+			{// If it was selected and shouldn't be now, delete the monitor
+				if(monTable[monIndex].Selected == true)
+				{
+					ok = false;
+					mmz->remmonitor(monTable[monIndex].DevID,monTable[monIndex].OutID,ok);
+					if(!ok)
+						cout << "Failed to remove monitor" << endl;
+				}
+			}
+		}
+	}
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)
@@ -443,78 +648,53 @@ void MyFrame::runnetwork(int ncycles)
 }
 
 // ----------------------------------------------------------------------------
-// DeviceConfigDialog
+// MyDeviceConfigDialog
 // ----------------------------------------------------------------------------
 
-//IMPLEMENT_CLASS(DeviceConfigDialog, wxPropertySheetDialog)
+//IMPLEMENT_CLASS(MyDeviceConfigDialog, wxPropertySheetDialog)
 
-BEGIN_EVENT_TABLE(DeviceConfigDialog, wxPropertySheetDialog)
+BEGIN_EVENT_TABLE(MyDeviceConfigDialog, wxPropertySheetDialog)
 END_EVENT_TABLE()
 
-DeviceConfigDialog::DeviceConfigDialog(wxWindow* win)
+MyDeviceConfigDialog::MyDeviceConfigDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos,
+						const wxSize& sz, long style, const wxString& name,
+						names *names_mod, devices *devices_mod, monitor *monitor_mod,
+						network *network_mod,vector<switchProp> &switchTable, vector<clockProp> &clockTable):
+  wxPropertySheetDialog(parent, wxID_ANY, title, pos, sz, style)
 {
-    //SetExtraStyle(wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY);
+	nmz = names_mod;
+	dmz = devices_mod;
+	mmz = monitor_mod;
+	netz = network_mod;
 
-    Create(win, wxID_ANY, _("Device Configuration"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
     CreateButtons(wxOK|wxCANCEL);
 
     wxBookCtrlBase* notebook = GetBookCtrl();
-		wxPanel* switchProperties = CreateSwitchPropertiesPage(notebook);
+		wxPanel* switchProperties = CreateSwitchPropertiesPage(notebook, switchTable);
 	notebook->AddPage(switchProperties, _("Switch Properties"));
-		wxPanel* clockProperties = CreateClockPropertiesPage(notebook);
+		wxPanel* clockProperties = CreateClockPropertiesPage(notebook, clockTable);
 	notebook->AddPage(clockProperties, _("Clock Properties"));
 
     LayoutDialog();
 }
 
-wxPanel* DeviceConfigDialog::CreateSwitchPropertiesPage(wxWindow* parent)
+wxPanel* MyDeviceConfigDialog::CreateSwitchPropertiesPage(wxWindow* parent,vector<switchProp> &switchTable)
 {
-	// Define options for values of switches
 	wxArrayString switchValue;
 		switchValue.Add(wxT("Off"));
 		switchValue.Add(wxT("On"));
-
-	struct switchProp
-	{
-		wxString Name;
-		wxString Value;
-	};
-	
-	wxString postSwitch = ":";
-	vector<switchProp> switchTable;
-
-	// Switch 1
-	switchProp switch1;
-	switch1.Name = wxT("switch1");
-	switch1.Name.Append(postSwitch);
-	switch1.Value = switchValue.Item(1);
-	switchTable.push_back(switch1);
-
-	// Switch 2
-	switchProp switch2;
-	switch2.Name = wxT("switch2");
-	switch2.Name.Append(postSwitch);
-	switch2.Value = switchValue.Item(0);
-	switchTable.push_back(switch2);
-
-	// Switch 3
-	switchProp switch3;
-	switch3.Name = wxT("switch3");
-	switch3.Name.Append(postSwitch);
-	switch3.Value = switchValue.Item(0);
-	switchTable.push_back(switch3);
 
 	// Create layout
 	wxPanel* panel = new wxPanel(parent, wxID_ANY);
 	wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
 		wxGridSizer *item0 = new wxGridSizer(2, 10, 10);
-			// Create switch options
-		for(int i=0; i<switchTable.size(); i++)
+		// Create switch options
+		for(int i=switchTable.size()-1; i>=0; i--)
 		{
-			wxStaticText* field = new wxStaticText(panel, wxID_ANY,switchTable[i].Name);
-			item0->Add(field, 0, wxALL, 5);
-			wxComboBox* value = new wxComboBox(panel, ID_SWITCH, switchTable[i].Value, wxDefaultPosition, wxDefaultSize, switchValue, wxCB_READONLY);
-			item0->Add(value, 0, wxALL, 0);
+				switchTable[i].field_box = new wxStaticText(panel, wxID_ANY,switchTable[i].Name);
+			item0->Add(switchTable[i].field_box, 0, wxALL, 5);
+				switchTable[i].value_box = new wxComboBox(panel, ID_SWITCH, switchTable[i].Value, wxDefaultPosition, wxDefaultSize, switchValue, wxCB_READONLY);
+			item0->Add(switchTable[i].value_box, 0, wxALL, 0);
 		}
 	topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
 	panel->SetSizer(topSizer);
@@ -523,43 +703,19 @@ wxPanel* DeviceConfigDialog::CreateSwitchPropertiesPage(wxWindow* parent)
     return panel;
 }
 
-wxPanel* DeviceConfigDialog::CreateClockPropertiesPage(wxWindow* parent)
+wxPanel* MyDeviceConfigDialog::CreateClockPropertiesPage(wxWindow* parent, vector<clockProp> &clockTable)
 {
-	struct clockProp
-	{
-		wxString Name;
-		wxString Value;
-	};
-	
-	wxString postClock = ":";
-	vector<clockProp> clockTable;
-
-	// Clock 1
-	clockProp clock1;
-	clock1.Name = wxT("clock1");
-	clock1.Name.Append(postClock);
-	clock1.Value = wxT("5");
-	clockTable.push_back(clock1);
-
-	// Clock 2
-	clockProp clock2;
-	clock2.Name = wxT("clock2");
-	clock2.Name.Append(postClock);
-	clock2.Value = wxT("10");
-	clockTable.push_back(clock2);
-	
-
 	// Create layout
 	wxPanel* panel = new wxPanel(parent, wxID_ANY);
 	wxBoxSizer *topSizer = new wxBoxSizer( wxVERTICAL );
 		wxGridSizer *item0 = new wxGridSizer(2, 10, 10);
 			// Create clock options
-			for(int i=0; i<clockTable.size(); i++)
+			for(int i=clockTable.size()-1; i>=0; i--)
 			{
-			wxStaticText* field = new wxStaticText(panel, wxID_ANY, clockTable[i].Name);
-			item0->Add(field, 0, wxALL, 5);			
-			wxSpinCtrl* value = new wxSpinCtrl(panel, ID_FONT_SIZE, clockTable[i].Value, wxDefaultPosition, wxDefaultSize);
-			item0->Add(value, 0, wxALL, 5);
+					clockTable[i].field_box = new wxStaticText(panel, wxID_ANY, clockTable[i].Name);
+				item0->Add(clockTable[i].field_box, 0, wxALL, 5);			
+					clockTable[i].value_box = new wxSpinCtrl(panel, ID_FONT_SIZE, clockTable[i].Value, wxDefaultPosition, wxDefaultSize);
+				item0->Add(clockTable[i].value_box, 0, wxALL, 5);
 			}
 	topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
 	topSizer->AddSpacer(5);

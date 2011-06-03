@@ -9,6 +9,7 @@
 #include "names.h"
 #include "devices.h"
 #include "monitor.h"
+#include "network.h"
 #include "wx/help.h"			// Required for help file
 #include "wx/fs_zip.h"			// Required for help file
 #include "wx/image.h"			// Required for help file
@@ -31,12 +32,32 @@ enum
   MONITOR_BUTTON_ID,
 }; // widget identifiers
 
+// Define switch data structure (for use in device config dialog box)
+struct switchProp
+{
+	wxString Name;
+	wxString Value;
+	int ID;
+	wxStaticText* field_box;
+	wxComboBox* value_box;
+};
+
+// Define clock data structure (for use in device config dialog box)
+struct clockProp
+{
+	wxString Name;
+	wxString Value;
+	int ID;
+	wxStaticText* field_box;
+	wxSpinCtrl* value_box;
+};
+
 class MyFrame: public wxFrame
 {
 public:
 	MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, 
-		names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, /*wxHelpController *m_helpController = NULL,*/
-		long style = wxDEFAULT_FRAME_STYLE); // constructor
+		names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, 
+		network *network_mod = NULL, long style = wxDEFAULT_FRAME_STYLE); // constructor
 private:
 		// PRIVATE VARIABLES
 	MyGLCanvas *canvas;								// GL drawing area widget to draw traces
@@ -44,6 +65,7 @@ private:
 	names *nmz;										// pointer to names class
 	devices *dmz;									// pointer to devices class
 	monitor *mmz;									// pointer to monitor class
+	network *netz;									// pointer to network class
 	wxHtmlHelpController help;						// Create help controller
 	int cyclescompleted;							// how many simulation cycles have been completed
 		// EVENT HANDLERS
@@ -74,14 +96,22 @@ enum
 	ID_FONT_SIZE
 };
 
-class DeviceConfigDialog: public wxPropertySheetDialog
+class MyDeviceConfigDialog: public wxPropertySheetDialog
 {
 //DECLARE_CLASS(DeviceConfigDialog)
 public:
-    DeviceConfigDialog(wxWindow* parent);
-	wxPanel* CreateSwitchPropertiesPage(wxWindow* parent);
-    wxPanel* CreateClockPropertiesPage(wxWindow* parent);
+    MyDeviceConfigDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos,
+						const wxSize& sz, long style, const wxString& name,
+						names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, 
+						network *network_mod = NULL,vector<switchProp> &switchTable = vector<switchProp>(),
+						vector<clockProp> &clockTable = vector<clockProp>());
+	wxPanel* CreateSwitchPropertiesPage(wxWindow* parent,vector<switchProp> &switchTable);
+    wxPanel* CreateClockPropertiesPage(wxWindow* parent,vector<clockProp> &clockTable);
 private:
+	names *nmz;										// pointer to names class
+	devices *dmz;									// pointer to devices class
+	monitor *mmz;									// pointer to monitor class
+	network *netz;									// pointer to network class
 	DECLARE_EVENT_TABLE()
 };
     
