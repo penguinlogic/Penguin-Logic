@@ -44,7 +44,7 @@ void names::writename (name id)		/* Prints out the given name on the console    
 cout<< nametable[id];
 }
 
-namestring names::getname(name id)
+namestring names::getname(name id) /* Does reverse lookup */
 {
 	return nametable[id];
 }
