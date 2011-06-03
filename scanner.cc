@@ -5,8 +5,6 @@ scanner::scanner (names* names_mod, const char*defname, bool &ok)
 {
 inf.open(defname);
 if(!inf){ ok= false; cout<<"Error: Unable to open file '"<<defname<<"'"<<endl;}
-
-
 else {ok=true; cout<<defname<<" was opened successfully"<<endl;}
 nmz=names_mod;
 current.linenum=1;
