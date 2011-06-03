@@ -40,7 +40,7 @@ void getnumber (int &number);
 void getname (namestring &str);
 
 public:	
-scanner(names* names_mod, const char* defname); // Constructor
+scanner(names* names_mod, const char* defname, bool & ok); // Constructor
 void getsymbol (symbol &s); //gets next symbol object
 void print_err(const char* error);
 
