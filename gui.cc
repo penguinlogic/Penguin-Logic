@@ -61,11 +61,11 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 			// Get name of monitor
 			name n1, n2;
 			mmz->getmonname(m,n1, n2);
-			wxString mon_name = wxString(nmz->getname(n1));
+			wxString mon_name = wxString(nmz->getname(n1).c_str(), wxConvUTF8);
 			if(n2 != -1)	// If device has more than 1 output, append output name
 			{
-				mon_name.Append(".");
-				mon_name.Append(nmz->getname(n2));
+				mon_name.Append(wxString(".", wxConvUTF8));
+				mon_name.Append(wxString(nmz->getname(n2).c_str(), wxConvUTF8));
 			}
 
 			// Display name of monitor
@@ -338,7 +338,7 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 }
 
 void MyFrame::OnSave(wxCommandEvent &event)
-  // Callback for the [File | Save waveforms as picture] menu item
+  // Callback for the [File | Save waveintforms as picture] menu item
 {
 	wxFileDialog dialog(this,_T("Save waveforms as picture"),wxEmptyString,wxEmptyString,_T("Portable network graphics (*.png)|*.png"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 	
@@ -406,7 +406,7 @@ void MyFrame::OnDeviceButton(wxCommandEvent &event)
 		switchValue.Add(wxT("Off"));
 		switchValue.Add(wxT("On"));
 	
-	wxString postSwitch = ":";
+	wxString postSwitch = wxString(":", wxConvUTF8);
 	vector<switchProp> switchTable;
 	switchTable.empty();
 	// Create switchTable
@@ -415,7 +415,7 @@ void MyFrame::OnDeviceButton(wxCommandEvent &event)
 	{
 		if (d->kind == aswitch)
 		{
-			switchtemp.Name = wxString(nmz->getname(d->id));
+			switchtemp.Name = wxString(nmz->getname(d->id).c_str(), wxConvUTF8);
 			switchtemp.Name.Append(postSwitch);
 			if(d->swstate==low)
 				switchtemp.Value = switchValue.Item(0);
@@ -428,7 +428,7 @@ void MyFrame::OnDeviceButton(wxCommandEvent &event)
 	
 
 	//-----CLOCKS----//
-	wxString postClock = ":";
+	wxString postClock = wxString(":", wxConvUTF8);
 	vector<clockProp> clockTable;
 
 	// Create clockTable
@@ -437,7 +437,7 @@ void MyFrame::OnDeviceButton(wxCommandEvent &event)
 	{
 		if (d->kind == aclock)
 		{
-			clocktemp.Name = wxString(nmz->getname(d->id));
+			clocktemp.Name = wxString(nmz->getname(d->id).c_str(), wxConvUTF8);
 			clocktemp.Name.Append(postClock);
 			clocktemp.Value = wxString::Format(wxT("%i"),d->frequency);
 			clocktemp.ID = d->id;
@@ -491,17 +491,6 @@ void MyFrame::OnDeviceButton(wxCommandEvent &event)
 void MyFrame::OnMonitorButton(wxCommandEvent &event)
   // Callback for the MONITOR BUTTON
 {
-	// Define structure for table of outputs
-	struct monProp
-	{
-		int DevID;
-		int OutID;
-		wxString DevName;
-		wxString OutName;
-		int MonID;
-		bool Selected;
-	};
-	
 	//  Create table of all outputs
 	devlink d;
 	vector<monProp> monTable;
@@ -514,7 +503,7 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 		{
 			montemp.DevID = d->id;
 			montemp.OutID = o->id;
-			montemp.DevName = nmz->getname(montemp.DevID);
+			montemp.DevName = wxString(nmz->getname(montemp.DevID).c_str(), wxConvUTF8);
 			montemp.Selected = false;
 			monTable.push_back(montemp);
 			o = o->next;
@@ -532,7 +521,7 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 		str = monTable[i].DevName;
 		if(monTable[i].OutID !=-1)
 		{
-			monTable[i].OutName = nmz->getname(monTable[i].OutID);
+			monTable[i].OutName = wxString(nmz->getname(monTable[i].OutID).c_str(), wxConvUTF8);
 			str.Append(wxT("."));
 			str.Append(monTable[i].OutName);
 		}
@@ -547,11 +536,11 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 		mmz->getmonname(i, DevID, OutID);
 		// Compute monitor name in "choices" format
 		str.Empty();
-		str = nmz->getname(DevID);
+		str = wxString(nmz->getname(DevID).c_str(), wxConvUTF8);
 		if(OutID !=-1)
 		{
 			str.Append(wxT("."));
-			str.Append(nmz->getname(OutID));
+			str.Append(wxString(nmz->getname(OutID).c_str(), wxConvUTF8));
 		}
 		// Find number of monitors in "choices" array
 		for (unsigned int i=0; i<choices.size(); i++)

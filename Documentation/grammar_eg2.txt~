@@ -9,6 +9,7 @@ DEVICES
 CONNECTIONS
 {
 	switch3 > dtype.DATA;
+		switch1 > dtype.DATA;
 	switch1 > dtype.SET;
 	switch2 > dtype.CLEAR;
 	clock > dtype.CLK;
