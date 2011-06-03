@@ -41,7 +41,7 @@ struct switchProp
 	wxStaticText* field_box;
 	wxComboBox* value_box;
 };
-
+static vector<switchProp> DEFAULT_SWITCH;
 // Define clock data structure (for use in device config dialog box)
 struct clockProp
 {
@@ -51,6 +51,7 @@ struct clockProp
 	wxStaticText* field_box;
 	wxSpinCtrl* value_box;
 };
+static vector<clockProp> DEFAULT_CLOCK;
 
 class MyFrame: public wxFrame
 {
@@ -103,8 +104,8 @@ public:
     MyDeviceConfigDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos,
 						const wxSize& sz, long style, const wxString& name,
 						names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, 
-						network *network_mod = NULL,vector<switchProp> &switchTable = vector<switchProp>(),
-						vector<clockProp> &clockTable = vector<clockProp>());
+						network *network_mod = NULL,vector<switchProp> &switchTable = DEFAULT_SWITCH,
+						vector<clockProp> &clockTable = DEFAULT_CLOCK);
 	wxPanel* CreateSwitchPropertiesPage(wxWindow* parent,vector<switchProp> &switchTable);
     wxPanel* CreateClockPropertiesPage(wxWindow* parent,vector<clockProp> &clockTable);
 private:
