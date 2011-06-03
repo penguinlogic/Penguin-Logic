@@ -100,7 +100,7 @@ void parser::inname (name & iname) // throws innameex if not given a valid innam
 try
   {
     if (cursym.get_type() != Inname) {errcount++; throw innameex_i;} // didn't get an inname
- else iname = cursym.get_uname_id();
+ else iname = cursym.get_name_id();
  }
  catch (exception& e)
    {
@@ -124,7 +124,7 @@ void parser::outname (name &oname) // throws outnameex if not given a valid outn
 try
   {
     if (cursym.get_type() != Outname) {errcount++; throw outnameex_i;} // didn't get an outname
-else oname = cursym.get_uname_id();  
+else oname = cursym.get_name_id();  
 	}
  catch (exception& e)
    {
@@ -195,11 +195,11 @@ try
         We test each combination of devname, devswitch, and if
         necessary the next symbol to make sure of a valid device
 	*/
-	if (cursym.get_value() == CLOCK) { //i.e. devname is CLOCK
+	if (cursym.get_name_id() == nmz->cvtname("CLOCK")) { //i.e. devname is CLOCK
 	  smz->getsymbol (cursym);
-	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	  if (cursym.get_syntaxvalue() == dash) { // i.e. symbol is '-'
 	    smz->getsymbol (cursym);
-	    if (cursym.get_value() == period) { //i.e. devswitch is '-period'
+	    if (cursym.get_syntaxvalue() == period) { //i.e. devswitch is '-period'
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 			  devkind_var = aclock;
@@ -210,11 +210,11 @@ try
 	  } else {errcount++; throw devdashex_i;} // expected '-'
 	}
 
-	if (cursym.get_value() == SWITCH) { //i.e. devname is SWITCH
+	if (cursym.get_name_id() == nmz->cvtname("SWITCH")) { //i.e. devname is SWITCH
 	  smz->getsymbol (cursym);
-	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	  if (cursym.get_syntaxvalue() == dash) { // i.e. symbol is '-'
 	    smz->getsymbol (cursym);
-	    if (cursym.get_value() == initialvalue) { //i.e. devswitch is 'initialvalue'
+	    if (cursym.get_syntaxvalue() == initialvalue) { //i.e. devswitch is 'initialvalue'
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint &&
 		  (cursym.get_uint() == 0 || cursym.get_uint() == 1)) { // i.e. symbol is a uint but is also a bool
@@ -227,11 +227,11 @@ try
 	}
 
 	//TODO: check uint within bounds (1-16) for all these devices
-	if (cursym.get_value() == AND) { //i.e. devname is AND
+	if (cursym.get_name_id() == nmz->cvtname("AND")) { //i.e. devname is AND
 	  smz->getsymbol (cursym);
-	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	  if (cursym.get_syntaxvalue() == dash) { // i.e. symbol is '-'
 	    smz->getsymbol (cursym);
-	    if (cursym.get_value() == numinputs) { //i.e. devswitch is 'numinputs'
+	    if (cursym.get_syntaxvalue() == numinputs) { //i.e. devswitch is 'numinputs'
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 			  devkind_var = andgate;
@@ -243,11 +243,11 @@ try
 
 	}
 
-	if (cursym.get_value() == NAND) { //i.e. devname is NAND
+	if (cursym.get_name_id() == nmz->cvtname("NAND")) { //i.e. devname is NAND
 	  smz->getsymbol (cursym);
-	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	  if (cursym.get_syntaxvalue() == dash) { // i.e. symbol is '-'
 	    smz->getsymbol (cursym);
-	    if (cursym.get_value() == numinputs) { //i.e. devswitch is 'numinputs'
+	    if (cursym.get_syntaxvalue() == numinputs) { //i.e. devswitch is 'numinputs'
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 			  devkind_var = nandgate;
@@ -258,11 +258,11 @@ try
 	  } else {errcount++; throw devdashex_i;} // expected '-'
 	}
 
-	if (cursym.get_value() == OR) { //i.e. devname is OR
+	if (cursym.get_name_id() == nmz->cvtname("OR")) { //i.e. devname is OR
 	  smz->getsymbol (cursym);
-	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	  if (cursym.get_syntaxvalue() == dash) { // i.e. symbol is '-'
 	    smz->getsymbol (cursym);
-	    if (cursym.get_value() == numinputs) { //i.e. devswitch is '-numinputs'
+	    if (cursym.get_syntaxvalue() == numinputs) { //i.e. devswitch is '-numinputs'
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 			  devkind_var = orgate;
@@ -273,11 +273,11 @@ try
 	  } else {errcount++; throw devdashex_i;} // expected '-'
 	}
 
-	if (cursym.get_value() == NOR) { //i.e. devname is NOR
+	if (cursym.get_name_id() == nmz->cvtname("NOR")) { //i.e. devname is NOR
 	  smz->getsymbol (cursym);
-	  if (cursym.get_value() == dash) { // i.e. symbol is '-'
+	  if (cursym.get_syntaxvalue() == dash) { // i.e. symbol is '-'
 	    smz->getsymbol (cursym);
-	    if (cursym.get_value() == numinputs) { //i.e. devswitch is '-numinputs'
+	    if (cursym.get_syntaxvalue() == numinputs) { //i.e. devswitch is '-numinputs'
 	      smz->getsymbol (cursym);
 	      if (cursym.get_type() == Uint) { // i.e. symbol is a uint
 			  devkind_var = norgate;
@@ -288,12 +288,12 @@ try
 	  } else {errcount++; throw devdashex_i;} // expected '-'
 	}
 
-	if (cursym.get_value() == DTYPE) { //i.e. devname is DTYPE
+	if (cursym.get_name_id() == nmz->cvtname("DTYPE")) { //i.e. devname is DTYPE
 		devkind_var = dtype;
 	  return; // we have a valid DTYPE
 	}
 
-	if (cursym.get_value() == XOR) { //i.e. devname is XOR
+	if (cursym.get_name_id() == nmz->cvtname("XOR")) { //i.e. devname is XOR
 		devkind_var = xorgate;
 	  return; // we have a valid XOR
 	}
@@ -326,7 +326,7 @@ try
   {
 //    cout<<"running uname"<<endl;
     if (cursym.get_type() != Uname) {errcount++; throw unameex_i;} // didn't get a uname
-	else did_var = cursym.get_uname_id();
+	else did_var = cursym.get_name_id();
   }
  catch (exception& e)
    {
@@ -398,12 +398,12 @@ try
 	bool ok;
     uname(dev);
     smz->getsymbol (cursym);
-    if (cursym.get_value() == dot) { // cursym is '.'
+    if (cursym.get_syntaxvalue() == dot) { // cursym is '.'
       smz->getsymbol (cursym);
       outname(outp);
 	  smz->getsymbol (cursym);
     } 
-	if (cursym.get_value() == semicolon) { // cursym is ';'
+	if (cursym.get_syntaxvalue() == semicolon) { // cursym is ';'
 	mmz->makemonitor(dev, outp, ok);      
 	if (ok){
 	cout<<"Monitor set at ";
@@ -419,7 +419,7 @@ try
 					  // to be parsed
    {
 	smz->print_err(e.what());
-     while (cursym.get_value() != semicolon && cursym.get_value() != endfile) { // iterates while cursym is not ';'
+     while (cursym.get_syntaxvalue() != semicolon && cursym.get_syntaxvalue() != endfile) { // iterates while cursym is not ';'
        smz->getsymbol (cursym);
 	   //throw parseex_i;
      }
@@ -446,18 +446,18 @@ try
 	bool ok;
     uname(odev);
     smz->getsymbol (cursym);
-    if (cursym.get_value() == dot) { // cursym is '.'
+    if (cursym.get_syntaxvalue() == dot) { // cursym is '.'
     smz->getsymbol (cursym);
     outname(outp);
-    } else if (cursym.get_value() == rarrow) { // cursym is '>'
+    } else if (cursym.get_syntaxvalue() == rarrow) { // cursym is '>'
     smz->getsymbol (cursym);
     uname(idev);
     smz->getsymbol (cursym);
-    if (cursym.get_value() == dot) { // cursym is '.'
+    if (cursym.get_syntaxvalue() == dot) { // cursym is '.'
       smz->getsymbol (cursym);
       inname(inp);
       smz->getsymbol (cursym);
-      if (cursym.get_value() == semicolon) { // cursym is ';'
+      if (cursym.get_syntaxvalue() == semicolon) { // cursym is ';'
 	netz->makeconnection (idev, inp, odev, outp, ok);
 	if (ok){
 	cout<<"Connection made between ";
@@ -477,7 +477,7 @@ try
    {
      //cout << e.what() << endl;
 	smz->print_err(e.what());
-     while (cursym.get_value() != semicolon && cursym.get_value() != endfile) { // iterates while cursym is not ';'
+     while (cursym.get_syntaxvalue() != semicolon && cursym.get_syntaxvalue() != endfile) { // iterates while cursym is not ';'
        smz->getsymbol (cursym);
      }
     //throw parseex_i;
@@ -504,11 +504,11 @@ try
     bool ok;
     device(devkind_var, variant_var);
     smz->getsymbol (cursym);
-    if (cursym.get_value() == equals) { // we have an '='
+    if (cursym.get_syntaxvalue() == equals) { // we have an '='
 	smz->getsymbol (cursym);     
 	uname(did_var);
 	smz->getsymbol (cursym);
-      if (cursym.get_value() == semicolon) { // we have a ';'
+      if (cursym.get_syntaxvalue() == semicolon) { // we have a ';'
 	dmz->makedevice(devkind_var, did_var, variant_var, ok); 
 	if (ok){
 	dmz->writedevice(devkind_var);
@@ -525,7 +525,7 @@ try
    {
     // cout << e.what() << endl;
 	smz->print_err(e.what());
-     while (cursym.get_value() != semicolon && cursym.get_value() != endfile) { // iterates while cursym is not ';'
+     while (cursym.get_syntaxvalue() != semicolon && cursym.get_syntaxvalue() != endfile) { // iterates while cursym is not ';'
        smz->getsymbol (cursym);
      }
     //throw parseex_i;
@@ -564,32 +564,32 @@ void parser::section (void) // throws sectionex if finds invalid section
 try
   {
     smz->getsymbol (cursym);
-     if (cursym.get_value() == endfile) return;
-     if (cursym.get_value() == DEVICES) { // cursym is 'DEVICES'     
+     if (cursym.get_syntaxvalue() == endfile) return;
+     if (cursym.get_syntaxvalue() == DEVICES) { // cursym is 'DEVICES'     	
 	smz->getsymbol (cursym);
-      if (cursym.get_value() == lbrak) { // cursym is '{'	
+      if (cursym.get_syntaxvalue() == lbrak) { // cursym is '{'	
 	smz->getsymbol (cursym);
-	while (cursym.get_value() != rbrak && cursym.get_value() != endfile) { // i.e. while inside braces
+	while (cursym.get_syntaxvalue() != rbrak && cursym.get_syntaxvalue() != endfile) { // i.e. while inside braces
 	  devrule();
 	  smz->getsymbol (cursym);
 	}
       } else {errcount++; throw lbrakex_i;} // we expected an '{'
 
-    } else if (cursym.get_value() == CONNECTIONS) { // cursym is 'CONNECTIONS'
+    } else if (cursym.get_syntaxvalue() == CONNECTIONS) { // cursym is 'CONNECTIONS'
       smz->getsymbol (cursym);
-      if (cursym.get_value() == lbrak) { // cursym is '{'
+      if (cursym.get_syntaxvalue() == lbrak) { // cursym is '{'
 	smz->getsymbol (cursym);
-	while (cursym.get_value() != rbrak && cursym.get_value() != endfile) { // i.e. while inside braces
+	while (cursym.get_syntaxvalue() != rbrak && cursym.get_syntaxvalue() != endfile) { // i.e. while inside braces
 	  connrule();
 	  smz->getsymbol (cursym);
 	}
       } else {errcount++; throw lbrakex_i;} // we expected an '{'
 
-    } else if (cursym.get_value() == MONITOR) { // cursym is 'MONITOR'
+    } else if (cursym.get_syntaxvalue() == MONITOR) { // cursym is 'MONITOR'
       smz->getsymbol (cursym);
-      if (cursym.get_value() == lbrak) { // cursym is '{'
+      if (cursym.get_syntaxvalue() == lbrak) { // cursym is '{'
 	smz->getsymbol (cursym);
-	while (cursym.get_value() != rbrak && cursym.get_value() != endfile) { // i.e. while inside braces
+	while (cursym.get_syntaxvalue() != rbrak && cursym.get_syntaxvalue() != endfile) { // i.e. while inside braces
 	  monrule();
 	 // cout << "monrule ran" << endl;
 	  smz->getsymbol (cursym);
@@ -601,7 +601,7 @@ catch (sectionex& e)
    {
      //cout << e.what() << endl;
 	smz->print_err(e.what());
-	while (!(cursym.get_value() == rbrak)) { // iterates while cursym is not '}'
+	while (!(cursym.get_syntaxvalue() == rbrak)) { // iterates while cursym is not '}'
        smz->getsymbol (cursym);
      }
      //throw parseex_i;
@@ -623,7 +623,7 @@ void parser::parsedeffile (void)
 	try {
   do {
    section();
-  } while (!(cursym.get_value() == endfile)); // i.e. while not eof
+  } while (!(cursym.get_syntaxvalue() == endfile)); // i.e. while not eof
   bool ok;
   netz->checknetwork(ok);
   if (!ok){errcount++; throw checknetworkex_i;}
