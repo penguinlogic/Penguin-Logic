@@ -24,11 +24,6 @@ bool MyApp::OnInit()
 		exit(1);
 		}
 
-
-
-
-
-
   // Construct the six classes required by the innards of the logic simulator
   nmz = new names();
   netz = new network(nmz);
@@ -45,7 +40,7 @@ bool MyApp::OnInit()
 	char *a[2]={"\0", "\0"};
     char **tmp1=(char**)a; int tmp2 = 0; glutInit(&tmp2, tmp1);
     // Construct the GUI
-    MyFrame *frame = new MyFrame(NULL, wxT("Logic simulator"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz, netz, wxString(argv[1]).mb_str());
+    MyFrame *frame = new MyFrame(NULL, wxT("Logic simulator"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz, netz, wxString(argv[1]));
 	frame->SetBackgroundColour(wxColour(255, 140, 0));
     frame->Show(true);
     return(true); // enter the GUI event loop

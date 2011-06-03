@@ -74,18 +74,30 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 			for (unsigned int i = 0; i < mon_name.Len(); i++) // Display each character in turn
 				glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mon_name[i]);
 			
-			// Plot waveform for monitor
+			// Draw axes
+			glColor3f(0.5, 0.5, 0.5);
+			glBegin(GL_LINE_STRIP);
+				glVertex2f(INDENT-1,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_HIGH+6);
+				glVertex2f(INDENT-1,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
+				glVertex2f(LENGTH*cyclesdisplayed+INDENT,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
+			glEnd();
 			
+			// Draw tickmarks
+			for(int i=0; i<cyclesdisplayed; i++)
+			{
+				glColor3f(1/255*175, 1/255*238, 1/255*238);
+				glBegin(GL_LINE_STRIP);
+					glVertex2f(LENGTH*(i+1)+INDENT,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
+					glVertex2f(LENGTH*(i+1)+INDENT,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-6);
+				glEnd();
+			}
+						
+			// Plot waveform for monitor
 			for (int i=0; i<cyclesdisplayed; i++)
 			{
 				if (mmz->getsignaltrace(m, i, s))
 				{
-					// Draw grid
-					glColor3f(0.5, 0.5, 0.5);
-					glBegin(GL_LINE_STRIP);
-					glVertex2f(LENGTH*i+INDENT-1,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_HIGH+5);
-					glVertex2f(LENGTH*i+INDENT-1,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
-					glVertex2f(LENGTH*i+INDENT-1,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
+					
 										
 					// Define beginning and end height of line					
 					glColor3f(1.0, 0.0, 0.0);
@@ -123,34 +135,6 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 			glEnd();
 		}
 	}
-
-	/*else	// draw an artificial trace
-	{
-		glColor3f(0.0, 1.0, 0.0);
-		glBegin(GL_LINE_STRIP);
-		for (int i=0; i<5; i++)
-		{
-			if (i%2)
-			{
-				y1 = 10.0;
-				y2 = y1;
-			}
-			else
-			{
-				y1 = 30.0;
-				y2 = y1;
-			}
-			glVertex2f(20*i+10.0, y1); 
-			glVertex2f(20*i+30.0, y2);
-		}
-		glEnd();
-	}
-
-	// Example of how to use GLUT to draw text on the canvas
-	glColor3f(0.0, 0.0, 1.0);
-	glRasterPos2f(10, 100);
-	for (unsigned int i = 0; i < example_text.Len(); i++)
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);*/
 
 	// We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
 	glFlush();
@@ -319,7 +303,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 		wxBoxSizer *right_sizer = new wxBoxSizer(wxVERTICAL);
 			wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY, wxPoint(-1, -1), wxSize(250, -1), wxVSCROLL|wxHSCROLL)/*this, wxID_ANY, wxDefaultPosition, wxSize(100, 600), wxVSCROLL|wxHSCROLL)*/;
 				const int p_inc = 40;		// Scroll increment
-				const int px_size = 400;	// Canvas size
+				const int px_size = 800;	// Canvas size
 				const int py_size = 1000;	// Canvas size
 				sp->SetScrollbars(p_inc, p_inc, px_size/p_inc, py_size/p_inc);
 				wxPanel* panel = new wxPanel(sp, wxID_ANY);
@@ -327,27 +311,96 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 					wxBoxSizer *info_sizer = new wxBoxSizer(wxVERTICAL);
 						// Filename
 						wxBoxSizer *deffile_sizer = new wxBoxSizer(wxHORIZONTAL);
-							wxStaticText* label = new wxStaticText(panel, wxID_ANY, wxT("Definition file name:"), wxDefaultPosition, wxDefaultSize, wxALIGN_TOP);
-						deffile_sizer->Add(label, 0,wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
-							wxStaticText* value = new wxStaticText(panel, wxID_ANY, defname);
-							value->Wrap(200);
-						deffile_sizer->Add(value, 0, wxALIGN_CENTER_VERTICAL ,0);
+						deffile_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("Definition file name:")), 0,wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
+						deffile_sizer->Add(new wxStaticText(panel, wxID_ANY, defname), 0, wxALIGN_CENTER_VERTICAL ,0);
 					info_sizer->Add(deffile_sizer, 0, wxEXPAND|wxALL,5);
 						// Devices
 						wxBoxSizer *devices_sizer = new wxBoxSizer(wxVERTICAL);
+						devices_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("DEVICES")), 0, wxEXPAND|wxALL,5);
+							devlink d;
+							bool found;
+							found = false;
+							d = netz->devicelist();
+							wxString wxStr;
+							int numinputs;
+							for (d = netz->devicelist(); d != NULL; d = d->next)
+							{
+								wxStr = wxString(nmz->getname(d->id).c_str(), wxConvUTF8);
+								wxStr.Append(wxT("  (type="));
+								switch(d->kind)
+								{
+								case aswitch:
+									wxStr.Append(wxT("SWITCH, state="));
+									switch(d->swstate)
+									{
+									case low:
+										wxStr.Append(wxT("LOW)"));
+										break;
+									case high:
+										wxStr.Append(wxT("HIGH)"));
+										break;
+									}
+									break;
+								case aclock:
+									wxStr.Append(wxT("CLOCK, period="));
+									wxStr << d->frequency;
+									wxStr.Append(wxT(")"));
+									break;
+								case andgate:
+									wxStr.Append(wxT("AND, inputs="));
+									numinputs = 0;
+									for(inplink i=d->ilist; i!=NULL; i=i->next)
+										numinputs;
+									wxStr << numinputs;
+									wxStr.Append(wxT(")"));
+									break;
+								case nandgate:
+									wxStr.Append(wxT("NAND, inputs="));
+									numinputs = 0;
+									for(inplink i=d->ilist; i!=NULL; i=i->next)
+										numinputs;
+									wxStr << numinputs;
+									wxStr.Append(wxT(")"));
+									break;
+								case orgate:
+									wxStr.Append(wxT("OR, inputs="));
+									numinputs = 0;
+									for(inplink i=d->ilist; i!=NULL; i=i->next)
+										numinputs;
+									wxStr << numinputs;
+									wxStr.Append(wxT(")"));
+									break;
+								case norgate:
+									wxStr.Append(wxT("NOR, inputs="));
+									numinputs = 0;
+									for(inplink i=d->ilist; i!=NULL; i=i->next)
+										numinputs;
+									wxStr << numinputs;
+									wxStr.Append(wxT("), inputs="));
+									break;
+								case xorgate:
+									wxStr.Append(wxT("XOR)"));
+									break;
+								case dtype:
+									wxStr.Append(wxT("DTYPE)"));
+									break;
+								}
+								devices_sizer->Add(new wxStaticText(panel, wxID_ANY, wxStr), 0, wxEXPAND|wxLEFT,25);
+							}
 					info_sizer->Add(devices_sizer, 0, wxEXPAND|wxALL, 5);
-						// Connections
-						wxBoxSizer *connections_sizer = new wxBoxSizer(wxVERTICAL);
-					info_sizer->Add(connections_sizer, 0, wxEXPAND|wxALL, 5);
-						// Monitors
-						wxBoxSizer *monitors_sizer = new wxBoxSizer(wxVERTICAL);
-					info_sizer->Add(monitors_sizer, 0, wxEXPAND|wxALL, 5);
-					// Insert tree structure here
+					//	// Connections
+					//	wxBoxSizer *connections_sizer = new wxBoxSizer(wxVERTICAL);
+					//	connections_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("CONNECTIONS")), 0, wxEXPAND|wxALL,5);
+					//info_sizer->Add(connections_sizer, 0, wxEXPAND|wxALL, 5);
+					//	// Monitors
+					//	wxBoxSizer *monitors_sizer = new wxBoxSizer(wxVERTICAL);
+					//	monitors_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("MONITORS")), 0, wxEXPAND|wxALL,5);
+					//info_sizer->Add(monitors_sizer, 0, wxEXPAND|wxALL, 5);
 				panel->SetSizer(info_sizer);
 					info_sizer->Fit(panel);
 		right_sizer->Add(sp, 1, wxALL, 10);
 	topsizer->Add(right_sizer, 0, wxEXPAND|wxALL, 10);
-	
+
 	SetSizeHints(800, 400);
 	SetSizer(topsizer);
 }
@@ -640,6 +693,9 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 				}
 			}
 		}
+		// Redraw the canvas
+		wxCommandEvent redraw_event;
+		OnRunButton(redraw_event);
 	}
 }
 
