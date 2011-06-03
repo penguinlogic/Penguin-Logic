@@ -42,6 +42,7 @@ struct switchProp
 	wxComboBox* value_box;
 };
 static vector<switchProp> DEFAULT_SWITCH;
+
 // Define clock data structure (for use in device config dialog box)
 struct clockProp
 {
@@ -52,6 +53,17 @@ struct clockProp
 	wxSpinCtrl* value_box;
 };
 static vector<clockProp> DEFAULT_CLOCK;
+
+// Define structure for table of outputs
+struct monProp
+{
+	int DevID;
+	int OutID;
+	wxString DevName;
+	wxString OutName;
+	int MonID;
+	bool Selected;
+};
 
 class MyFrame: public wxFrame
 {
