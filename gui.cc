@@ -317,7 +317,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	topsizer->Add(left_sizer, 1, wxEXPAND | wxALL, 10);
 		//Right panel
 		wxBoxSizer *right_sizer = new wxBoxSizer(wxVERTICAL);
-			wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1), wxVSCROLL|wxHSCROLL)/*this, wxID_ANY, wxDefaultPosition, wxSize(100, 600), wxVSCROLL|wxHSCROLL)*/;
+			wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY, wxPoint(-1, -1), wxSize(250, -1), wxVSCROLL|wxHSCROLL)/*this, wxID_ANY, wxDefaultPosition, wxSize(100, 600), wxVSCROLL|wxHSCROLL)*/;
 				const int p_inc = 40;		// Scroll increment
 				const int px_size = 400;	// Canvas size
 				const int py_size = 1000;	// Canvas size
@@ -327,10 +327,11 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 					wxBoxSizer *info_sizer = new wxBoxSizer(wxVERTICAL);
 						// Filename
 						wxBoxSizer *deffile_sizer = new wxBoxSizer(wxHORIZONTAL);
-							wxStaticText* label = new wxStaticText(panel, wxID_ANY, wxT("Definition file name:"));
-						deffile_sizer->Add(label, 1,wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
+							wxStaticText* label = new wxStaticText(panel, wxID_ANY, wxT("Definition file name:"), wxDefaultPosition, wxDefaultSize, wxALIGN_TOP);
+						deffile_sizer->Add(label, 0,wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
 							wxStaticText* value = new wxStaticText(panel, wxID_ANY, defname);
-						deffile_sizer->Add(value, 1, wxALIGN_CENTER_VERTICAL ,0);
+							value->Wrap(200);
+						deffile_sizer->Add(value, 0, wxALIGN_CENTER_VERTICAL ,0);
 					info_sizer->Add(deffile_sizer, 0, wxEXPAND|wxALL,5);
 						// Devices
 						wxBoxSizer *devices_sizer = new wxBoxSizer(wxVERTICAL);
@@ -386,7 +387,6 @@ void MyFrame::OnSave(wxCommandEvent &event)
 	wxFileDialog dialog(this,_T("Save waveforms as picture"),wxEmptyString,wxEmptyString,_T("Portable network graphics (*.png)|*.png"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 	
 	dialog.SetFilterIndex(1);
-	canvas->Get
 	if (dialog.ShowModal() == wxID_OK)
 		/*wxLogMessage(_T("%s, filter %d"),dialog.GetPath().c_str(), dialog.GetFilterIndex())*/;
 }
