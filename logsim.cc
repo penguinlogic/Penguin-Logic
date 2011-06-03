@@ -14,7 +14,7 @@ IMPLEMENT_APP(MyApp)
 bool MyApp::OnInit()
   // This function is automatically called when the application starts
 {
-  
+  	
 	#if defined(_WINDOWS) && defined(_DEBUG)
 		RedirectIOToConsole();          // Required for cout in windows
 	#endif
@@ -22,27 +22,30 @@ bool MyApp::OnInit()
 	if (argc != 2) { // check we have one command line argument
 		wcout << "Usage:      " << argv[0] << " [filename]" << endl;
 		exit(1);
-	}
+		}
+
+
+
+
+
 
   // Construct the six classes required by the innards of the logic simulator
   nmz = new names();
   netz = new network(nmz);
   dmz = new devices(nmz, netz);
   mmz = new monitor(nmz, netz);
-  smz = new scanner(nmz, wxString(argv[1]).mb_str());
-//cout << "pre parser constructor" << endl;
+  smz = new scanner(nmz, wxString(argv[1]).mb_str(), filecheck );
+ if (!filecheck) exit(1);
   pmz = new parser(netz, dmz, mmz, smz, nmz);
-//  pmz = new parser(smz);
-//cout << "finished constructing parser" << endl;
 
   if (pmz->readin ()) { // check the logic file parsed correctly
 #ifdef USE_GUI
     // glutInit cannot cope with Unicode command line arguments, so we pass
     // it some fake ASCII ones instead
-	char *a[2]={"dummy","dummy"};
+	char *a[2]={"\0", "\0"};
     char **tmp1=(char**)a; int tmp2 = 0; glutInit(&tmp2, tmp1);
     // Construct the GUI
-    MyFrame *frame = new MyFrame(NULL, wxT("Logic simulator"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz, netz);
+    MyFrame *frame = new MyFrame(NULL, wxT("Logic simulator"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz, netz, wxString(argv[1]).mb_str());
 	frame->SetBackgroundColour(wxColour(255, 140, 0));
     frame->Show(true);
     return(true); // enter the GUI event loop
