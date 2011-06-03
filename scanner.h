@@ -19,7 +19,7 @@ struct character
 {public:
 string line;
 char ch;
-int pos;
+unsigned int pos;
 int linenum;
 };
 
