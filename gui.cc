@@ -46,7 +46,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	const int CANVAS_HEIGHT=1000;
-	const int CANVAS_WIDTH =1400;
+	const int CANVAS_WIDTH =2000;
 	const int SIG_LOW = 10;
 	const int SIG_HIGH = 30;
 	const int SEPARATION = 50;
@@ -195,6 +195,11 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)	// Callback function for mouse eve
 		Render(text);
 }
 
+/*void MyGLCanvas::GetImage()
+{
+	
+}*/
+
 // MyFrame ///////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -232,7 +237,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 
 	// Define File menu
 	wxMenu *fileMenu = new wxMenu;
-	fileMenu->Append(wxID_OPEN, wxT("&Open circuit definition file"));
+	//fileMenu->Append(wxID_OPEN, wxT("&Open circuit definition file"));
 	fileMenu->Append(wxID_SAVE, wxT("&Save waveforms as picture"));
 	fileMenu->Append(wxID_EXIT, wxT("&Exit"));
 
@@ -273,7 +278,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 			// Canvas
 			wxScrolledWindow *sw = new wxScrolledWindow(this, wxID_ANY, wxPoint(0, 0), wxSize(400, 400), wxVSCROLL|wxHSCROLL);
 				const int s_inc = 40;		// Scroll increment
-				const int cx_size = 1400;	// Canvas size
+				const int cx_size = 2000;	// Canvas size
 				const int cy_size = 1000;	// Canvas size
 				sw->SetScrollbars(s_inc, s_inc, cx_size/s_inc, cy_size/s_inc);
 				canvas = new MyGLCanvas(sw, wxID_ANY, monitor_mod, names_mod, wxDefaultPosition, wxSize(cx_size,cy_size));
@@ -441,7 +446,10 @@ void MyFrame::OnSave(wxCommandEvent &event)
 	
 	dialog.SetFilterIndex(1);
 	if (dialog.ShowModal() == wxID_OK)
-		/*wxLogMessage(_T("%s, filter %d"),dialog.GetPath().c_str(), dialog.GetFilterIndex())*/;
+	{
+		
+		//wxLogMessage(_T("%s, filter %d"),dialog.GetPath().c_str(), dialog.GetFilterIndex());
+	}
 }
 
 void MyFrame::OnExit(wxCommandEvent &event)

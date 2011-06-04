@@ -19,6 +19,8 @@
 #include "wx/wxprec.h"			// Required for help file
 #include <wx/wxhtml.h>			// Required for help file
 
+//wxImage::AddHandler(wxPNGHandler);
+
 class DeviceConfigDialog;
 class MyGLCanvas;
 
