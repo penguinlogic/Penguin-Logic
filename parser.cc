@@ -8,7 +8,7 @@ using namespace std;
 /***************************************************************************************/
 bool parser::readin (void)
 {
-//  try {
+  try {
     parsedeffile();
 //    cout << "It worked!" << endl;
 	if (errcount == 0) {
@@ -19,11 +19,11 @@ bool parser::readin (void)
 		cout << "Could not parse definition file: " << errcount << " errors found" << endl;
 		return false;
 	}
-//  }
-//  catch (exception& e) {
-//    cout << "Failed to correctly parse definition file." << endl;
-//    return false;
-//  }
+  }
+  catch (exception& e) {
+    cout << "Cannot run simulator" << endl;
+    return false;
+  }
 }
 
 parser::parser (network* network_mod, devices* devices_mod,
@@ -726,6 +726,6 @@ void parser::parsedeffile (void)
 }
 catch (exception& e) {
 	cout << "Parse error: " << e.what() << endl;
-	//throw;
+	throw;
 }
 }
