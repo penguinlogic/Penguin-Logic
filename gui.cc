@@ -108,12 +108,15 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	topsizer->Add(left_sizer, 1, wxEXPAND | wxALL, 10);
 		//Right panel
 		wxBoxSizer *right_sizer = new wxBoxSizer(wxVERTICAL);
-			wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY, wxPoint(-1, -1), wxSize(250, -1), wxVSCROLL|wxHSCROLL)/*this, wxID_ANY, wxDefaultPosition, wxSize(100, 600), wxVSCROLL|wxHSCROLL)*/;
+			wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY, wxPoint(-1, -1), wxSize(250, -1), wxVSCROLL|wxHSCROLL);
 				const int p_inc = 40;		// Scroll increment
 				const int px_size = 800;	// Canvas size
 				const int py_size = 1000;	// Canvas size
+				sp->SetSize(wxSize(250,-1));
 				sp->SetScrollbars(p_inc, p_inc, px_size/p_inc, py_size/p_inc);
+							
 				wxPanel* panel = new wxPanel(sp, wxID_ANY);
+				panel->SetSize(wxSize(250, -1));
 				// Right hand panel
 					wxBoxSizer *info_sizer = new wxBoxSizer(wxVERTICAL);
 						// Filename
@@ -135,8 +138,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 					//	wxBoxSizer *monitors_sizer = new wxBoxSizer(wxVERTICAL);
 					//	monitors_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("MONITORS")), 0, wxEXPAND|wxALL,5);
 					//info_sizer->Add(monitors_sizer, 0, wxEXPAND|wxALL, 5);
-				panel->SetSizer(info_sizer);
-					info_sizer->Fit(panel);
+				panel->SetSizerAndFit(info_sizer);
 		right_sizer->Add(sp, 1, wxALL, 10);
 	topsizer->Add(right_sizer, 0, wxEXPAND|wxALL, 10);
 	SetSizeHints(800, 400);
@@ -256,14 +258,37 @@ void MyFrame::OnSave(wxCommandEvent &event)
 	dialog.SetFilterIndex(1);
 	if (dialog.ShowModal() == wxID_OK)
 	{
-		//static unsigned char* pixels;
-		GLubyte* image = new GLubyte[2000 * 1000 * 3];
-		canvas->GetImage(image);
-		wxImage CanvasImage = wxImage(2000, 1000, image, false);
+		// Get size of canvas
+		wxSize ImSize = canvas->GetSize();
+		unsigned int ImHeight = ImSize.GetHeight();
+		unsigned int ImWidth = ImSize.GetWidth();
+
+		// Get image data from canvas
+		GLubyte* mirror_image = new GLubyte[ImWidth * ImHeight * 3];
+		GLubyte* image = new GLubyte[ImWidth * ImHeight * 3];
+		canvas->GetImage(mirror_image);
+		
+		// Flip image to compensate for image being upside down
+		int rev_val=ImHeight-1;
+		int bytesPerPixel = 3;
+		for(unsigned int x=0; x<ImWidth; x++)
+		{
+			for(unsigned int y=0; y<ImHeight; y++)
+			{
+				//image[x, y,  = mirror_image[x, ImHeight-y];
+				image[(x+y*ImWidth)*bytesPerPixel+0] = mirror_image[(x+(rev_val-y)*ImWidth)*3];
+				image[(x+y*ImWidth)*bytesPerPixel+1] = mirror_image[(x+(rev_val-y)*ImWidth)*3 + 1];
+				image[(x+y*ImWidth)*bytesPerPixel+2] = mirror_image[(x+(rev_val-y)*ImWidth)*3 + 2];
+			}
+		}
+		
+		// Store image in wxImage format
+		wxImage CanvasImage = wxImage(ImWidth, ImHeight, image, false);
 		CanvasImage.AddHandler(new wxPNGHandler);
-		CanvasImage.Mirror(false);
+
+		// Save file and display success notification
 		CanvasImage.SaveFile(dialog.GetPath(), wxBITMAP_TYPE_PNG);
-		//wxLogMessage(_T("%s, filter %d"),dialog.GetPath().c_str(), dialog.GetFilterIndex());
+		SetStatusText(wxT("File saved successfully"),1);
 	}
 }
 
@@ -561,8 +586,9 @@ void MyGLCanvas::Render(int cycles)
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	const int CANVAS_HEIGHT=1000;
-	const int CANVAS_WIDTH =2000;
+	wxSize CanvasSize = GetSize();
+	const unsigned int CANVAS_HEIGHT=CanvasSize.GetHeight();
+	const unsigned int CANVAS_WIDTH =CanvasSize.GetWidth();
 	const int SIG_LOW = 10;
 	const int SIG_HIGH = 30;
 	const int SEPARATION = 50;
