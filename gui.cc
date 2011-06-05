@@ -256,9 +256,13 @@ void MyFrame::OnSave(wxCommandEvent &event)
 	dialog.SetFilterIndex(1);
 	if (dialog.ShowModal() == wxID_OK)
 	{
-		static char* pixels;
-		canvas->GetImage(pixels);
-
+		//static unsigned char* pixels;
+		GLubyte* image = new GLubyte[2000 * 1000 * 3];
+		canvas->GetImage(image);
+		wxImage CanvasImage = wxImage(2000, 1000, image, false);
+		CanvasImage.AddHandler(new wxPNGHandler);
+		CanvasImage.Mirror(false);
+		CanvasImage.SaveFile(dialog.GetPath(), wxBITMAP_TYPE_PNG);
 		//wxLogMessage(_T("%s, filter %d"),dialog.GetPath().c_str(), dialog.GetFilterIndex());
 	}
 }
@@ -695,9 +699,11 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)	// Callback function for mouse eve
 	Render();
 }
 
-void MyGLCanvas::GetImage(char* &pixels)
+void MyGLCanvas::GetImage(unsigned char* &pixels)
 {
-	glReadPixels(0, 0, 2000, 1000, 1, 1, pixels);
+	glReadBuffer(GL_FRONT);
+	// glPixelStorei( GL_PACK_ALIGNMENT, 1 );
+	glReadPixels(0, 0, 2000, 1000, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 }
 
 

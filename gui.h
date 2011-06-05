@@ -107,7 +107,7 @@ public:
 			const wxString& name = wxT("MyGLCanvas")); // constructor
 		// PUBLIC MEMBER FUNCTIONS
 	void Render(int cycles = -1); // function to draw canvas contents
-	void GetImage(char* &pixels);
+	void GetImage(unsigned char* &pixels);
 private:
 		// PRIVATE VARIABLES
 	bool init;                         // has the GL context been initialised?
