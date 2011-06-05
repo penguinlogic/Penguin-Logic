@@ -1,6 +1,7 @@
 #ifndef gui_h
 #define gui_h
 
+// Include necessary header files
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
 #include <wx/spinctrl.h>
@@ -18,58 +19,50 @@
 #include "wx/filesys.h"			// Required for help file
 #include "wx/wxprec.h"			// Required for help file
 #include <wx/wxhtml.h>			// Required for help file
+#include <GL/glut.h>
+#include "wx_icon.xpm"
+#include <iostream>
 
-//wxImage::AddHandler(wxPNGHandler);
+using namespace std;
 
+
+// Declare classes
+class MyFrame;
 class DeviceConfigDialog;
 class MyGLCanvas;
 
-enum
-{ 
-  MY_SPINCNTRL_ID = wxID_HIGHEST + 1,
-  MY_TEXTCTRL_ID,
-  RUN_BUTTON_ID,
-  CONT_BUTTON_ID,
-  DEVICE_BUTTON_ID,
-  MONITOR_BUTTON_ID,
-}; // widget identifiers
 
-// Define switch data structure (for use in device config dialog box)
-struct switchProp
-{
-	wxString Name;
-	wxString Value;
-	int ID;
-	wxStaticText* field_box;
-	wxComboBox* value_box;
-};
+//----DEFINE DATA STRUCTURES------//
+// Enumerated types used as widget identifiers
+enum {MY_SPINCNTRL_ID = wxID_HIGHEST + 1,	MY_TEXTCTRL_ID,
+	RUN_BUTTON_ID,	CONT_BUTTON_ID,	DEVICE_BUTTON_ID,
+	MONITOR_BUTTON_ID,};
+
+// switchProp - used in switch properties page
+struct switchProp {wxString Name; wxString Value; int ID;
+				wxStaticText* field_box; wxComboBox* value_box;};
+
+// clockProp - used in clock properties page
+struct clockProp {wxString Name; wxString Value; int ID;
+				wxStaticText* field_box; wxSpinCtrl* value_box;};
+
+// monProp - used in monitor selection box
+struct monProp {int DevID;int OutID; wxString DevName;
+				wxString OutName; int MonID; bool Selected;};
+
+// Define statics for use as default parameters
+static wxArrayString wxEmptyArrayString;
 static vector<switchProp> DEFAULT_SWITCH;
-
-// Define clock data structure (for use in device config dialog box)
-struct clockProp
-{
-	wxString Name;
-	wxString Value;
-	int ID;
-	wxStaticText* field_box;
-	wxSpinCtrl* value_box;
-};
 static vector<clockProp> DEFAULT_CLOCK;
 
-// Define structure for table of outputs
-struct monProp
-{
-	int DevID;
-	int OutID;
-	wxString DevName;
-	wxString OutName;
-	int MonID;
-	bool Selected;
-};
 
+
+
+//----MY FRAME CLASS------//
 class MyFrame: public wxFrame
 {
 public:
+		// CONSTRUCTOR
 	MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size, 
 		names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, 
 		network *network_mod = NULL, wxString deffilename = wxEmptyString, long style = wxDEFAULT_FRAME_STYLE); // constructor
@@ -84,8 +77,10 @@ private:
 	wxHtmlHelpController help;						// Create help controller
 	int cyclescompleted;							// how many simulation cycles have been completed
 	wxString defname;								// name of definition files
-		// EVENT HANDLERS
+		// MEMBER FUNCTIONS
+	wxString MyFrame::DeviceProps(devlink d);
 	void runnetwork(int ncycles);					// function to run the logic network
+		// EVENT HANDLERS
 	void OnDevelopment(wxCommandEvent& event);		// callback for functions under development
 	void OnOpen(wxCommandEvent& event);				// callback for [File | Open] menu item
 	void OnSave(wxCommandEvent& event);				// callback for [File | Save] menu item
@@ -96,58 +91,61 @@ private:
 	void OnContButton(wxCommandEvent& event);		// callback for push button (cont)
 	void OnDeviceButton(wxCommandEvent& event);		// callback for push button (DEVICES)
 	void OnMonitorButton(wxCommandEvent& event);	// callback for push button (MONITOR)
-	void OnSpin(wxSpinEvent& event);				// callback for spin control
-	void OnText(wxCommandEvent& event);				// callback for text entry field
 		// EVENT TABLE
 	DECLARE_EVENT_TABLE()
 };
 
-enum
-{
-	// 
-	ID_SWITCH,
-	
-	ID_APPLY_SETTINGS_TO,
-	ID_BACKGROUND_STYLE,
-	ID_FONT_SIZE
-};
 
-class MyDeviceConfigDialog: public wxPropertySheetDialog
-{
-//DECLARE_CLASS(DeviceConfigDialog)
-public:
-    MyDeviceConfigDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos,
-						const wxSize& sz, long style, const wxString& name,
-						names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, 
-						network *network_mod = NULL,vector<switchProp> &switchTable = DEFAULT_SWITCH,
-						vector<clockProp> &clockTable = DEFAULT_CLOCK);
-	wxPanel* CreateSwitchPropertiesPage(wxWindow* parent,vector<switchProp> &switchTable);
-    wxPanel* CreateClockPropertiesPage(wxWindow* parent,vector<clockProp> &clockTable);
-private:
-	names *nmz;										// pointer to names class
-	devices *dmz;									// pointer to devices class
-	monitor *mmz;									// pointer to monitor class
-	network *netz;									// pointer to network class
-	DECLARE_EVENT_TABLE()
-};
-    
+
+//----GL CANVAS CLASS------//
 class MyGLCanvas: public wxGLCanvas
 {
 public:
+		// CONSTRUCTOR
 	MyGLCanvas(wxWindow *parent, wxWindowID id = wxID_ANY, monitor* monitor_mod = NULL, names* names_mod = NULL,
 			const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 			const wxString& name = wxT("MyGLCanvas")); // constructor
-	void Render(wxString example_text = wxT(""), int cycles = -1); // function to draw canvas contents
+		// PUBLIC MEMBER FUNCTIONS
+	void Render(int cycles = -1); // function to draw canvas contents
+	void GetImage(char* &pixels);
 private:
+		// PRIVATE VARIABLES
 	bool init;                         // has the GL context been initialised?
 	int cyclesdisplayed;               // how many simulation cycles have been displayed
 	monitor *mmz;                      // pointer to monitor class, used to extract signal traces
 	names *nmz;                        // pointer to names class, used to extract signal names
+		// PRIVATE MEMBER FUNCTIONS
 	void InitGL();                     // function to initialise GL context
 	void OnSize(wxSizeEvent& event);   // callback for when canvas is resized
 	void OnPaint(wxPaintEvent& event); // callback for when canvas is exposed
 	void OnMouse(wxMouseEvent& event); // callback for mouse events inside canvas
+		// EVENT TABLE
 	DECLARE_EVENT_TABLE()
 };
+
+
+
+//----DEVICE CONFIG DIALOG BOX CLASS------//
+class MyDeviceConfigDialog: public wxPropertySheetDialog
+{
+public:
+		// CONSTRUCTOR
+	MyDeviceConfigDialog(wxWindow* parent, const wxString& title, long style, const wxString& name,
+						names *names_mod = NULL, devices *devices_mod = NULL, monitor *monitor_mod = NULL, 
+						network *network_mod = NULL, wxArrayString switchValue = wxEmptyArrayString,
+						vector<switchProp> &switchTable = DEFAULT_SWITCH, vector<clockProp> &clockTable = DEFAULT_CLOCK);
+private:
+		// PRIVATE VARIABLES
+	names *nmz;										// pointer to names class
+	devices *dmz;									// pointer to devices class
+	monitor *mmz;									// pointer to monitor class
+	network *netz;									// pointer to network class
+		// MEMBER FUNCTIONS
+	wxPanel* CreateSwitchPropertiesPage(wxWindow* parent, wxArrayString switchValue, vector<switchProp> &switchTable);
+    wxPanel* CreateClockPropertiesPage(wxWindow* parent, vector<clockProp> &clockTable);
+		// EVENT TABLE
+	DECLARE_EVENT_TABLE()
+};
+
     
 #endif /* gui_h */

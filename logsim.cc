@@ -37,7 +37,7 @@ bool MyApp::OnInit()
 #ifdef USE_GUI
     // glutInit cannot cope with Unicode command line arguments, so we pass
     // it some fake ASCII ones instead
-	char *a[2]={"\0", "\0"};
+	const char *a[2]={"\0", "\0"};
     char **tmp1=(char**)a; int tmp2 = 0; glutInit(&tmp2, tmp1);
     // Construct the GUI
     MyFrame *frame = new MyFrame(NULL, wxT("Logic simulator"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz, netz, wxString(argv[1]));

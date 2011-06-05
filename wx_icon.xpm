@@ -1,5 +1,5 @@
 /* XPM */
-static char * wx_icon_xpm[] = {
+static const char * wx_icon_xpm[] = {
 "32 32 349 2",
 "  	c None",
 ". 	c #BBBBBB",

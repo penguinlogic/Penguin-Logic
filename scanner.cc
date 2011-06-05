@@ -149,7 +149,7 @@ cout<<"Error in line "<<last.linenum<<", at character "<<last.pos<<":"<<endl;
 
 cout<<last.line<<endl;
 
-for (int i=0; i<last.pos-1; i++) {
+for (unsigned int i=0; i<last.pos-1; i++) {
 	if (last.line[i] == '\t') cout << '\t';
 	else cout << " ";
 } // accounts for tabs at in erroneous line

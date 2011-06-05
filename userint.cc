@@ -14,11 +14,11 @@ using namespace std;
  */
 void userint::readline (void)
 {
-  char ch;
+  //char ch;
   do {
     cout << "# " << flush;
     cin.getline (cmdline, maxline);
-    cmdlen = cin.gcount() - 1;
+    cmdlen = static_cast<int>(cin.gcount()) - 1;
   } while (cmdlen == 0);
   cmdpos = 0;
   curch = cmdline[cmdpos];
@@ -82,7 +82,7 @@ void userint::rdnumber (int& n, int lo, int hi)
 {
   skip ();
   n = 0;
-  cmdok = isdigit(curch);
+  cmdok = isdigit(curch)!=0;
   if (cmdok) {
     do {
       n = n * 10 + ((int) curch) - ((int) '0');
@@ -106,7 +106,7 @@ void userint::rdstring (namestring &n)
 {
   int i = 0;
   skip ();
-  cmdok = isalpha(curch);
+  cmdok = isalpha(curch)!=0;
   if (cmdok) {
     do {
       if (i < maxlength) {
@@ -217,7 +217,7 @@ void userint::runnetwork (int ncycles)
  */
 void userint::runcmd (void)
 {
-  int n;
+  //int n;
   int ncycles;
   cyclescompleted = 0;
   rdnumber (ncycles, 1, maxcycles);

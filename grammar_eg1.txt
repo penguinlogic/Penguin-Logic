@@ -5,6 +5,7 @@ DEVICES
 	SWITCH -initialvalue 1 = switch3;
 	AND -numinputs 2 = and1;
 	OR -numinputs 2 = or1;
+	CLOCK -period 5 = averylongunameforaclocktoseetheeffect;
 }
 
 CONNECTIONS

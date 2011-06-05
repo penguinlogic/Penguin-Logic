@@ -338,7 +338,7 @@ try
   {
     if (cursym.get_type() != Uname) {errcount++; throw unameex_i;} // didn't get a uname
 	if (DEVICES != section_var.get_syntaxvalue()) {
-			for(int i = 0; i < uname_list.size(); i++) {
+			for(unsigned int i = 0; i < uname_list.size(); i++) {
 				if (cursym.get_name_id() == uname_list[i]) {did_var = cursym.get_name_id(); return;}
 			}
 			errcount++;
@@ -425,7 +425,7 @@ try
 	if (cursym.get_syntaxvalue() == semicolon) { // cursym is ';'
 	// checks to make sure unames have been defined in DEVICES
 	int valid_dev_count = 0;
-	for (int i = 0; i < uname_list.size(); i++) {
+	for (unsigned int i = 0; i < uname_list.size(); i++) {
 		if (dev == uname_list[i]) valid_dev_count++;
 	}
 	if (0 == valid_dev_count) {errcount++; throw undefunameex_i;}//we found a device not initialised in DEVICES
@@ -508,7 +508,7 @@ try
       inname(inp);
 	  smz->getsymbol (cursym);
       if (cursym.get_syntaxvalue() == semicolon) { // cursym is ';'
-	for (int i = 0; i < idev_conn_list.size(); i++) {
+	for (unsigned int i = 0; i < idev_conn_list.size(); i++) {
 		if (idev == idev_conn_list[i] && inp == inp_conn_list[i]) {errcount++; throw idevalreadyusedex_i;}
 	}
 
@@ -579,7 +579,7 @@ try
     if (cursym.get_syntaxvalue() == equals) { // we have an '='
 	smz->getsymbol (cursym);     
 	uname(did_var);
-	for(int i = 0; i < uname_list.size(); i++) {
+	for(unsigned int i = 0; i < uname_list.size(); i++) {
 	if (did_var == uname_list[i]) {errcount++; throw dupunameex_i;}	// we found a duplicate uname
 	}
 
