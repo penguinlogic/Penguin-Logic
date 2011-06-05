@@ -15,10 +15,10 @@ bool MyApp::OnInit()
 
 	// glutInit cannot cope with Unicode command line arguments, so we pass
 	// it some fake ASCII ones instead
-	char *a[2]={"dummy","dummy"};
+	const char *a[2]={"dummy","dummy"};
 	char **tmp1=(char**)a; int tmp2 = 0; glutInit(&tmp2, tmp1);
 	// Construct the GUI
-	MyFrame *frame = new MyFrame(NULL, wxT("Penguin Logic"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz, /*m_helpController,*/ wxDEFAULT_FRAME_STYLE);
+	MyFrame *frame = new MyFrame(NULL, wxT("Penguin Logic"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz, netz, wxT(""), wxDEFAULT_FRAME_STYLE);
 	frame->SetBackgroundColour(wxColour(204, 204, 255));
 	frame->Show(true);
 

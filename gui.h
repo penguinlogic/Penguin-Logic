@@ -78,7 +78,7 @@ private:
 	int cyclescompleted;							// how many simulation cycles have been completed
 	wxString defname;								// name of definition files
 		// MEMBER FUNCTIONS
-	wxString MyFrame::DeviceProps(devlink d);
+	wxString DeviceProps(devlink d);
 	void runnetwork(int ncycles);					// function to run the logic network
 		// EVENT HANDLERS
 	void OnDevelopment(wxCommandEvent& event);		// callback for functions under development
