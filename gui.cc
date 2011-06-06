@@ -25,6 +25,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
   // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
   // using sizers
 {
+	cout << "Constructing Frame" << endl;
 	SetIcon(wxIcon(wx_icon_xpm));
 	nmz = names_mod;
 	dmz = devices_mod;
@@ -84,6 +85,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 				const int cy_size = 1000;	// Canvas size
 				sw->SetScrollbars(s_inc, s_inc, cx_size/s_inc, cy_size/s_inc);
 				canvas = new MyGLCanvas(sw, wxID_ANY, monitor_mod, names_mod, wxDefaultPosition, wxSize(cx_size,cy_size));
+				wxButton *test = new wxButton(sw, RUN_BUTTON_ID, wxT("Run"));
 			left_sizer->Add(sw, 1, wxEXPAND | wxALL, 10);
 			// Button panel
 			wxFlexGridSizer *button_sizer = new wxFlexGridSizer(2,0,0,0);
@@ -138,11 +140,14 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 					//	wxBoxSizer *monitors_sizer = new wxBoxSizer(wxVERTICAL);
 					//	monitors_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("MONITORS")), 0, wxEXPAND|wxALL,5);
 					//info_sizer->Add(monitors_sizer, 0, wxEXPAND|wxALL, 5);
-				panel->SetSizerAndFit(info_sizer);
+				panel->SetSizer(info_sizer);
+					info_sizer->Fit(panel);
 		right_sizer->Add(sp, 1, wxALL, 10);
 	topsizer->Add(right_sizer, 0, wxEXPAND|wxALL, 10);
 	SetSizeHints(800, 400);
 	SetSizer(topsizer);
+	
+	//cout << "Finished cons
 }
 
 wxString MyFrame::DeviceProps(devlink d)
@@ -622,7 +627,7 @@ void MyGLCanvas::Render(int cycles)
 			glColor3ub(0, 100, 0);
 			glRasterPos2f(5, CANVAS_HEIGHT-(m+1)*SEPARATION + 15);
 			for (unsigned int i = 0; (i < mon_name.Len()); i++) // Display each character in turn
-				glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, mon_name[i]);
+				//glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, mon_name[i]);
 			
 			// Draw axes
 			glColor3ub(0, 0, 0);
@@ -637,8 +642,8 @@ void MyGLCanvas::Render(int cycles)
 			glBegin(GL_LINES);
 			for(int i=0; i<cyclesdisplayed; i++)
 			{
-					glVertex2f(LENGTH*(i+1)+INDENT,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
-					glVertex2f(LENGTH*(i+1)+INDENT,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-6);
+				glVertex2f(LENGTH*(i+1)+INDENT,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
+				glVertex2f(LENGTH*(i+1)+INDENT,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-6);
 			}
 			glEnd();
 						
@@ -679,8 +684,8 @@ void MyGLCanvas::Render(int cycles)
 				}
 				else
 					cout << "Couldn't get signal trace" << endl;
+				glEnd();
 			}
-			glEnd();
 		}
 	}
 
@@ -717,7 +722,6 @@ void MyGLCanvas::OnSize(wxSizeEvent& event)	// Callback function for when the ca
 	init = false;
 	Refresh(); // required by some buggy nvidia graphics drivers,
 	Update();  // harmless on other platforms!
-	Render();
 }
 
 void MyGLCanvas::OnMouse(wxMouseEvent& event)	// Callback function for mouse events inside the GL canvas
@@ -728,7 +732,6 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)	// Callback function for mouse eve
 void MyGLCanvas::GetImage(unsigned char* &pixels)
 {
 	glReadBuffer(GL_FRONT);
-	// glPixelStorei( GL_PACK_ALIGNMENT, 1 );
 	glReadPixels(0, 0, 2000, 1000, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 }
 
