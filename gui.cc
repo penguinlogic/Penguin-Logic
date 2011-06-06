@@ -1,10 +1,8 @@
 #include "gui.h"
 
-
-
-// ----------------------------------------------------------------------------//
+// ---------------------------------------------------------------------------//
 // MyFrame
-// ----------------------------------------------------------------------------//
+// ---------------------------------------------------------------------------//
 
 // Event Table
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
@@ -19,11 +17,12 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_BUTTON(MONITOR_BUTTON_ID, MyFrame::OnMonitorButton)
 END_EVENT_TABLE()
 
-MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, const wxSize& size,
-		 names *names_mod, devices *devices_mod, monitor *monitor_mod, network *network_mod, wxString deffilename, long style):
-  wxFrame(parent, wxID_ANY, title, pos, size, style)
-  // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
-  // using sizers
+MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
+	const wxSize& size, names *names_mod, devices *devices_mod,
+	monitor *monitor_mod, network *network_mod, wxString deffilename,
+	long style):	wxFrame(parent, wxID_ANY, title, pos, size, style)
+  // Constructor - initialises pointers to names, devices and monitor classes,
+  // lays out widgets using sizers
 {
 	SetIcon(wxIcon(wx_icon_xpm));
 	nmz = names_mod;
@@ -33,7 +32,8 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	defname = deffilename;
 	if (nmz == NULL || dmz == NULL || mmz == NULL || netz == NULL)
 	{
-		cout << "Cannot operate GUI without names, devices, monitor and network classes" << endl;
+		cout << "Cannot operate GUI without names, devices, monitor"
+				<< "and network classes" << endl;
 		exit(1);
 	}
 
@@ -78,39 +78,53 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 		// Left panel
 		wxBoxSizer *left_sizer = new wxBoxSizer(wxVERTICAL);
 			// Canvas
-			wxScrolledWindow *sw = new wxScrolledWindow(this, wxID_ANY, wxPoint(0, 0), wxSize(400, 400), wxVSCROLL|wxHSCROLL);
+			wxScrolledWindow *sw = new wxScrolledWindow(this, wxID_ANY,
+					wxPoint(0, 0), wxSize(400, 400), wxVSCROLL|wxHSCROLL);
 				const int s_inc = 40;		// Scroll increment
-				const int cx_size = 2000;	// Canvas size
-				const int cy_size = 1000;	// Canvas size
+				const int cx_size = 3000;	// Canvas size
+				const int cy_size = 2000;	// Canvas size
 				sw->SetScrollbars(s_inc, s_inc, cx_size/s_inc, cy_size/s_inc);
-				canvas = new MyGLCanvas(sw, wxID_ANY, monitor_mod, names_mod, wxDefaultPosition, wxSize(cx_size,cy_size));
+				canvas = new MyGLCanvas(sw, wxID_ANY, monitor_mod, names_mod, 
+									wxDefaultPosition, wxSize(cx_size,cy_size));
 				wxButton *test = new wxButton(sw, RUN_BUTTON_ID, wxT("Run"));
 			left_sizer->Add(sw, 1, wxEXPAND | wxALL, 10);
 			// Button panel
 			wxFlexGridSizer *button_sizer = new wxFlexGridSizer(2,0,0,0);
 					// Run button
-				button_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
+				button_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0,
+												wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// Spinner (label)
-				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Cycles:")), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
+				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Cycles:")),
+							0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
 					// Spinner (device)
-					spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString(wxT("10")));
+					spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID,
+											wxString(wxT("10")));
 				button_sizer->Add(spin, 0 , wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// DEVICE button
-				button_sizer->Add(new wxButton(this, DEVICE_BUTTON_ID, wxT("Change device properties")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
+				button_sizer->Add(new wxButton(this, DEVICE_BUTTON_ID,
+									wxT("Change device properties")), 0,
+									wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// Continue button
-				button_sizer->Add(new wxButton(this, CONT_BUTTON_ID, wxT("Continue")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
+				button_sizer->Add(new wxButton(this, CONT_BUTTON_ID,
+							wxT("Continue")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// Static text (placeholder)
-				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("")), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
+				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("")), 0,
+							wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
 					// Static text (placeholder)
-				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("")), 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
+				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("")), 0,
+								wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
 					// MONITOR button
-				button_sizer->Add(new wxButton(this, MONITOR_BUTTON_ID, wxT("Change monitor points")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
+				button_sizer->Add(new wxButton(this, MONITOR_BUTTON_ID,
+								wxT("Change monitor points")), 0,
+								wxALIGN_CENTER_VERTICAL|wxALL, 10);
 			left_sizer->Add(button_sizer, 0, wxEXPAND | wxALL, 10);
 	topsizer->Add(left_sizer, 1, wxEXPAND | wxALL, 10);
 		//Right panel
 		wxBoxSizer *right_sizer = new wxBoxSizer(wxVERTICAL);
 		right_sizer->SetMinSize(wxSize(250,-1));
-			wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY, wxPoint(-1, -1), wxSize(250, -1), wxVSCROLL|wxHSCROLL);
+			wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY,
+										wxPoint(-1, -1), wxSize(250, -1),
+										wxVSCROLL|wxHSCROLL);
 				const int p_inc = 40;		// Scroll increment
 				const int px_size = 800;	// Canvas size
 				const int py_size = 1000;	// Canvas size
@@ -120,22 +134,30 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 					wxBoxSizer *info_sizer = new wxBoxSizer(wxVERTICAL);
 						// Filename
 						wxBoxSizer *deffile_sizer = new wxBoxSizer(wxHORIZONTAL);
-						deffile_sizer->Add(new wxStaticText(sp, wxID_ANY, wxT("Definition file name:")), 0,wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
-						deffile_sizer->Add(new wxStaticText(sp, wxID_ANY, defname), 0, wxALIGN_CENTER_VERTICAL ,0);
+						deffile_sizer->Add(new wxStaticText(sp, wxID_ANY,
+										wxT("Definition file name:")), 0,
+										wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
+						deffile_sizer->Add(new wxStaticText(sp, wxID_ANY, defname),
+										0, wxALIGN_CENTER_VERTICAL ,0);
 					info_sizer->Add(deffile_sizer, 0, wxEXPAND|wxALL,0);
 						// Devices
 						wxBoxSizer *devices_sizer = new wxBoxSizer(wxVERTICAL);
-						devices_sizer->Add(new wxStaticText(sp, wxID_ANY, wxT("DEVICES")), 0, wxEXPAND|wxALL,5);
-							for (devlink d = netz->devicelist(); d != NULL; d = d->next)
-								devices_sizer->Add(new wxStaticText(sp, wxID_ANY, DeviceProps(d)), 0, wxEXPAND|wxLEFT,25);
+						devices_sizer->Add(new wxStaticText(sp, wxID_ANY,
+										wxT("DEVICES")), 0, wxEXPAND|wxALL,5);
+							for (devlink d = netz->devicelist(); d != NULL;
+										d = d->next)
+								devices_sizer->Add(new wxStaticText(sp, wxID_ANY,
+												DeviceProps(d)), 0, wxEXPAND|wxLEFT,25);
 					info_sizer->Add(devices_sizer, 0, wxEXPAND|wxALL, 0);
 					//	// Connections
 					//	wxBoxSizer *connections_sizer = new wxBoxSizer(wxVERTICAL);
-					//	connections_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("CONNECTIONS")), 0, wxEXPAND|wxALL,5);
+					//	connections_sizer->Add(new wxStaticText(panel, wxID_ANY,
+					//						wxT("CONNECTIONS")), 0, wxEXPAND|wxALL,5);
 					//info_sizer->Add(connections_sizer, 0, wxEXPAND|wxALL, 5);
 					//	// Monitors
 					//	wxBoxSizer *monitors_sizer = new wxBoxSizer(wxVERTICAL);
-					//	monitors_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("MONITORS")), 0, wxEXPAND|wxALL,5);
+					//	monitors_sizer->Add(new wxStaticText(panel, wxID_ANY,
+					//					wxT("MONITORS")), 0, wxEXPAND|wxALL,5);
 					//info_sizer->Add(monitors_sizer, 0, wxEXPAND|wxALL, 5);
 				sp->SetSizer(info_sizer);
 		right_sizer->Add(sp, 1, wxEXPAND|wxALL, 10);
@@ -203,7 +225,7 @@ wxString MyFrame::DeviceProps(devlink d)
 }
 
 void MyFrame::runnetwork(int ncycles)
-  // Function to run the network, derived from corresponding function in userint.cc
+  // Function to run the network
 {
   bool ok = true;
   int n = ncycles;
@@ -230,7 +252,8 @@ void MyFrame::OnDevelopment(wxCommandEvent &event)
 void MyFrame::OnOpen(wxCommandEvent &event)
   // Callback for the [File | Open circuit definition file] menu item
 {
-	wxFileDialog dialog(this,_T("Open circuit definition file"),wxEmptyString,wxEmptyString,_T("Logic definition files (*.txt;*.ldf)|*.txt;*.ldf"));
+	wxFileDialog dialog(this,_T("Open circuit definition file"),wxEmptyString,
+		wxEmptyString,_T("Logic definition files (*.txt;*.ldf)|*.txt;*.ldf"));
 
     dialog.SetDirectory(wxGetHomeDir());
     dialog.CentreOnParent();
@@ -252,7 +275,9 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 void MyFrame::OnSave(wxCommandEvent &event)
   // Callback for the [File | Save waveintforms as picture] menu item
 {
-	wxFileDialog dialog(this,_T("Save waveforms as picture"),wxEmptyString,wxEmptyString,_T("Portable network graphics (*.png)|*.png"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+	wxFileDialog dialog(this,_T("Save waveforms as picture"),wxEmptyString,
+			wxEmptyString,_T("Portable network graphics (*.png)|*.png"),
+			wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 	
 	dialog.SetFilterIndex(1);
 	if (dialog.ShowModal() == wxID_OK)
@@ -275,9 +300,12 @@ void MyFrame::OnSave(wxCommandEvent &event)
 			for(unsigned int y=0; y<ImHeight; y++)
 			{
 				//image[x, y,  = mirror_image[x, ImHeight-y];
-				image[(x+y*ImWidth)*bytesPerPixel+0] = mirror_image[(x+(rev_val-y)*ImWidth)*3];
-				image[(x+y*ImWidth)*bytesPerPixel+1] = mirror_image[(x+(rev_val-y)*ImWidth)*3 + 1];
-				image[(x+y*ImWidth)*bytesPerPixel+2] = mirror_image[(x+(rev_val-y)*ImWidth)*3 + 2];
+				image[(x+y*ImWidth)*bytesPerPixel+0] = 
+								mirror_image[(x+(rev_val-y)*ImWidth)*3];
+				image[(x+y*ImWidth)*bytesPerPixel+1] = 
+								mirror_image[(x+(rev_val-y)*ImWidth)*3 + 1];
+				image[(x+y*ImWidth)*bytesPerPixel+2] = 
+								mirror_image[(x+(rev_val-y)*ImWidth)*3 + 2];
 			}
 		}
 		
@@ -388,10 +416,11 @@ void MyFrame::OnDeviceButton(wxCommandEvent &event)
 
 
 	//----CREATE DIALOG-----//
-	MyDeviceConfigDialog dialog(this, _("Device Configuration"), wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER,
-								_("Device Configuration"), nmz, dmz, mmz, netz, switchValue, switchTable, clockTable);
-    
-	
+	MyDeviceConfigDialog dialog(this, _("Device Configuration"),
+							wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER,
+							_("Device Configuration"), nmz, dmz, mmz, netz,
+							switchValue, switchTable, clockTable);
+    	
 	//----GET RETURN VALUES----//
 	if(dialog.ShowModal()==wxID_OK)
 	{
@@ -422,7 +451,8 @@ void MyFrame::OnDeviceButton(wxCommandEvent &event)
 		// Set new clock values
 		for(unsigned int i=0; i<clockTable.size(); i++)
 		{
-			dmz->setclock(clockTable[i].ID, clockTable[i].value_box->GetValue(), ok);
+			dmz->setclock(clockTable[i].ID,
+							clockTable[i].value_box->GetValue(), ok);
 			if(!ok)
 				cout << "Error setting clock value" << endl;
 		}
@@ -444,7 +474,8 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 		{
 			montemp.DevID = d->id;
 			montemp.OutID = o->id;
-			montemp.DevName = wxString(nmz->getname(montemp.DevID).c_str(), wxConvUTF8);
+			montemp.DevName = wxString(nmz->getname(montemp.DevID).c_str(),
+										wxConvUTF8);
 			montemp.Selected = false;
 			monTable.push_back(montemp);
 			o = o->next;
@@ -462,14 +493,15 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 		str = monTable[i].DevName;
 		if(monTable[i].OutID !=-1)
 		{
-			monTable[i].OutName = wxString(nmz->getname(monTable[i].OutID).c_str(), wxConvUTF8);
+			monTable[i].OutName = wxString(nmz->
+							getname(monTable[i].OutID).c_str(), wxConvUTF8);
 			str.Append(wxT("."));
 			str.Append(monTable[i].OutName);
 		}
 		choices.Add(str);
 	}
 
-	// Find location of each current monitor in "choices" and add to "selections"
+	// Find location of each monitor in "choices" and add to "selections"
 	for(int i=0; i<(mmz->moncount()); i++)
 	{
 		// Get details of nth monitor
@@ -495,7 +527,8 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 	}
 	
 	// Create dialog box
-	wxString MonMsg = wxT("Please select the required monitor points and select OK");
+	wxString MonMsg =
+		wxT("Please select the required monitor points and select OK");
 	wxString MonCap = wxT("Change monitor points");
 	wxMultiChoiceDialog monitor(this, MonMsg, MonCap, choices);
 	monitor.SetSelections(selections);
@@ -522,9 +555,14 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 				if(monTable[monIndex].Selected == false)
 				{
 					ok = false;
-					mmz->makemonitor(monTable[monIndex].DevID,monTable[monIndex].OutID,ok);
+					mmz->makemonitor(monTable[monIndex].DevID,
+										monTable[monIndex].OutID,ok);
 					if(!ok)
-						cout << "Failed to make monitor" << endl;
+					{
+						wxMessageDialog *error = new wxMessageDialog(this,
+											wxT("Failed to make monitor"));
+						error->ShowModal();
+					}
 				}
 			}
 			else
@@ -532,9 +570,14 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 				if(monTable[monIndex].Selected == true)
 				{
 					ok = false;
-					mmz->remmonitor(monTable[monIndex].DevID,monTable[monIndex].OutID,ok);
+					mmz->remmonitor(monTable[monIndex].DevID,
+									monTable[monIndex].OutID,ok);
 					if(!ok)
-						cout << "Failed to remove monitor" << endl;
+					{
+						wxMessageDialog *error = new wxMessageDialog(this,
+										wxT("Failed to remove monitor"));
+						error->ShowModal();
+					}
 				}
 			}
 		}
@@ -546,9 +589,9 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 
 
 
-// ----------------------------------------------------------------------------//
+// ---------------------------------------------------------------------------//
 // MyGLCanvas
-// ----------------------------------------------------------------------------//
+// ---------------------------------------------------------------------------//
 
 // Event Table
 BEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
@@ -557,9 +600,10 @@ BEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
 	EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
 END_EVENT_TABLE()
   
-MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod, 
-const wxPoint& pos, const wxSize& size, long style, const wxString& name):
-wxGLCanvas(parent, id, pos, size, style, name)
+MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod,
+					names* names_mod, const wxPoint& pos, const wxSize& size,
+					long style, const wxString& name):
+					wxGLCanvas(parent, id, pos, size, style, name)
   // Constructor - initialises private variables
 {
 	mmz = monitor_mod;
@@ -595,19 +639,21 @@ void MyGLCanvas::Render(int cycles)
 	const int LENGTH = 20;
 	const int MAX_NAME_LENGTH = 10;
 
-
-	if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0))	// draw the first monitor signal, get trace from monitor class
+		// draw the first monitor signal, get trace from monitor class
+	if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0))
 	{
 		for(int m=mmz->moncount()-1; m>=0; m--)
 		{
 			// Get name of monitor
 			name n1, n2;
 			mmz->getmonname(m,n1, n2);
-			wxString mon_name = wxString(nmz->getname(n1).c_str(), wxConvUTF8);
-			if(n2 != -1)	// If device has more than 1 output, append output name
+			wxString mon_name = wxString(nmz->getname(n1).c_str(),
+										wxConvUTF8);
+			if(n2 != -1)	// Append output name if necessary
 			{
 				mon_name.Append(wxString(".", wxConvUTF8));
-				mon_name.Append(wxString(nmz->getname(n2).c_str(), wxConvUTF8));
+				mon_name.Append(wxString(nmz->getname(n2).c_str(),
+										wxConvUTF8));
 			}
 
 			// Truncate name of monitor if too long
@@ -620,7 +666,8 @@ void MyGLCanvas::Render(int cycles)
 			// Display name of monitor
 			glColor3ub(0, 100, 0);
 			glRasterPos2f(5, CANVAS_HEIGHT-(m+1)*SEPARATION + 15);
-			for (unsigned int i = 0; (i < mon_name.Len()); i++) // Display each character in turn
+				// Display each character in turn
+			for (unsigned int i = 0; (i < mon_name.Len()); i++)
 				glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, mon_name[i]);
 			
 			// Draw axes
@@ -628,7 +675,8 @@ void MyGLCanvas::Render(int cycles)
 			glBegin(GL_LINE_STRIP);
 				glVertex2f(INDENT-1,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_HIGH+6);
 				glVertex2f(INDENT-1,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
-				glVertex2f(LENGTH*cyclesdisplayed+INDENT,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
+				glVertex2f(LENGTH*cyclesdisplayed+INDENT,
+							CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
 			glEnd();
 			
 			// Draw tickmarks
@@ -636,8 +684,10 @@ void MyGLCanvas::Render(int cycles)
 			glBegin(GL_LINES);
 			for(int i=0; i<cyclesdisplayed; i++)
 			{
-				glVertex2f(LENGTH*(i+1)+INDENT,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
-				glVertex2f(LENGTH*(i+1)+INDENT,CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-6);
+				glVertex2f(LENGTH*(i+1)+INDENT,
+							CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-1);
+				glVertex2f(LENGTH*(i+1)+INDENT,
+							CANVAS_HEIGHT-(m+1)*SEPARATION+SIG_LOW-6);
 			}
 			glEnd();
 						
@@ -684,7 +734,7 @@ void MyGLCanvas::Render(int cycles)
 		}
 	}
 
-	// We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
+	// Flush the graphics pipeline and swap the back buffer to the front
 	glFlush();
 	SwapBuffers();
 }
@@ -705,13 +755,15 @@ void MyGLCanvas::InitGL()	// Function to initialise the GL context
 	glLoadIdentity();
 }
 
-void MyGLCanvas::OnPaint(wxPaintEvent& event)	// Callback function for when the canvas is exposed
+void MyGLCanvas::OnPaint(wxPaintEvent& event)
+	// Callback function for when the canvas is exposed
 {
 	wxPaintDC dc(this); // required for correct refreshing under MS windows
 	Render();
 }
 
-void MyGLCanvas::OnSize(wxSizeEvent& event)	// Callback function for when the canvas is resized
+void MyGLCanvas::OnSize(wxSizeEvent& event)
+	// Callback function for when the canvas is resized
 {
 	wxGLCanvas::OnSize(event); // required on some platforms
 	init = false;
@@ -719,33 +771,41 @@ void MyGLCanvas::OnSize(wxSizeEvent& event)	// Callback function for when the ca
 	Update();  // harmless on other platforms!
 }
 
-void MyGLCanvas::OnMouse(wxMouseEvent& event)	// Callback function for mouse events inside the GL canvas
+void MyGLCanvas::OnMouse(wxMouseEvent& event)
+	// Callback function for mouse events inside the GL canvas
 {
 	Render();
 }
 
 void MyGLCanvas::GetImage(unsigned char* &pixels)
 {
+	wxSize CanvasSize = GetSize();
 	glReadBuffer(GL_FRONT);
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
-	glReadPixels(0, 0, 2000, 1000, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	glReadPixels(0, 0, CanvasSize.GetWidth(), CanvasSize.GetHeight(),
+					GL_RGB, GL_UNSIGNED_BYTE, pixels);
 	cout << "Pixels" << pixels << endl;
 }
 
 
 
-// ----------------------------------------------------------------------------//
+// ---------------------------------------------------------------------------//
 // MyDeviceConfigDialog
-// ----------------------------------------------------------------------------//
+// ---------------------------------------------------------------------------//
 
 // Event Table
 BEGIN_EVENT_TABLE(MyDeviceConfigDialog, wxPropertySheetDialog)
 END_EVENT_TABLE()
 
-MyDeviceConfigDialog::MyDeviceConfigDialog(wxWindow* parent, const wxString& title, long style,
-						const wxString& name, names *names_mod, devices *devices_mod, monitor *monitor_mod,
-						network *network_mod, wxArrayString switchValue, vector<switchProp> &switchTable, vector<clockProp> &clockTable):
-  wxPropertySheetDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(400,200), style)
+MyDeviceConfigDialog::MyDeviceConfigDialog(wxWindow* parent,
+						const wxString& title, long style,
+						const wxString& name, names *names_mod,
+						devices *devices_mod, monitor *monitor_mod,
+						network *network_mod, wxArrayString switchValue,
+						vector<switchProp> &switchTable,
+						vector<clockProp> &clockTable):
+						wxPropertySheetDialog(parent, wxID_ANY, title,
+							wxDefaultPosition, wxSize(400,200), style)
 {
 	nmz = names_mod;
 	dmz = devices_mod;
@@ -755,15 +815,18 @@ MyDeviceConfigDialog::MyDeviceConfigDialog(wxWindow* parent, const wxString& tit
     CreateButtons(wxOK|wxCANCEL);
 
     wxBookCtrlBase* notebook = GetBookCtrl();
-		wxPanel* switchProperties = CreateSwitchPropertiesPage(notebook, switchValue, switchTable);
+		wxPanel* switchProperties =
+			CreateSwitchPropertiesPage(notebook, switchValue, switchTable);
 	notebook->AddPage(switchProperties, _("Switch Properties"));
-		wxPanel* clockProperties = CreateClockPropertiesPage(notebook, clockTable);
+		wxPanel* clockProperties =
+			CreateClockPropertiesPage(notebook, clockTable);
 	notebook->AddPage(clockProperties, _("Clock Properties"));
 	
     LayoutDialog();
 }
 
-wxPanel* MyDeviceConfigDialog::CreateSwitchPropertiesPage(wxWindow* parent, wxArrayString switchValue, vector<switchProp> &switchTable)
+wxPanel* MyDeviceConfigDialog::CreateSwitchPropertiesPage(wxWindow* parent,
+				wxArrayString switchValue, vector<switchProp> &switchTable)
 {
 	// Create layout
 	wxPanel* panel = new wxPanel(parent, wxID_ANY);
@@ -772,9 +835,12 @@ wxPanel* MyDeviceConfigDialog::CreateSwitchPropertiesPage(wxWindow* parent, wxAr
 			// Create labels and combo boxes for all switches
 			for(int i=switchTable.size()-1; i>=0; i--)
 			{
-					switchTable[i].field_box = new wxStaticText(panel, wxID_ANY,switchTable[i].Name);
+					switchTable[i].field_box =
+						new wxStaticText(panel, wxID_ANY,switchTable[i].Name);
 				item0->Add(switchTable[i].field_box, 0, wxALL, 5);
-					switchTable[i].value_box = new wxComboBox(panel, wxID_ANY, switchTable[i].Value, wxDefaultPosition, wxDefaultSize, switchValue, wxCB_READONLY);
+					switchTable[i].value_box = new wxComboBox(panel, wxID_ANY,
+						switchTable[i].Value, wxDefaultPosition, wxDefaultSize,
+						switchValue, wxCB_READONLY);
 				item0->Add(switchTable[i].value_box, 0, wxALL, 0);
 			}
 		topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5);
@@ -785,7 +851,8 @@ wxPanel* MyDeviceConfigDialog::CreateSwitchPropertiesPage(wxWindow* parent, wxAr
 	return panel;
 }
 
-wxPanel* MyDeviceConfigDialog::CreateClockPropertiesPage(wxWindow* parent, vector<clockProp> &clockTable)
+wxPanel* MyDeviceConfigDialog::CreateClockPropertiesPage(wxWindow* parent,
+						vector<clockProp> &clockTable)
 {
 	// Create layout
 	wxPanel* panel = new wxPanel(parent, wxID_ANY);
@@ -794,9 +861,11 @@ wxPanel* MyDeviceConfigDialog::CreateClockPropertiesPage(wxWindow* parent, vecto
 				// Create lables and spinners for all clocks
 				for(int i=clockTable.size()-1; i>=0; i--)
 				{
-						clockTable[i].field_box = new wxStaticText(panel, wxID_ANY, clockTable[i].Name);
+						clockTable[i].field_box = new wxStaticText(panel,
+												wxID_ANY, clockTable[i].Name);
 					item0->Add(clockTable[i].field_box, 0, wxALL, 5);			
-						clockTable[i].value_box = new wxSpinCtrl(panel, wxID_ANY, clockTable[i].Value);
+						clockTable[i].value_box = new wxSpinCtrl(panel,
+												wxID_ANY, clockTable[i].Value);
 					item0->Add(clockTable[i].value_box, 0, wxALL, 5);
 				}
 		topSizer->Add( item0, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
