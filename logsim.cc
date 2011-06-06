@@ -41,7 +41,7 @@ bool MyApp::OnInit()
     char **tmp1=(char**)a; int tmp2 = 0; glutInit(&tmp2, tmp1);
     // Construct the GUI
     MyFrame *frame = new MyFrame(NULL, wxT("Logic simulator"), wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz, netz, wxString(argv[1]));
-	frame->SetBackgroundColour(wxColour(255, 140, 0));
+	frame->SetBackgroundColour(wxColour(176, 196, 222));
     frame->Show(true);
     return(true); // enter the GUI event loop
 #else

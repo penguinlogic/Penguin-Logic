@@ -25,7 +25,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
   // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
   // using sizers
 {
-	cout << "Constructing Frame" << endl;
 	SetIcon(wxIcon(wx_icon_xpm));
 	nmz = names_mod;
 	dmz = devices_mod;
@@ -41,7 +40,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	// Define File menu
 	wxMenu *fileMenu = new wxMenu;
 	//fileMenu->Append(wxID_OPEN, wxT("&Open circuit definition file"));
-	fileMenu->Append(wxID_SAVE, wxT("&Save waveforms as picture"));
+	//fileMenu->Append(wxID_SAVE, wxT("&Save waveforms as picture"));
 	fileMenu->Append(wxID_EXIT, wxT("&Exit"));
 
 	// Define Help menu
@@ -110,28 +109,26 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 	topsizer->Add(left_sizer, 1, wxEXPAND | wxALL, 10);
 		//Right panel
 		wxBoxSizer *right_sizer = new wxBoxSizer(wxVERTICAL);
+		right_sizer->SetMinSize(wxSize(250,-1));
 			wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY, wxPoint(-1, -1), wxSize(250, -1), wxVSCROLL|wxHSCROLL);
 				const int p_inc = 40;		// Scroll increment
 				const int px_size = 800;	// Canvas size
 				const int py_size = 1000;	// Canvas size
-				sp->SetSize(wxSize(250,-1));
 				sp->SetScrollbars(p_inc, p_inc, px_size/p_inc, py_size/p_inc);
-							
-				wxPanel* panel = new wxPanel(sp, wxID_ANY);
-				panel->SetSize(wxSize(250, -1));
+				//sp->Show();
 				// Right hand panel
 					wxBoxSizer *info_sizer = new wxBoxSizer(wxVERTICAL);
 						// Filename
 						wxBoxSizer *deffile_sizer = new wxBoxSizer(wxHORIZONTAL);
-						deffile_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("Definition file name:")), 0,wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
-						deffile_sizer->Add(new wxStaticText(panel, wxID_ANY, defname), 0, wxALIGN_CENTER_VERTICAL ,0);
-					info_sizer->Add(deffile_sizer, 0, wxEXPAND|wxALL,5);
+						deffile_sizer->Add(new wxStaticText(sp, wxID_ANY, wxT("Definition file name:")), 0,wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
+						deffile_sizer->Add(new wxStaticText(sp, wxID_ANY, defname), 0, wxALIGN_CENTER_VERTICAL ,0);
+					info_sizer->Add(deffile_sizer, 0, wxEXPAND|wxALL,0);
 						// Devices
 						wxBoxSizer *devices_sizer = new wxBoxSizer(wxVERTICAL);
-						devices_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("DEVICES")), 0, wxEXPAND|wxALL,5);
+						devices_sizer->Add(new wxStaticText(sp, wxID_ANY, wxT("DEVICES")), 0, wxEXPAND|wxALL,5);
 							for (devlink d = netz->devicelist(); d != NULL; d = d->next)
-								devices_sizer->Add(new wxStaticText(panel, wxID_ANY, DeviceProps(d)), 0, wxEXPAND|wxLEFT,25);
-					info_sizer->Add(devices_sizer, 0, wxEXPAND|wxALL, 5);
+								devices_sizer->Add(new wxStaticText(sp, wxID_ANY, DeviceProps(d)), 0, wxEXPAND|wxLEFT,25);
+					info_sizer->Add(devices_sizer, 0, wxEXPAND|wxALL, 0);
 					//	// Connections
 					//	wxBoxSizer *connections_sizer = new wxBoxSizer(wxVERTICAL);
 					//	connections_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("CONNECTIONS")), 0, wxEXPAND|wxALL,5);
@@ -140,14 +137,11 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 					//	wxBoxSizer *monitors_sizer = new wxBoxSizer(wxVERTICAL);
 					//	monitors_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("MONITORS")), 0, wxEXPAND|wxALL,5);
 					//info_sizer->Add(monitors_sizer, 0, wxEXPAND|wxALL, 5);
-				panel->SetSizer(info_sizer);
-					info_sizer->Fit(panel);
-		right_sizer->Add(sp, 1, wxALL, 10);
+				sp->SetSizer(info_sizer);
+		right_sizer->Add(sp, 1, wxEXPAND|wxALL, 10);
 	topsizer->Add(right_sizer, 0, wxEXPAND|wxALL, 10);
 	SetSizeHints(800, 400);
 	SetSizer(topsizer);
-	
-	//cout << "Finished cons
 }
 
 wxString MyFrame::DeviceProps(devlink d)
@@ -627,7 +621,7 @@ void MyGLCanvas::Render(int cycles)
 			glColor3ub(0, 100, 0);
 			glRasterPos2f(5, CANVAS_HEIGHT-(m+1)*SEPARATION + 15);
 			for (unsigned int i = 0; (i < mon_name.Len()); i++) // Display each character in turn
-				//glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, mon_name[i]);
+				glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, mon_name[i]);
 			
 			// Draw axes
 			glColor3ub(0, 0, 0);
@@ -648,10 +642,11 @@ void MyGLCanvas::Render(int cycles)
 			glEnd();
 						
 			// Plot waveform for monitor
+			
+			glColor3ub(255, 0, 0);
+			glBegin(GL_LINE_STRIP);
 			for (int i=0; i<cyclesdisplayed; i++)
 			{
-				glColor3ub(255, 0, 0);
-				glBegin(GL_LINE_STRIP);
 				if (mmz->getsignaltrace(m, i, s))
 				{
 					// Define beginning and end height of line					
@@ -684,8 +679,8 @@ void MyGLCanvas::Render(int cycles)
 				}
 				else
 					cout << "Couldn't get signal trace" << endl;
-				glEnd();
 			}
+			glEnd();
 		}
 	}
 
@@ -701,7 +696,7 @@ void MyGLCanvas::InitGL()	// Function to initialise the GL context
 	GetClientSize(&w, &h);
 	SetCurrent();
 	glDrawBuffer(GL_BACK);
-	glClearColor(1.0/255*176, 1.0/255*196, 1.0/255*222, 0.0);
+	glClearColor(1.0/255*255, 1.0/255*255, 1.0/255*255, 0.0);
 	glViewport(0, 0, (GLint) w, (GLint) h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -732,7 +727,9 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)	// Callback function for mouse eve
 void MyGLCanvas::GetImage(unsigned char* &pixels)
 {
 	glReadBuffer(GL_FRONT);
+	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
 	glReadPixels(0, 0, 2000, 1000, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	cout << "Pixels" << pixels << endl;
 }
 
 
