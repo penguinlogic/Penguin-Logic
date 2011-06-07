@@ -31,9 +31,7 @@ getch function reads in the next character from the input file, keeping a record
 void
 scanner::getch ()
 {
-  last = current;
-
-  if (!inf.eof ())
+   if (!inf.eof ())
     {
       if (current.pos == current.line.size ())
 	{
@@ -147,6 +145,8 @@ the getsymbol function sets the parameters of the symbol passed to it. It ignore
 void
 scanner::getsymbol (symbol & s)
 {
+  last = current;
+	
   s.set_parameters (notype, novalue, -1, -1);
 
   skipspaces ();
@@ -249,7 +249,7 @@ scanner::print_err (const char *error)
 
   cout << last.line << endl;
 
-  for (unsigned int i = 0; i < last.pos - 1; i++)
+  for (unsigned int i = 0; i < last.pos; i++)
     {
       if (last.line[i] == '\t')
 	cout << '\t';
