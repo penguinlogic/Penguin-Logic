@@ -34,17 +34,41 @@
 				<OBJECT type="text/sitemap">
 					<param name="Name" value="EBNF Grammar">
 					<param name="Local" value="logicdefinitiongrammar.txt">
+				</OBJECT>
+				<LI>
+				<OBJECT type="text/sitemap">
+					<param name="Name" value="Semantic Rules">
+					<param name="Local" value="SemanticRules.html">
+				</OBJECT>
+					
+				<LI>
+				<OBJECT type="text/sitemap">
+					<param name="Name" value="Example Definition File 1">
+					<param name="Local" value="grammar_eg1.txt">
+				</OBJECT>
+					
+				<LI>
+				<OBJECT type="text/sitemap">
+					<param name="Name" value="Example Definition File 2">
+					<param name="Local" value="grammar_eg2.txt">
+				</OBJECT>
+					
+				<LI>
+				<OBJECT type="text/sitemap">
+					<param name="Name" value="Example Definition File 3">
+					<param name="Local" value="grammar_eg3.txt">
+				</OBJECT>
 			</UL>
 			
 			<LI>
 			<OBJECT type="text/sitemap">
-				<param name="Name" value="Running the program">
+				<param name="Name" value="Compiling and Running the program">
 			</OBJECT>
 			
 			<UL>
 				<LI>
 				<OBJECT type="text/sitemap">
-					<param name="Name" value="Running the program">
+					<param name="Name" value="Compiling and Running the program">
 					<param name="Local" value="RunningTheProgram.html">
 				</OBJECT>
 			</UL>

@@ -341,11 +341,19 @@ void MyFrame::OnAbout(wxCommandEvent &event)
 void MyFrame::OnRunButton(wxCommandEvent &event)
   // Callback for the push button
 {
-    cyclescompleted = 0;
-    mmz->resetmonitor();
-    runnetwork(spin->GetValue());
-	canvas->Render(cyclescompleted);
-	SetStatusText(wxT("Run button pressed"), 1);
+    if(spin->GetValue() <= maxcycles)
+	{
+		cyclescompleted = 0;
+		mmz->resetmonitor();
+		runnetwork(spin->GetValue());
+		canvas->Render(cyclescompleted);
+		SetStatusText(wxT("Run button pressed"), 1);
+	}
+	else
+	{
+		wxMessageDialog *error = new wxMessageDialog(this, wxT("Error: max number of cycles exceeded, please reduce the number of cycles using the spinner"));
+		error->ShowModal();
+	}
 }
 
 void MyFrame::OnContButton(wxCommandEvent &event)
@@ -353,7 +361,7 @@ void MyFrame::OnContButton(wxCommandEvent &event)
 {
    int ncycles = spin->GetValue();
 	SetStatusText(wxT("Continue button pressed"), 1);
-	if (cyclescompleted > 0)
+	if (cyclescompleted > 0 && cyclescompleted + spin->GetValue()<=maxcycles)
 	{
 		if ((ncycles + cyclescompleted) > maxcycles)
 			ncycles = maxcycles - cyclescompleted;

@@ -1,0 +1,59 @@
+DEVICES
+{
+	SWITCH -initialvalue 1 = sw1;
+	SWITCH -initialvalue 1 = sw2;
+	SWITCH -initialvalue 1 = sw3;
+	SWITCH -initialvalue 1 = sw4;
+	SWITCH -initialvalue 1 = sw5;
+	SWITCH -initialvalue 1 = sw6;
+	SWITCH -initialvalue 1 = sw7;
+	SWITCH -initialvalue 1 = sw8;
+	SWITCH -initialvalue 1 = sw9;
+	SWITCH -initialvalue 1 = sw10;
+	SWITCH -initialvalue 1 = sw11;
+	SWITCH -initialvalue 1 = sw12;
+	AND -numinputs 2 = and1;
+	NAND -numinputs 2 = nand1;
+	OR -numinputs 6 = or1;
+	XOR = xor1;
+	NOR -numinputs 2 = nor1;
+	OR -numinputs 2 = or2;
+	DTYPE = dtype1;
+	CLOCK -period 2 = clock1;
+	CLOCK -period 2 = clock2;
+}
+CONNECTIONS
+{
+	sw1 > and1.I1;
+	sw2 > and1.I2;
+	sw3 > nand1.I1;
+	sw4 > nand1.I2;
+
+	sw5 > or1.I1;
+	sw6 > or1.I2;
+	sw7 > or1.I3;
+	sw8 > or1.I4;
+	sw9 > or1.I5;
+	sw10 > or1.I6;
+
+	sw11 > xor1.I1;
+	sw12 > xor1.I2;
+
+	and1 > or2.I1;
+	nand1 > or2.I2;
+
+	or1 > nor1.I1;
+	xor1 > nor1.I2;
+
+	or2 > dtype1.DATA;
+	clock1 > dtype1.SET;
+	clock2 > dtype1.CLK;
+	nor1 > dtype1.CLEAR;
+}
+MONITOR
+{
+	dtype1.Q;
+	dtype1.QBAR;
+	nor1;
+	or2;
+}

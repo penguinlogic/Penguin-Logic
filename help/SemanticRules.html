@@ -1,0 +1,85 @@
+<html>
+	<head>
+		<TITLE>
+			Semantic rules
+		</TITLE>
+		<meta name="keywords" content="Creating a definition file">
+		<script type="text/javascript" language="JavaScript" src="FHNonscroll.js"></script>
+		<script type="text/javascript" language="JavaScript" src="FHUtilities.js"></script>
+		<script type="text/javascript" language="JavaScript" src="FHFlyoverPopups.js"></script>
+		<link rel="stylesheet" type="text/css" href="FHFlyoverPopupStyle.css" />
+	</HEAD>
+	
+	<body bgcolor="#FFFFFF" scroll="no">
+		<div id="FHNonScroll">
+			<table width="100%" border="0" cellspacing="0" cellpadding="2">
+				<tr>
+					<td width="100%" align="left">
+						<font size=2 color="#000000" face="Arial">
+							<div>
+								<font size=5 color="#333399" face="Verdana">
+									<b>
+										Semantic rules
+									</b>
+								</font>
+							</div>
+						</font>
+					</TD>
+					<td width="120" align="right" nowrap>
+						<font face="Verdana" size="2">
+							<a href="Overview.html">
+								<img src="Images/BrowseBlueLeft.png" border="0" alt="Previous Topic">
+							</a>
+							&nbsp;&nbsp;
+							<a href="RunningTheProgram.html">
+								<img src="Images/BrowseBlueRight.png" border="0" alt="Next Topic">
+							</a>
+							&nbsp;
+						</font>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div id="FHScroll">
+			<body bgcolor="#ffffff" leftmargin=5 topmargin=5 rightmargin=5 bottommargin=5>
+				<font size=2 color="#000000" face="Arial">
+					<div>
+						<font size=3 face="Times New Roman">
+							The semantics rules are as described below:
+							<ol>
+								<li>
+									Sections must be in order (DEVICES, CONNECTIONS, MONITOR)
+								</li>
+								<li>
+									0 or more rules in each section
+								</li>
+								<li>
+									unames in CONNECTIONS and MONITOR must be defined in DEVICES
+								</li>
+								<li>
+									Each device name must have the correct device switch and quantity (bool or uint or none)
+associated with it
+								</li>
+								<li>
+									outname and inname must be valid for specified uname
+								</li>
+								<li>
+									unames must be unique
+								</li>
+								<li>
+									A keyword (section name, device type, initial condition, outname or inname) may not be a uname
+								</li>
+								<li>
+									In CONNECTIONS, each input must be connected to exactly 1 output
+								</li>
+								<li>
+									A comment must begin and end with a single forward-slash (‘/’), and may run across multiple lines.  Or, a double forward-slash (`//') comments out the remainder of the line.  (NB this is filtered by the scanner when extracting symbols).  
+								</li>
+							</ol>
+						</font>
+					</div>
+				</font>
+			</body>
+		</div>
+	</body>
+</html>

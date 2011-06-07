@@ -1,7 +1,7 @@
 ﻿[OPTIONS]
 Binary Index=No
 Compatibility=1.1 or later
-Compiled file=help.chm
+Compiled file=help.htb
 Contents file=help.hhc
 Default Font=Arial,8,1
 Default Window=Main
@@ -33,6 +33,10 @@ CreatingADefinitionFile.html
 RunningTheProgram.html
 ObtainDesiredOutput.html
 logicdefinitiongrammar.txt
+SemanticRules.html
+grammar_eg1.txt
+grammar_eg2.txt
+grammar_eg3.txt
  
 [MAP]
 #define Overview 10001
@@ -40,6 +44,10 @@ logicdefinitiongrammar.txt
 #define RunningTheProgram 10003
 #define ObtainDesiredOutput 10004
 #define logicdefinitiongrammar 10005
+#define SemanticRules 10006
+#define grammar_eg1 10007
+#define grammar_eg2 10008
+#define grammar_eg3 10009
  
 [ALIAS]
  

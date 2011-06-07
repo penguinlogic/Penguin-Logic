@@ -1,0 +1,22 @@
+DEVICES
+{
+	SWITCH -initialvalue 0 = /comment enclosed forward slashes/ switch1; 
+	SWITCH -initialvalue 1 = switch2; //comment at the end of a line
+	SWITCH -initialvalue 1 = switch3;
+	AND -numinputs 2 = and1;
+	OR -numinputs 2 = or1;
+}
+
+CONNECTIONS
+{
+	switch1 > and1.I1;
+	switch2 > and1.I2;
+	switch2 > or1.I1;
+	switch3 > or1.I2;
+}
+
+MONITOR
+{
+	and1;
+	or1;
+}//
