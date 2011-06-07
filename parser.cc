@@ -21,7 +21,7 @@ bool parser::readin(void)
 	}
     }
     catch(exception & e) {
-	cout << "Cannot run simulator" << endl;
+	cout << "Cannot run simulator. Use './logsim --help' to see required syntax." << endl;
 	return false;
     }
 }
