@@ -15,7 +15,13 @@
 
 using namespace std;
 
-struct character
+
+
+/***************************************************************************
+Contains the character and, to enable printing of errors, includes its line number, column position and a string containing the line itself
+*/
+
+struct character 
 {public:
 string line;
 char ch;
@@ -23,6 +29,7 @@ unsigned int pos;
 int linenum;
 };
 
+/***************************************************************************/
 class scanner
 {
 private:
