@@ -359,6 +359,11 @@ void MyFrame::OnContButton(wxCommandEvent &event)
 			ncycles = maxcycles - cyclescompleted;
 		runnetwork (spin->GetValue());
     }
+	else if(cyclescompleted + spin->GetValue()>maxcycles)
+	{
+		wxMessageDialog *error = new wxMessageDialog(this, wxT("Error: max number of cycles exceeded, please start again by clicking the 'Run' button"));
+		error->ShowModal();
+	}
 	else
 		SetStatusText(wxT("Error: nothing to continue!"), 1);
 	canvas->Render(cyclescompleted);

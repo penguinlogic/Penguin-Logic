@@ -48,7 +48,27 @@
 				<font size=2 color="#000000" face="Arial">
 					<div>
 						<font size=3 face="Times New Roman">
-							Create a definition file in the form specified by the EBNF syntax.
+							The circuit definition file must be in a <strong>plain text</strong> format (e.g. `.txt'), and must conform to the grammar specification and the syntax rules.  The easiest way to create a definition file is to make a copy of one of the example files, and modify it to meet your needs.  The syntax is designed to be readable so shouldn't require much explanation, but the key components are:
+							<ul>
+								<li>
+									<strong>
+										DEVICES
+									</strong>
+									All the devices to be used in the simulation must be declared before they can be used in the other sections.
+								</li>
+								<li>
+									<strong>
+										CONNECTIONS
+									</strong>
+									This defines the connections between the devices in the simulation.  Each device input must be connected to exactly one output (from another device or itself).
+								</li>
+								<li>
+									<strong>
+										MONITOR
+									</strong>
+									This defines the points which will be monitored and displayed as waveforms by the simulator.  This can be easily modified by the GUI, so isn't vital to get correct at this stage.
+								</li>
+							</ul>
 						</font>
 					</div>
 				</font>

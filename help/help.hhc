@@ -2,10 +2,6 @@
 
 <html>
 	<head>
-		<!--
-			<meta name="GENERATOR" content="Fast-Help Corporate Edition">
-		-->
-		<!-- Sitemap 1.0 -->
 	</head>
 	
 	<body>
@@ -33,6 +29,11 @@
 					<param name="Name" value="Creating a definition file">
 					<param name="Local" value="CreatingADefinitionFile.html">
 				</OBJECT>
+				
+				<LI>
+				<OBJECT type="text/sitemap">
+					<param name="Name" value="EBNF Grammar">
+					<param name="Local" value="logicdefinitiongrammar.txt">
 			</UL>
 			
 			<LI>

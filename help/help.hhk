@@ -2,10 +2,6 @@
 
 <html>
 	<head>
-		<!--
-			<meta name="GENERATOR" content="Fast-Help Corporate Edition">
-		-->
-		<!-- Sitemap 1.0 -->
 	</head>
 	
 	<body>
@@ -13,16 +9,6 @@
 			<param name="Font" value="Arial,8,1">
 		</object>
 		<UL>
-			<!--
-				<LI>
-				<object type="text/sitemap">
-					<param name="Name" value="**Trial version. Not for distribution">
-					<param name="Name" value="Fast-Help">
-					<param name="Local" value="http://www.Fast-Help.com">
-					<param name="URL" value="http://www.Fast-Help.com">
-				</object>
-			-->
-			
 			<LI>
 			<OBJECT type="text/sitemap">
 				<param name="Name" value="Creating a definition file">

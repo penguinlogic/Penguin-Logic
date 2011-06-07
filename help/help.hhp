@@ -1,5 +1,4 @@
-﻿;Created with Fast-Help Corporate Edition on 01/06/2011 19:42:03
-[OPTIONS]
+﻿[OPTIONS]
 Binary Index=No
 Compatibility=1.1 or later
 Compiled file=help.chm
@@ -33,12 +32,14 @@ Overview.html
 CreatingADefinitionFile.html
 RunningTheProgram.html
 ObtainDesiredOutput.html
+logicdefinitiongrammar.txt
  
 [MAP]
 #define Overview 10001
 #define CreatingADefinitionFile 10002
 #define RunningTheProgram 10003
 #define ObtainDesiredOutput 10004
+#define logicdefinitiongrammar 10005
  
 [ALIAS]
  
