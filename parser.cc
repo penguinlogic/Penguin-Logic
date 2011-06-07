@@ -198,7 +198,7 @@ devdashex_i;
 tests device-specific syntax and, if valid, sets parameters for device creation
 */
 
-void parser::device(devicekind & devkind_var, int &variant_var)	// throws deviceex if finds invalid device
+void parser::device(devicekind & devkind_var, int &variant_var, vector <int> &wvvector_var)	// throws deviceex if finds invalid device
 {
     try {
 	if (cursym.get_type() == Devname) {	//i.e. if symbol is a 'devname'
@@ -376,6 +376,30 @@ void parser::device(devicekind & devkind_var, int &variant_var)	// throws device
 		devkind_var = xorgate;
 		return;		// we have a valid XOR
 	    }
+
+		if (cursym.get_name_id() == nmz->cvtname("SIGGEN")) { //i.e. devname is SIGGEN
+		smz->getsymbol(cursym);
+		if (cursym.get_syntaxvalue() == dash) {	// i.e. symbol is '-'
+		    smz->getsymbol(cursym);
+		    if (cursym.get_syntaxvalue() == waveform) {	//i.e. devswitch is '-waveform'
+			smz->getsymbol(cursym);
+			if (cursym.get_type() == Uint) {	// i.e. symbol is a uint
+				// TODO: check each digit is only 1 or 0.
+			    //if (16 < cursym.get_uint() || 1 > cursym.get_uint()) {
+				//errcount++;
+				//throw uintoutofboundsex_i;	// uint not between 1 and 16
+			    //}
+				cout << "got a SIGGEN!" << endl;
+			    devkind_var = siggen;
+				wvvector_var = cursym.get_wvform();
+				cout << "size of wvvector: " << wvvector_var.size() << endl;
+			    //variant_var = cursym.get_uint();
+			//cout << "variant: " << variant_var << endl;
+			    return;	// we have a valid SIGGEN
+			}
+			}
+		}
+		}
 
 	    throw deviceex_i;	// didn't get a valid devname
 	} else {
@@ -676,9 +700,10 @@ void parser::devrule(void)	// throws devruleex if finds invalid devrule
     try {
 	devicekind devkind_var;
 	int variant_var;
+	vector <int> wvvector_var;
 	name did_var;
 	bool ok;
-	device(devkind_var, variant_var);
+	device(devkind_var, variant_var, wvvector_var);
 	smz->getsymbol(cursym);
 	if (cursym.get_syntaxvalue() == equals) {	// we have an '='
 	    smz->getsymbol(cursym);
@@ -692,7 +717,7 @@ void parser::devrule(void)	// throws devruleex if finds invalid devrule
 
 	    smz->getsymbol(cursym);
 	    if (cursym.get_syntaxvalue() == semicolon) {	// we have a ';'
-		dmz->makedevice(devkind_var, did_var, variant_var, ok);
+		dmz->makedevice(devkind_var, did_var, variant_var, wvvector_var, ok);
 		uname_list.push_back(did_var);	// adds uname id to uname_list vector so we can check elsewhere
 		// for duplicate/undefined unames
 		if (0 == errcount) {

@@ -100,6 +100,8 @@ void devices::makeswitch (name id, int setting, bool& ok)
     netz->adddevice (aswitch, id, d);
     netz->addoutput (d, blankname);
     d->swstate = (setting == 0) ? low : high;
+	d->olist->sig = d->swstate;
+	cout << "initial state: " << d->swstate << endl;
   }
 }
 
@@ -171,6 +173,33 @@ void devices::makedtype (name id)
   d->memory = low;
 }
 
+/***********************************************************************
+ *
+ * Used to make new signal generator devices.
+ * No inputs.
+ * Called by makedevice.
+ *
+ */
+void devices::makesiggen (name id, vector <int> &wvvector_var)
+{
+	devlink d;
+	netz->adddevice (siggen, id, d);
+	netz->addoutput (d, blankname);
+	d->wvvector = wvvector_var;
+	d->counter = 0;	// records how far through waveform we are
+
+	//symbol s_tmp;
+	//vector<int> digvector;
+	//s_tmp.uintdigits(digvector, wform);
+	//cout << "wform: " << wform << endl;
+	cout << "size of siggen wave: " << wvvector_var.size() << endl;
+	for (int i = 0; i < wvvector_var.size(); i++) {
+		cout << "vector[i]: " << wvvector_var[i] << endl;
+	}
+
+}
+
+
 
 /***********************************************************************
  *
@@ -179,7 +208,7 @@ void devices::makedtype (name id)
  * number of inputs. 'ok' returns true if operation succeeds.         
  *
  */
-void devices::makedevice (devicekind dkind, name did, int variant, bool& ok)
+void devices::makedevice (devicekind dkind, name did, int variant, vector <int> wvvector_var, bool& ok)
 {
   ok = true;
   switch (dkind) {
@@ -200,7 +229,9 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok)
       break;
     case dtype:
       makedtype(did);
-      break;
+	  break;
+	case siggen:
+	  makesiggen(did, wvvector_var);
   }
 }
 
@@ -213,20 +244,21 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok)
  */
 void devices::signalupdate (asignal target, asignal& sig)
 {
-  asignal oldsig;
-  oldsig = sig;
-  switch (sig) {
-    case falling:
-    case low:
-      sig = (target == high) ? rising : low;
-      break;
-    case rising:
-    case high:
-      sig = (target == low) ? falling : high;
-      break;
-  }
-  if (sig != oldsig)
-    steadystate = false;
+  //asignal oldsig;
+  //oldsig = sig;
+  //switch (sig) {
+  //  case falling:
+  //  case low:
+  //    sig = (target == high) ? rising : low;
+  //    break;
+  //  case rising:
+  //  case high:
+  //    sig = (target == low) ? falling : high;
+  //    break;
+  //}
+  sig = target;
+  //if (sig != oldsig)
+    //steadystate = false;
 }
 
 
@@ -249,7 +281,16 @@ asignal devices::inv (asignal s)
  */
 void devices::execswitch (devlink d)
 {
+	cout << "swstate: " << d->swstate << endl;
+  cout << "dolistsig1: " << d->olist->sig << endl;
+
   signalupdate (d->swstate, d->olist->sig);
+  //if (0 == d->olist->sig) {
+//
+  //}
+
+
+  cout << "dolistsig2: " << d->olist->sig << endl;
 }
 
 
@@ -336,6 +377,49 @@ void devices::execclock(devlink d)
   }
 }
 
+/***********************************************************************
+ *
+ * Used to simulate the operation of signal generator devices.
+ * Called by executedevices.
+ *
+ */
+void devices::execsiggen(devlink d)
+{
+	//vector <int> binarywave;
+	//symbol s_tmp; // make temp symbol so we can call uintdigits()
+
+	//s_tmp.uintdigits(binarywave, d->wvform); // binarywave now contains
+	                                         // the waveform
+	
+	if (d->wvvector.size() == d->counter) // reset counter when we reach
+		d->counter = 0;                  // end of given waveform
+
+cout << "d->wvvector[i]" << d->wvvector[d->counter] << endl;
+
+    if (0 == d->wvvector[d->counter]) {
+	   if (low == d->olist->sig || falling == d->olist->sig) {
+			signalupdate (low, d->olist->sig);
+	   }
+	   else {
+			d->olist->sig = falling;
+			signalupdate (low, d->olist->sig);
+	   }
+	}
+
+    if (1 == d->wvvector[d->counter]) {
+	   if (high == d->olist->sig || rising == d->olist->sig) {
+		   	signalupdate (high, d->olist->sig);
+	   }
+   	   else {
+   		   d->olist->sig = rising;
+   		   signalupdate (high, d->olist->sig);
+   	   }
+	}
+
+	(d->counter)++;
+}
+
+
 
 /***********************************************************************
  *
@@ -371,18 +455,18 @@ void devices::updateclocks (void)
  */
 void devices::executedevices (bool& ok)
 {
-  const int maxmachinecycles = 20;
+  //const int maxmachinecycles = 20;
   devlink d;
-  int machinecycle;
+  //int machinecycle;
   if (debugging)
     cout << "Start of execution cycle" << endl;
   updateclocks ();
-  machinecycle = 0;
-  do {
-    machinecycle++;
-    if (debugging)
-      cout << "machine cycle # " << machinecycle << endl;
-    steadystate = true;
+  //machinecycle = 0;
+  //do {
+    //machinecycle++;
+   // if (debugging)
+     // cout << "machine cycle # " << machinecycle << endl;
+    //steadystate = true;
     for (d = netz->devicelist (); d != NULL; d = d->next) {
       switch (d->kind) {
         case aswitch:  execswitch (d);           break;
@@ -392,15 +476,16 @@ void devices::executedevices (bool& ok)
         case andgate:  execgate (d, high, high); break;
         case nandgate: execgate (d, high, low);  break;
         case xorgate:  execxorgate (d);          break;
-        case dtype:    execdtype (d);            break;     
+        case dtype:    execdtype (d);            break;
+		case siggen:   execsiggen (d);           break;
       }
       if (debugging)
 	showdevice (d);
     }
-  } while ((! steadystate) && (machinecycle < maxmachinecycles));
+  //} while ((! steadystate) && (machinecycle < maxmachinecycles));
   if (debugging)
     cout << "End of execution cycle" << endl;
-  ok = steadystate;
+  ok = true;//steadystate;
 }
 
 

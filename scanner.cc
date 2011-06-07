@@ -112,11 +112,38 @@ scanner::getnumber (int &number)
 {
   number = 0;
   string str;
+
   while (!inf.eof () && isdigit (current.ch))
     {
       str.push_back (current.ch);
       stringstream ss (str);
       ss >> number;
+      getch ();
+    }
+}
+
+// overloaded version builds a digit vector as well for the sig gen.
+void
+scanner::getnumber (int &number, vector <int> &wvform)
+{
+  number = 0;
+  string str;
+
+  while (!inf.eof () && isdigit (current.ch))
+    {
+      str.push_back (current.ch);
+      stringstream ss (str);
+      ss >> number;
+
+	  int digit_tmp;
+	  string str_digit;
+	  str_digit.push_back (current.ch);
+	  stringstream tt (str_digit);
+	  tt >> digit_tmp;
+	  wvform.push_back(digit_tmp); // builds a vector of digits for the siggen
+	                               // needed because storing as an int loses any
+								   // leading zeros
+
       getch ();
     }
 }
@@ -146,6 +173,7 @@ void
 scanner::getsymbol (symbol & s)
 {
   last = current;
+  vector <int> wvform;
 	
   s.set_parameters (notype, novalue, -1, -1);
 
@@ -159,8 +187,8 @@ scanner::getsymbol (symbol & s)
 
   else if (isdigit (current.ch))
     {
-      getnumber (num);
-      s.set_parameters (Uint, novalue, num, -1);
+      getnumber (num, wvform);
+      s.set_parameters (Uint, novalue, num, -1, wvform);
     }
 
   else if (isalpha (current.ch))
@@ -180,10 +208,13 @@ scanner::getsymbol (symbol & s)
 	s.set_parameters (Devswitch, initialvalue, -1, -1);
       else if (idstr == "numinputs")
 	s.set_parameters (Devswitch, numinputs, -1, -1);
+	  else if (idstr == "waveform")
+	s.set_parameters (Devswitch, waveform, -1, -1);
+
 
       else if (idstr == "CLOCK" || idstr == "SWITCH" || idstr == "AND"
 	       || idstr == "NAND" || idstr == "OR" || idstr == "NOR"
-	       || idstr == "DTYPE" || idstr == "XOR")
+	       || idstr == "DTYPE" || idstr == "XOR" || idstr == "SIGGEN")
 	s.set_parameters (Devname, novalue, -1, nmz->lookup (idstr));
 
       else if (idstr == "DATA" || idstr == "SET" || idstr == "CLEAR"
