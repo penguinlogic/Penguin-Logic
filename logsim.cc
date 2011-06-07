@@ -19,6 +19,37 @@ bool MyApp::OnInit()
 		RedirectIOToConsole();          // Required for cout in windows
 	#endif
 
+	if (wxString(argv[1]) == wxT("--help")) {
+		wcout << "Usage:      " << argv[0] << " [filename]" << endl << endl;
+		wcout << "[filename] must be in form defined by EBNF grammar: " << endl << endl;
+		wcout << "LogicDefinitionGrammar = { section }" << endl <<
+				 "section                = ( `DEVICES' `{' {devrule} `}' ) |" << endl <<
+ 				 "                         ( `CONNECTIONS' `{' {connrule} `}' ) |" << endl <<
+				 "                         ( `MONITOR' `{' {monrule} `}' )" << endl <<
+				 "devrule                = device `=' uname `;'" << endl <<
+				 "connrule               = uname [ `.' outname ] `>' uname `.' inname `;'" << endl <<
+				 "monrule                = uname [ `.' outname ] `;'" << endl <<
+				 "uname                  = alphachar { alnumchar }" << endl <<
+				 "device                 = ( `CLOCK' `-period' uint ) |" << endl <<
+				 "                         ( `SWITCH' `-initialvalue' bool ) |" << endl <<
+				 "                         ( `AND' `-numinputs' uint ) |" << endl <<
+				 "                         ( `NAND' `-numinputs' uint ) |" << endl <<
+				 " 	                 ( `OR' `-numinputs' uint ) |" << endl <<
+				 "                         ( `NOR' `-numinputs' uint ) |" << endl <<
+				 "                         ( `DTYPE' ) |" << endl <<
+				 "                         ( `XOR' )" << endl <<
+				 "outname                = `Q' | `QBAR'" << endl <<
+				 "inname                 = `I1' | `I2' | `I3' | `I4' |" << endl <<
+				 "                         `I5' | `I6' | `I7' | `I8' |" << endl <<
+				 "                         `I9' | `I10' | `I11' | `I12' |" << endl <<
+ 				 "                        `I13' | `I14' | `I15' | `I16' |" << endl <<
+				 "                         `DATA' |" << endl <<
+				 "                         `SET' |" << endl <<
+  				 "                       `CLEAR' |" << endl <<
+				 "                         `CLK'" << endl;
+		exit(0);
+	}
+
 	if (argc != 2) { // check we have one command line argument
 		wcout << "Usage:      " << argv[0] << " [filename]" << endl;
 		exit(1);
