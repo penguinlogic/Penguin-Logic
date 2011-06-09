@@ -31,6 +31,7 @@ class devices{
   void execclock(devlink d);
   void execsiggen(devlink d);
   void updateclocks (void);
+  void updatesiggens (void);
   void outsig (asignal s);
 
 public:

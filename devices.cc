@@ -244,21 +244,21 @@ void devices::makedevice (devicekind dkind, name did, int variant, vector <int> 
  */
 void devices::signalupdate (asignal target, asignal& sig)
 {
-  //asignal oldsig;
-  //oldsig = sig;
-  //switch (sig) {
-  //  case falling:
-  //  case low:
-  //    sig = (target == high) ? rising : low;
-  //    break;
-  //  case rising:
-  //  case high:
-  //    sig = (target == low) ? falling : high;
-  //    break;
-  //}
+  asignal oldsig;
+  oldsig = sig;
+  switch (sig) {
+    case falling:
+    case low:
+      sig = (target == high) ? rising : low;
+      break;
+    case rising:
+    case high:
+      sig = (target == low) ? falling : high;
+      break;
+  }
   sig = target;
-  //if (sig != oldsig)
-    //steadystate = false;
+  if (sig != oldsig)
+    steadystate = false;
 }
 
 
@@ -385,39 +385,46 @@ void devices::execclock(devlink d)
  */
 void devices::execsiggen(devlink d)
 {
+  if (d->olist->sig == rising)
+    signalupdate (high, d->olist->sig);
+  else {
+    if (d->olist->sig == falling)
+      signalupdate (low, d->olist->sig);
+  }
+}
 	//vector <int> binarywave;
 	//symbol s_tmp; // make temp symbol so we can call uintdigits()
 
 	//s_tmp.uintdigits(binarywave, d->wvform); // binarywave now contains
 	                                         // the waveform
 	
-	if (d->wvvector.size() == d->counter) // reset counter when we reach
-		d->counter = 0;                  // end of given waveform
-
-cout << "d->wvvector[i]" << d->wvvector[d->counter] << endl;
-
-    if (0 == d->wvvector[d->counter]) {
-	   if (low == d->olist->sig || falling == d->olist->sig) {
-			signalupdate (low, d->olist->sig);
-	   }
-	   else {
-			d->olist->sig = falling;
-			signalupdate (low, d->olist->sig);
-	   }
-	}
-
-    if (1 == d->wvvector[d->counter]) {
-	   if (high == d->olist->sig || rising == d->olist->sig) {
-		   	signalupdate (high, d->olist->sig);
-	   }
-   	   else {
-   		   d->olist->sig = rising;
-   		   signalupdate (high, d->olist->sig);
-   	   }
-	}
-
-	(d->counter)++;
-}
+//	if (d->wvvector.size() == d->counter) // reset counter when we reach
+//		d->counter = 0;                  // end of given waveform
+//
+//cout << "d->wvvector[i]" << d->wvvector[d->counter] << endl;
+//
+//    if (0 == d->wvvector[d->counter]) {
+//	   if (low == d->olist->sig || falling == d->olist->sig) {
+//			signalupdate (low, d->olist->sig);
+//	   }
+//	   else {
+//			d->olist->sig = falling;
+//			signalupdate (low, d->olist->sig);
+//	   }
+//	}
+//
+//    if (1 == d->wvvector[d->counter]) {
+//	   if (high == d->olist->sig || rising == d->olist->sig) {
+//		   	signalupdate (high, d->olist->sig);
+//	   }
+//   	   else {
+//   		   d->olist->sig = rising;
+//   		   signalupdate (high, d->olist->sig);
+//   	   }
+//	}
+//
+//	(d->counter)++;
+//}
 
 
 
@@ -445,6 +452,42 @@ void devices::updateclocks (void)
   }
 }
 
+/***********************************************************************
+ *
+ * Increment the counters in siggen devices and initiate changes
+ * in their outputs every clock cycle according to their given waveform.
+ * Called by executedevices.
+ *
+ */
+void devices::updatesiggens (void)
+{
+  devlink d;
+  for (d = netz->devicelist (); d != NULL; d = d->next) {
+	  if (d->kind == siggen) {
+		if (d->counter == d->wvvector.size()) {
+		d->counter = 0;
+		}
+		if (0 == d->wvvector[d->counter]) {
+			if (low == d->olist->sig || falling == d->olist->sig) {
+				signalupdate (low, d->olist->sig);
+			}
+			else {
+				signalupdate (falling, d->olist->sig);
+			}
+			
+		}
+		if (1 == d->wvvector[d->counter]) {
+			if (high == d->olist->sig || rising == d->olist->sig) {
+				signalupdate (high, d->olist->sig);
+			}
+			else {
+				signalupdate (rising, d->olist->sig);
+			}
+		}
+		(d->counter)++;
+	  }
+  }
+}
 
 /***********************************************************************
  *
@@ -455,18 +498,19 @@ void devices::updateclocks (void)
  */
 void devices::executedevices (bool& ok)
 {
-  //const int maxmachinecycles = 20;
+  const int maxmachinecycles = 20;
   devlink d;
-  //int machinecycle;
+  int machinecycle;
   if (debugging)
     cout << "Start of execution cycle" << endl;
   updateclocks ();
-  //machinecycle = 0;
-  //do {
-    //machinecycle++;
-   // if (debugging)
-     // cout << "machine cycle # " << machinecycle << endl;
-    //steadystate = true;
+  updatesiggens ();
+  machinecycle = 0;
+  do {
+    machinecycle++;
+    if (debugging)
+      cout << "machine cycle # " << machinecycle << endl;
+    steadystate = true;
     for (d = netz->devicelist (); d != NULL; d = d->next) {
       switch (d->kind) {
         case aswitch:  execswitch (d);           break;
@@ -482,7 +526,7 @@ void devices::executedevices (bool& ok)
       if (debugging)
 	showdevice (d);
     }
-  //} while ((! steadystate) && (machinecycle < maxmachinecycles));
+  } while ((! steadystate) && (machinecycle < maxmachinecycles));
   if (debugging)
     cout << "End of execution cycle" << endl;
   ok = true;//steadystate;
