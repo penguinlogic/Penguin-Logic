@@ -11,8 +11,10 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(wxID_EXIT, MyFrame::OnExit)
 	EVT_MENU(wxID_HELP_CONTENTS, MyFrame::OnHelpContents)
 	EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
-	EVT_BUTTON(RUN_BUTTON_ID, MyFrame::OnRunButton)
-	EVT_BUTTON(CONT_BUTTON_ID, MyFrame::OnContButton)
+	//EVT_BUTTON(RUN_BUTTON_ID, MyFrame::OnRunButton)
+	//EVT_BUTTON(CONT_BUTTON_ID, MyFrame::OnContButton)
+	EVT_BUTTON(PLAY_BUTTON_ID, MyFrame::OnPlayButton)
+	EVT_BUTTON(CLEAR_BUTTON_ID, MyFrame::OnClearButton)
 	EVT_BUTTON(DEVICE_BUTTON_ID, MyFrame::OnDeviceButton)
 	EVT_BUTTON(MONITOR_BUTTON_ID, MyFrame::OnMonitorButton)
 END_EVENT_TABLE()
@@ -24,6 +26,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
   // Constructor - initialises pointers to names, devices and monitor classes,
   // lays out widgets using sizers
 {
+	CanvasClear = true;
 	SetIcon(wxIcon(wx_icon_xpm));
 	nmz = names_mod;
 	dmz = devices_mod;
@@ -78,23 +81,22 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
 		// Left panel
 		wxBoxSizer *left_sizer = new wxBoxSizer(wxVERTICAL);
 			// Canvas
-			wxScrolledWindow *sw = new wxScrolledWindow(this, wxID_ANY,
-					wxPoint(0, 0), wxSize(400, 400), wxVSCROLL|wxHSCROLL);
-				const int s_inc = 40;		// Scroll increment
-				const int cx_size = 3000;	// Canvas size
-				const int cy_size = 2000;	// Canvas size
-				sw->SetScrollbars(s_inc, s_inc, cx_size/s_inc, cy_size/s_inc);
-				canvas = new MyGLCanvas(sw, wxID_ANY, monitor_mod, names_mod, 
-									wxDefaultPosition, wxSize(cx_size,cy_size));
-				wxButton *test = new wxButton(sw, RUN_BUTTON_ID, wxT("Run"));
+			sw = new MyScrolledWindow(this, wxID_ANY,
+					wxPoint(0, 0), wxSize(400, 400), wxVSCROLL|wxHSCROLL, mmz, nmz);
 			left_sizer->Add(sw, 1, wxEXPAND | wxALL, 10);
 			// Button panel
 			wxFlexGridSizer *button_sizer = new wxFlexGridSizer(2,0,0,0);
 					// Run button
-				button_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0,
-												wxALIGN_CENTER_VERTICAL|wxALL, 10);
+				//button_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0,
+												//wxALIGN_CENTER_VERTICAL|wxALL, 10);
+					// Play/Pause button
+					play_pause = new wxButton(this, PLAY_BUTTON_ID, wxT("Play / Pause"));
+					timer = new MyTimer();
+					timer->frame = this;
+
+				button_sizer->Add(play_pause, 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// Spinner (label)
-				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Cycles:")),
+				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Simulation speed:")),
 							0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
 					// Spinner (device)
 					spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID,
@@ -105,8 +107,11 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
 									wxT("Change device properties")), 0,
 									wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// Continue button
-				button_sizer->Add(new wxButton(this, CONT_BUTTON_ID,
-							wxT("Continue")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
+				//button_sizer->Add(new wxButton(this, CONT_BUTTON_ID,
+							//wxT("Continue")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
+					// Clear button
+				button_sizer->Add(new wxButton(this, CLEAR_BUTTON_ID,
+							wxT("Clear canvas")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// Static text (placeholder)
 				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("")), 0,
 							wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
@@ -119,49 +124,49 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
 								wxALIGN_CENTER_VERTICAL|wxALL, 10);
 			left_sizer->Add(button_sizer, 0, wxEXPAND | wxALL, 10);
 	topsizer->Add(left_sizer, 1, wxEXPAND | wxALL, 10);
-		//Right panel
-		wxBoxSizer *right_sizer = new wxBoxSizer(wxVERTICAL);
-		right_sizer->SetMinSize(wxSize(250,-1));
-			wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY,
-										wxPoint(-1, -1), wxSize(250, -1),
-										wxVSCROLL|wxHSCROLL);
-				const int p_inc = 40;		// Scroll increment
-				const int px_size = 800;	// Canvas size
-				const int py_size = 1000;	// Canvas size
-				sp->SetScrollbars(p_inc, p_inc, px_size/p_inc, py_size/p_inc);
-				//sp->Show();
-				// Right hand panel
-					wxBoxSizer *info_sizer = new wxBoxSizer(wxVERTICAL);
-						// Filename
-						wxBoxSizer *deffile_sizer = new wxBoxSizer(wxHORIZONTAL);
-						deffile_sizer->Add(new wxStaticText(sp, wxID_ANY,
-										wxT("Definition file name:")), 0,
-										wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
-						deffile_sizer->Add(new wxStaticText(sp, wxID_ANY, defname),
-										0, wxALIGN_CENTER_VERTICAL ,0);
-					info_sizer->Add(deffile_sizer, 0, wxEXPAND|wxALL,0);
-						// Devices
-						wxBoxSizer *devices_sizer = new wxBoxSizer(wxVERTICAL);
-						devices_sizer->Add(new wxStaticText(sp, wxID_ANY,
-										wxT("DEVICES")), 0, wxEXPAND|wxALL,5);
-							for (devlink d = netz->devicelist(); d != NULL;
-										d = d->next)
-								devices_sizer->Add(new wxStaticText(sp, wxID_ANY,
-												DeviceProps(d)), 0, wxEXPAND|wxLEFT,25);
-					info_sizer->Add(devices_sizer, 0, wxEXPAND|wxALL, 0);
-					//	// Connections
-					//	wxBoxSizer *connections_sizer = new wxBoxSizer(wxVERTICAL);
-					//	connections_sizer->Add(new wxStaticText(panel, wxID_ANY,
-					//						wxT("CONNECTIONS")), 0, wxEXPAND|wxALL,5);
-					//info_sizer->Add(connections_sizer, 0, wxEXPAND|wxALL, 5);
-					//	// Monitors
-					//	wxBoxSizer *monitors_sizer = new wxBoxSizer(wxVERTICAL);
-					//	monitors_sizer->Add(new wxStaticText(panel, wxID_ANY,
-					//					wxT("MONITORS")), 0, wxEXPAND|wxALL,5);
-					//info_sizer->Add(monitors_sizer, 0, wxEXPAND|wxALL, 5);
-				sp->SetSizer(info_sizer);
-		right_sizer->Add(sp, 1, wxEXPAND|wxALL, 10);
-	topsizer->Add(right_sizer, 0, wxEXPAND|wxALL, 10);
+	//	//Right panel
+	//	wxBoxSizer *right_sizer = new wxBoxSizer(wxVERTICAL);
+	//	right_sizer->SetMinSize(wxSize(250,-1));
+	//		wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY,
+	//									wxPoint(-1, -1), wxSize(250, -1),
+	//									wxVSCROLL|wxHSCROLL);
+	//			const int p_inc = 40;		// Scroll increment
+	//			const int px_size = 800;	// Canvas size
+	//			const int py_size = 1000;	// Canvas size
+	//			sp->SetScrollbars(p_inc, p_inc, px_size/p_inc, py_size/p_inc);
+	//			//sp->Show();
+	//			// Right hand panel
+	//				wxBoxSizer *info_sizer = new wxBoxSizer(wxVERTICAL);
+	//					// Filename
+	//					wxBoxSizer *deffile_sizer = new wxBoxSizer(wxHORIZONTAL);
+	//					deffile_sizer->Add(new wxStaticText(sp, wxID_ANY,
+	//									wxT("Definition file name:")), 0,
+	//									wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
+	//					deffile_sizer->Add(new wxStaticText(sp, wxID_ANY, defname),
+	//									0, wxALIGN_CENTER_VERTICAL ,0);
+	//				info_sizer->Add(deffile_sizer, 0, wxEXPAND|wxALL,0);
+	//					// Devices
+	//					wxBoxSizer *devices_sizer = new wxBoxSizer(wxVERTICAL);
+	//					devices_sizer->Add(new wxStaticText(sp, wxID_ANY,
+	//									wxT("DEVICES")), 0, wxEXPAND|wxALL,5);
+	//						for (devlink d = netz->devicelist(); d != NULL;
+	//									d = d->next)
+	//							devices_sizer->Add(new wxStaticText(sp, wxID_ANY,
+	//											DeviceProps(d)), 0, wxEXPAND|wxLEFT,25);
+	//				info_sizer->Add(devices_sizer, 0, wxEXPAND|wxALL, 0);
+	//					// Connections
+	//					wxBoxSizer *connections_sizer = new wxBoxSizer(wxVERTICAL);
+	//					connections_sizer->Add(new wxStaticText(panel, wxID_ANY,
+	//										wxT("CONNECTIONS")), 0, wxEXPAND|wxALL,5);
+	//				info_sizer->Add(connections_sizer, 0, wxEXPAND|wxALL, 5);
+	//					// Monitors
+	//					wxBoxSizer *monitors_sizer = new wxBoxSizer(wxVERTICAL);
+	//					monitors_sizer->Add(new wxStaticText(panel, wxID_ANY,
+	//									wxT("MONITORS")), 0, wxEXPAND|wxALL,5);
+	//				info_sizer->Add(monitors_sizer, 0, wxEXPAND|wxALL, 5);
+	//			sp->SetSizer(info_sizer);
+	//	right_sizer->Add(sp, 1, wxEXPAND|wxALL, 10);
+	//topsizer->Add(right_sizer, 0, wxEXPAND|wxALL, 10);
 	SetSizeHints(800, 400);
 	SetSizer(topsizer);
 }
@@ -283,14 +288,14 @@ void MyFrame::OnSave(wxCommandEvent &event)
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		// Get size of canvas
-		wxSize ImSize = canvas->GetSize();
+		wxSize ImSize = sw->canvas->GetSize();
 		unsigned int ImHeight = ImSize.GetHeight();
 		unsigned int ImWidth = ImSize.GetWidth();
 
 		// Get image data from canvas
 		GLubyte* mirror_image = new GLubyte[ImWidth * ImHeight * 3];
 		GLubyte* image = new GLubyte[ImWidth * ImHeight * 3];
-		canvas->GetImage(mirror_image);
+		sw->canvas->GetImage(mirror_image);
 		
 		// Flip image to compensate for image being upside down
 		int rev_val=ImHeight-1;
@@ -338,7 +343,7 @@ void MyFrame::OnAbout(wxCommandEvent &event)
 	about.ShowModal();                  
 }
 
-void MyFrame::OnRunButton(wxCommandEvent &event)
+/*void MyFrame::OnRunButton(wxCommandEvent &event)
   // Callback for the push button
 {
     if(spin->GetValue() <= maxcycles)
@@ -346,7 +351,7 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
 		cyclescompleted = 0;
 		mmz->resetmonitor();
 		runnetwork(spin->GetValue());
-		canvas->Render(cyclescompleted);
+		sw->canvas->Render(cyclescompleted);
 		SetStatusText(wxT("Run button pressed"), 1);
 	}
 	else
@@ -354,9 +359,9 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
 		wxMessageDialog *error = new wxMessageDialog(this, wxT("Error: max number of cycles exceeded, please reduce the number of cycles using the spinner"));
 		error->ShowModal();
 	}
-}
+}*/
 
-void MyFrame::OnContButton(wxCommandEvent &event)
+/*void MyFrame::OnContButton(wxCommandEvent &event)
   // Callback for the push button
 {
    int ncycles = spin->GetValue();
@@ -374,12 +379,56 @@ void MyFrame::OnContButton(wxCommandEvent &event)
 	}
 	else
 		SetStatusText(wxT("Error: nothing to continue!"), 1);
-	canvas->Render(cyclescompleted);
+	sw->canvas->Render(cyclescompleted);
+}*/
+
+void MyFrame::OnPlayButton(wxCommandEvent &event)
+{
+	if(timer->IsRunning())
+	{
+		timer->Stop();
+		SetStatusText(wxT("Simulation paused"),1);
+	}
+	else
+	{
+		if(CanvasClear)
+		{
+			mmz->resetmonitor();
+			timer->cycles = 0;
+			CanvasClear = false;
+		}
+		timer->Start(spin->GetValue(),false);
+		SetStatusText(wxT("Simulation running"),1);
+	}
+}
+
+void MyFrame::OnClearButton(wxCommandEvent &event)
+{
+	if(!CanvasClear)
+	{
+		if(timer->IsRunning())
+			timer->Stop();
+		CanvasClear = true;
+		sw->canvas->Clear();
+		timer->cycles = 0;
+		SetStatusText(wxT("Canvas has been cleared"),1);
+	}
+	else
+		SetStatusText(wxT("Nothing to clear!"),1);
 }
 
 void MyFrame::OnDeviceButton(wxCommandEvent &event)
   // Callback for the SWITCH button
 {
+	bool running;
+	if(timer->IsRunning())
+	{
+		timer->Stop();
+		running = true;
+	}
+	else
+		running = false;
+
 	// Get list of devices
 	devlink d;
 	
@@ -470,11 +519,23 @@ void MyFrame::OnDeviceButton(wxCommandEvent &event)
 				cout << "Error setting clock value" << endl;
 		}
 	}
+	
+	if(running)
+		timer->Start();
 }
 
 void MyFrame::OnMonitorButton(wxCommandEvent &event)
   // Callback for the MONITOR BUTTON
 {
+	bool running;
+	if(timer->IsRunning())
+	{
+		timer->Stop();
+		running = true;
+	}
+	else
+		running = false;
+	
 	//  Create table of all outputs
 	devlink d;
 	vector<monProp> monTable;
@@ -596,8 +657,63 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 		}
 		// Redraw the canvas
 		wxCommandEvent redraw_event;
-		OnRunButton(redraw_event);
+		OnPlayButton(redraw_event);
+		sw->canvas->Clear();
 	}
+	if(running)
+		timer->Start();
+}
+
+
+// ---------------------------------------------------------------------------//
+// MyScrolledWindow
+// ---------------------------------------------------------------------------//
+
+// Event Table
+BEGIN_EVENT_TABLE(MyScrolledWindow, wxScrolledWindow)
+	//EVT_SCROLLWIN(MyScrolledWindow::OnScroll)
+	//wxEVT_SCROLLWIN(wxScrollWinEventFunction)
+END_EVENT_TABLE()
+
+MyScrolledWindow::MyScrolledWindow(wxWindow *parent, wxWindowID winid,
+					const wxPoint& pos, const wxSize& size, long style,
+					monitor* monitor_mod, names* names_mod):
+					wxScrolledWindow(parent, winid, pos, size, style)
+{
+	const int s_inc = 40;		// Scroll increment
+	const int cx_size = 3000;	// Canvas size
+	const int cy_size = 2000;	// Canvas size
+	SetScrollbars(s_inc, s_inc, cx_size/s_inc, cy_size/s_inc);
+	canvas = new MyGLCanvas(this, wxID_ANY, monitor_mod, names_mod, 
+						wxDefaultPosition, wxSize(cx_size,cy_size));
+}
+
+void MyScrolledWindow::OnScroll(wxScrollWinEvent& event)
+{
+	/*cout << "Scroll request detected" << endl;
+	int *Hpix, Vpix;
+	GetScrollPixelsPerUnit(Hpix, Vpix);
+	cout << "Got scroll pixels" << endl;
+	cout << Hpix << Vpix << endl;
+	cout << *Hpix << *Vpix << endl;
+	cout << &Hpix << &Vpix << endl;
+	switch(event.GetOrientation())
+	{
+	case 4:	// Horizontal scrolling
+		Scroll(event.GetPosition()*(*Hpix),-1);
+		break;
+	case 8: // Vertical scrolling
+		Scroll(-1,event.GetPosition()*(*Vpix));
+		break;
+	default:
+		cout << "ERROR: scrolling failed" << endl;
+		break;
+	}
+	cout << "Orientation = " << event.GetOrientation() << endl;;
+	cout << "Position = " << event.GetPosition() << endl;
+
+	// Refresh canvas
+	canvas->OnScroll(event);*/
 }
 
 
@@ -611,6 +727,7 @@ BEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
 	EVT_SIZE(MyGLCanvas::OnSize)
 	EVT_PAINT(MyGLCanvas::OnPaint)
 	EVT_MOUSE_EVENTS(MyGLCanvas::OnMouse)
+	EVT_SCROLLWIN(MyGLCanvas::OnScroll)
 END_EVENT_TABLE()
   
 MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod,
@@ -717,7 +834,7 @@ void MyGLCanvas::Render(int cycles)
 					{
 						y1 = CANVAS_HEIGHT-(m+1)*SEPARATION + SIG_LOW;
 						y2 = y1;
-					}
+					}   
 					else if (s==high)
 					{
 						y1 = CANVAS_HEIGHT-(m+1)*SEPARATION + SIG_HIGH;
@@ -737,8 +854,8 @@ void MyGLCanvas::Render(int cycles)
 						break;
 
 					// Plot line
-					glVertex2f(LENGTH*i+INDENT, y1); 
-					glVertex2f(LENGTH*i+LENGTH+INDENT, y2);
+					glVertex2f(LENGTH*(cyclesdisplayed-i-1)+INDENT+LENGTH, y1); 
+					glVertex2f(LENGTH*(cyclesdisplayed-i-1)+INDENT, y2);
 				}
 				else
 					cout << "Couldn't get signal trace" << endl;
@@ -750,6 +867,34 @@ void MyGLCanvas::Render(int cycles)
 	// Flush the graphics pipeline and swap the back buffer to the front
 	glFlush();
 	SwapBuffers();
+}
+
+void MyGLCanvas::Clear()
+{
+	cyclesdisplayed = -1;
+	glClear(GL_COLOR_BUFFER_BIT);
+	glFlush();
+	SwapBuffers();
+	glClear(GL_COLOR_BUFFER_BIT);
+	glFlush();
+	SwapBuffers();
+}
+
+void MyGLCanvas::GetImage(unsigned char* &pixels)
+{
+	wxSize CanvasSize = GetSize();
+	glReadBuffer(GL_FRONT);
+	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
+	glReadPixels(0, 0, CanvasSize.GetWidth(), CanvasSize.GetHeight(),
+					GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	cout << "Pixels" << pixels << endl;
+}
+
+void MyGLCanvas::OnScroll(wxScrollWinEvent& event)
+{
+	cout << "Scroll event detected" << endl;
+	//wxPaintDC dc(this); // required for correct refreshing under MS windows
+	//Render();
 }
 
 void MyGLCanvas::InitGL()	// Function to initialise the GL context
@@ -768,13 +913,6 @@ void MyGLCanvas::InitGL()	// Function to initialise the GL context
 	glLoadIdentity();
 }
 
-void MyGLCanvas::OnPaint(wxPaintEvent& event)
-	// Callback function for when the canvas is exposed
-{
-	wxPaintDC dc(this); // required for correct refreshing under MS windows
-	Render();
-}
-
 void MyGLCanvas::OnSize(wxSizeEvent& event)
 	// Callback function for when the canvas is resized
 {
@@ -784,21 +922,22 @@ void MyGLCanvas::OnSize(wxSizeEvent& event)
 	Update();  // harmless on other platforms!
 }
 
+void MyGLCanvas::OnPaint(wxPaintEvent& event)
+	// Callback function for when the canvas is exposed
+{
+	wxPaintDC dc(this); // required for correct refreshing under MS windows
+	Render();
+}
+
 void MyGLCanvas::OnMouse(wxMouseEvent& event)
 	// Callback function for mouse events inside the GL canvas
 {
 	Render();
+	//init = false;
+	//Refresh(); // required by some buggy nvidia graphics drivers,
+	//Update();  // harmless on other platforms!
 }
 
-void MyGLCanvas::GetImage(unsigned char* &pixels)
-{
-	wxSize CanvasSize = GetSize();
-	glReadBuffer(GL_FRONT);
-	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
-	glReadPixels(0, 0, CanvasSize.GetWidth(), CanvasSize.GetHeight(),
-					GL_RGB, GL_UNSIGNED_BYTE, pixels);
-	cout << "Pixels" << pixels << endl;
-}
 
 
 
@@ -887,4 +1026,16 @@ wxPanel* MyDeviceConfigDialog::CreateClockPropertiesPage(wxWindow* parent,
 	panel->SetSizer(topSizer);
 	
     return panel;
+}
+
+
+// ---------------------------------------------------------------------------//
+// MyTimer
+// ---------------------------------------------------------------------------//
+
+void MyTimer::Notify()
+{
+	cycles++;
+	frame->runnetwork(1);
+	frame->sw->canvas->Render(cycles);
 }
