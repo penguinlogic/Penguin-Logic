@@ -10,7 +10,6 @@ bool parser::readin(void)
 {
     try {
 	parsedeffile();
-//    cout << "It worked!" << endl;
 	if (errcount == 0) {
 	    cout << "Definition file parsed successfully" << endl;
 	    return true;
@@ -29,14 +28,11 @@ bool parser::readin(void)
 parser::parser(network * network_mod, devices * devices_mod,
 	       monitor * monitor_mod, scanner * scanner_mod, names * names_mod)
 {
-//cout << "parser constructor" << endl;
     netz = network_mod;		/* make internal copies of these class pointers */
     dmz = devices_mod;		/* so we can call functions from these classes  */
     mmz = monitor_mod;		/* eg. to call makeconnection from the network  */
     smz = scanner_mod;		/* class you say:                               */
-    /* netz->makeconnection (i1, i2, o1, o2, ok);   */
     nmz = names_mod;
-    // cursym = *new symbol();
     symbol cursym;
     errcount = 0;
     section_var.set_parameters(Section, DEVICES, -1, -1);	// Used in section()
@@ -92,7 +88,6 @@ void
 	    uint_var = cursym.get_uint();
     }
     catch(exception & e) {
-	//cout << e.what() << endl;
 	smz->print_err(e.what());
 	throw;
     }
@@ -127,8 +122,6 @@ void parser::inname(name & iname)	// throws innameex if not given a valid inname
 	    iname = cursym.get_name_id();
     }
     catch(exception & e) {
-//    // cout << e.what() << endl;
-//      smz->print_err(e.what());
 	throw;
     }
 }
@@ -153,8 +146,6 @@ void parser::outname(name & oname)	// throws outnameex if not given a valid outn
 	    oname = cursym.get_name_id();
     }
     catch(exception & e) {
-//   //  cout << e.what() << endl;
-//      smz->print_err(e.what());
 	throw;
     }
 }
@@ -414,8 +405,6 @@ void parser::device(devicekind & devkind_var, int &variant_var, vector <int> &wv
 	}			// didn't get a devname to start with
     }
     catch(exception & e) {
-//     //cout << e.what() << endl;
-//     smz->print_err(e.what());
 	throw;
     }
 }
@@ -461,8 +450,6 @@ void parser::uname(name & did_var)	// throws unameex if not given a valid uname
 	    did_var = cursym.get_name_id();
     }
     catch(exception & e) {
-//     //cout << e.what() << endl;
-//      smz->print_err(e.what());
 	throw;
     }
 }
@@ -543,13 +530,6 @@ void parser::monrule(void)	// throws monruleex if finds invalid monrule
 	    if (0 == errcount) {
 		mmz->makemonitor(dev, outp, ok);
 		if (ok) {
-		    //cout << "Monitor set at ";
-		    //nmz->writename(dev);
-		    //if (outp != blankname) {
-			//cout << ".";
-			//nmz->writename(outp);
-		    //}
-		    //cout << endl;
 		    return;
 		} else {
 		    errcount++;
@@ -568,7 +548,6 @@ void parser::monrule(void)	// throws monruleex if finds invalid monrule
 	smz->print_err(e.what());
 	while (cursym.get_syntaxvalue() != semicolon && cursym.get_syntaxvalue() != endfile) {	// iterates while cursym is not ';'
 	    smz->getsymbol(cursym);
-	    //throw parseex_i;
 	}
     }
 }
@@ -642,17 +621,6 @@ void parser::connrule(void)	// throws connruleex if finds invalid connrule
 			    inp_conn_list.push_back(inp);	// append uname id of input pin once successfully connected
 			    // we can now check that future connections do not connect
 			    // input pins that have already been used
-			    //cout << "Connection made between ";
-			    //nmz->writename(odev);
-			    //if (outp != blankname) {
-				//cout << ".";
-				//nmz->writename(outp);
-			    //}
-			    //cout << " and ";
-			    //nmz->writename(idev);
-			    //cout << ".";
-			    //nmz->writename(inp);
-			    //cout << endl;
 			    return;
 
 			} else {	//connection error
@@ -674,12 +642,10 @@ void parser::connrule(void)	// throws connruleex if finds invalid connrule
 	}			// we expected a '>'
     }
     catch(exception & e) {
-	//cout << e.what() << endl;
 	smz->print_err(e.what());
 	while (cursym.get_syntaxvalue() != semicolon && cursym.get_syntaxvalue() != endfile) {	// iterates while cursym is not ';'
 	    smz->getsymbol(cursym);
 	}
-	//throw parseex_i;
     }
 }
 
@@ -728,11 +694,7 @@ void parser::devrule(void)	// throws devruleex if finds invalid devrule
 		// for duplicate/undefined unames
 		if (0 == errcount) {
 		    if (ok) {
-			//dmz->writedevice(devkind_var);
-			//cout << ": ";
-			//nmz->writename(did_var);
-			//cout << " made" << endl;
-			return;
+					return;
 		    } else {
 			errcount++;
 			throw makedevex_i;
@@ -748,12 +710,10 @@ void parser::devrule(void)	// throws devruleex if finds invalid devrule
 	}			// we expected an '='
     }
     catch(exception & e) {
-	// cout << e.what() << endl;
 	smz->print_err(e.what());
 	while (cursym.get_syntaxvalue() != semicolon && cursym.get_syntaxvalue() != endfile) {	// iterates while cursym is not ';'
 	    smz->getsymbol(cursym);
 	}
-	//throw parseex_i;
     }
 }
 
@@ -842,7 +802,6 @@ void parser::section(void)	// throws sectionex if finds invalid section
 		smz->getsymbol(cursym);
 		while (cursym.get_syntaxvalue() != rbrak && cursym.get_syntaxvalue() != endfile) {	// i.e. while inside braces
 		    monrule();
-		    // cout << "monrule ran" << endl;
 		    smz->getsymbol(cursym);
 		}
 	    } else {
@@ -856,12 +815,10 @@ void parser::section(void)	// throws sectionex if finds invalid section
 	}			// didn't get a valid section keyword
     }
     catch(sectionex & e) {
-	//cout << e.what() << endl;
 	smz->print_err(e.what());
 	while (!(cursym.get_syntaxvalue() == rbrak)) {	// iterates while cursym is not '}'
 	    smz->getsymbol(cursym);
 	}
-	//throw parseex_i;
     }
 }
 

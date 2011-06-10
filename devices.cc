@@ -101,7 +101,6 @@ void devices::makeswitch (name id, int setting, bool& ok)
     netz->addoutput (d, blankname);
     d->swstate = (setting == 0) ? low : high;
 	d->olist->sig = d->swstate;
-	cout << "initial state: " << d->swstate << endl;
   }
 }
 
@@ -271,16 +270,7 @@ asignal devices::inv (asignal s)
  */
 void devices::execswitch (devlink d)
 {
-	cout << "swstate: " << d->swstate << endl;
-  cout << "dolistsig1: " << d->olist->sig << endl;
-
   signalupdate (d->swstate, d->olist->sig);
-  //if (0 == d->olist->sig) {
-//
-  //}
-
-
-  cout << "dolistsig2: " << d->olist->sig << endl;
 }
 
 
