@@ -15,45 +15,40 @@
 
 using namespace std;
 
-
-
 /***************************************************************************
 Contains the character and, to enable printing of errors, includes its line number, column position and a string containing the line itself
 */
 
-struct character 
-{public:
-string line;
-char ch;
-unsigned int pos;
-int linenum;
+struct character {
+ public:
+	string line;
+	char ch;
+	unsigned int pos;
+	int linenum;
 };
 
 /***************************************************************************/
-class scanner
-{
-private:
-names* nmz;
-ifstream inf;
-character current;
-character last;
-bool eofile;
-namestring idstr;
-int num;
-void skipspaces ();
-void skipcomments();
-void getch();
-void getnumber (int &number);
-void getnumber (int &number, vector <int> &wvform);
-void getname (namestring &str);
+class scanner {
+ private:
+	names * nmz;
+	ifstream inf;
+	character current;
+	character last;
+	bool eofile;
+	namestring idstr;
+	int num;
+	void skipspaces();
+	void skipcomments();
+	void getch();
+	void getnumber(int &number);
+	void getnumber(int &number, vector < int >&wvform);
+	void getname(namestring & str);
 
-public:	
-scanner(names* names_mod, const char* defname, bool & ok); // Constructor
-void getsymbol (symbol &s); //gets next symbol object
-void print_err(const char* error);
+ public:
+	 scanner(names * names_mod, const char *defname, bool & ok);	// Constructor
+	void getsymbol(symbol & s);	//gets next symbol object
+	void print_err(const char *error);
 
 };
 
-
-
-#endif /* scanner_h */
+#endif				/* scanner_h */
