@@ -100,6 +100,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
 							0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
 					// Spinner (device)
 					spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString(wxT("100")));
+					spin->SetRange(10,1000);
 				button_sizer->Add(spin, 0 , wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// DEVICE button
 				button_sizer->Add(new wxButton(this, DEVICE_BUTTON_ID,
@@ -529,7 +530,9 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 	bool running;
 	if(timer->IsRunning())
 	{
-		timer->Stop();
+		cout << "Timer is running" << endl;
+		wxCommandEvent redraw_event;
+		OnPlayButton(redraw_event);
 		running = true;
 	}
 	else
@@ -654,13 +657,15 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 				}
 			}
 		}
-		// Redraw the canvas
-		wxCommandEvent redraw_event;
-		OnPlayButton(redraw_event);
-		sw->canvas->Clear();
+		// Clear the canvas
+		wxCommandEvent clear_event;
+		OnClearButton(clear_event);
 	}
 	if(running)
-		timer->Start();
+	{
+		wxCommandEvent redraw_event;
+		OnPlayButton(redraw_event);
+	}
 }
 
 
