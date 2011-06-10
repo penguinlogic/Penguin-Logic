@@ -19,9 +19,10 @@ DEVICES
 	NOR -numinputs 2 = nor1;
 	OR -numinputs 2 = or2;
 	DTYPE = dtype1;
+	SIGGEN -waveform 1010111010000111001 = siggen1;
 	CLOCK -period 2 = clock1;
-	CLOCK -period 2 = clock2;
 }
+
 CONNECTIONS
 {
 	sw1 > and1.I1;
@@ -45,15 +46,17 @@ CONNECTIONS
 	or1 > nor1.I1;
 	xor1 > nor1.I2;
 
-	or2 > dtype1.DATA;
-	clock1 > dtype1.SET;
-	clock2 > dtype1.CLK;
+	dtype1.QBAR > dtype1.DATA;
+	siggen1 > dtype1.SET;
+	clock1 > dtype1.CLK;
 	nor1 > dtype1.CLEAR;
 }
+
 MONITOR
 {
 	dtype1.Q;
 	dtype1.QBAR;
-	nor1;
 	or2;
+	siggen1;
+	clock1;
 }
