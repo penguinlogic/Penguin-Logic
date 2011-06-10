@@ -6,7 +6,7 @@
 #include "devices.h"
 
 const int maxmonitors = 30;      /* max number of monitor points */
-const int maxcycles = 100;        /* max number of cycles per run */
+const int maxcycles = 1000;        /* max number of cycles per run */
 
 struct moninfo {
   name devid;

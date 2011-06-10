@@ -94,24 +94,23 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
 					timer = new MyTimer();
 					timer->frame = this;
 
-				button_sizer->Add(play_pause, 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
+				button_sizer->Add(play_pause, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 10);
 					// Spinner (label)
-				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Simulation speed:")),
+				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("  Simulation\ncycle period:")),
 							0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
 					// Spinner (device)
-					spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID,
-											wxString(wxT("10")));
+					spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString(wxT("100")));
 				button_sizer->Add(spin, 0 , wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// DEVICE button
 				button_sizer->Add(new wxButton(this, DEVICE_BUTTON_ID,
 									wxT("Change device properties")), 0,
-									wxALIGN_CENTER_VERTICAL|wxALL, 10);
+									wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 10);
 					// Continue button
 				//button_sizer->Add(new wxButton(this, CONT_BUTTON_ID,
 							//wxT("Continue")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// Clear button
 				button_sizer->Add(new wxButton(this, CLEAR_BUTTON_ID,
-							wxT("Clear canvas")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
+							wxT("Reset simulation")), 0, wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 10);
 					// Static text (placeholder)
 				button_sizer->Add(new wxStaticText(this, wxID_ANY, wxT("")), 0,
 							wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxLEFT, 10);
@@ -121,7 +120,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
 					// MONITOR button
 				button_sizer->Add(new wxButton(this, MONITOR_BUTTON_ID,
 								wxT("Change monitor points")), 0,
-								wxALIGN_CENTER_VERTICAL|wxALL, 10);
+								wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 10);
 			left_sizer->Add(button_sizer, 0, wxEXPAND | wxALL, 10);
 	topsizer->Add(left_sizer, 1, wxEXPAND | wxALL, 10);
 	//	//Right panel
@@ -397,7 +396,7 @@ void MyFrame::OnPlayButton(wxCommandEvent &event)
 			timer->cycles = 0;
 			CanvasClear = false;
 		}
-		timer->Start(spin->GetValue(),false);
+		timer->Start(spin->GetValue(),wxTIMER_CONTINUOUS);
 		SetStatusText(wxT("Simulation running"),1);
 	}
 }

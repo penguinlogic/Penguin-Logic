@@ -124,7 +124,7 @@ class MyScrolledWindow: public wxScrolledWindow
 {
 public:
 // CONSTRUCTOR
-	MyScrolledWindow::MyScrolledWindow(wxWindow *parent,
+	MyScrolledWindow(wxWindow *parent,
 						wxWindowID winid = wxID_ANY,
 						const wxPoint& pos = wxDefaultPosition,
 						const wxSize& size = wxDefaultSize,
