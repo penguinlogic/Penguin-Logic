@@ -37,6 +37,20 @@ void
     name_id_var = in_name_id;
 }
 
+void
+ symbol::set_parameters(type in_type, syntaxvalue in_syntaxvalue, int in_uint,
+			name in_name_id, vector <int> in_wvform)
+{
+    type_var = in_type;
+    syntaxvalue_var = in_syntaxvalue;
+    uint_var = in_uint;
+    name_id_var = in_name_id;
+	wvform_var = in_wvform;
+}
+
+
+
+
 /* Returns the type of symbol held in the object*/
 type symbol::get_type()
 {
@@ -73,6 +87,13 @@ name symbol::get_name_id()
     return name_id_var;
 }
 
+// returns waveform in vector
+vector <int> symbol::get_wvform()
+{
+	return wvform_var;
+}
+
+
 /* performs equality operation */
 bool symbol::operator==(symbol rhs)
 {
@@ -103,4 +124,14 @@ symbol symbol::operator=(symbol rhs)
     uint_var = rhs.get_uint();
     name_id_var = rhs.get_name_id();
     return *this;
+}
+
+void symbol::uintdigits (vector <int> &digits, int int_in) // returns each digit in uint_in in a vector
+{
+	if (int_in > 9)
+	{
+		uintdigits (digits, int_in / 10);
+	}
+
+	digits.push_back (int_in % 10);
 }

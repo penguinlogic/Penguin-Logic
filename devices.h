@@ -3,6 +3,7 @@
 
 #include "names.h"
 #include "network.h"
+#include "symbol.h"
 
 class devices{
   names* nmz;      // the version of the names module we use.
@@ -20,6 +21,7 @@ class devices{
   void makeclock (name id, int frequency);
   void makegate (devicekind dkind, name did, int ninputs, bool& ok);
   void makedtype (name id);
+  void makesiggen (name id, vector <int> &wvvector_var);
   void signalupdate (asignal target, asignal& sig);
   asignal inv (asignal s);
   void execswitch (devlink d);
@@ -27,11 +29,13 @@ class devices{
   void execxorgate(devlink d);
   void execdtype (devlink d);
   void execclock(devlink d);
+  void execsiggen(devlink d);
   void updateclocks (void);
+  void updatesiggens (void);
   void outsig (asignal s);
 
 public:
-  void makedevice (devicekind dkind, name did, int variant, bool& ok);
+  void makedevice (devicekind dkind, name did, int variant, vector <int> wvvector_var, bool& ok);
     /* Adds a device to the network of the specified kind and name.  The   */
     /* variant is used with such things as gates where it specifies the    */
     /* number of inputs. 'ok' returns true if operation succeeds.          */

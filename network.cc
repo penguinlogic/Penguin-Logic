@@ -91,7 +91,7 @@ void network::adddevice (devicekind dkind, name did, devlink& dev)
   dev->kind = dkind;
   dev->ilist = NULL;
   dev->olist = NULL;
-  if (dkind != aclock) {        // device goes at head of list 
+  if (dkind != (aclock || siggen)) {        // device goes at head of list 
     if (lastdev == NULL)
 	lastdev = dev;
     dev->next = devs;

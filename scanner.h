@@ -44,6 +44,7 @@ void skipspaces ();
 void skipcomments();
 void getch();
 void getnumber (int &number);
+void getnumber (int &number, vector <int> &wvform);
 void getname (namestring &str);
 
 public:	

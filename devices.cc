@@ -100,6 +100,8 @@ void devices::makeswitch (name id, int setting, bool& ok)
     netz->adddevice (aswitch, id, d);
     netz->addoutput (d, blankname);
     d->swstate = (setting == 0) ? low : high;
+	d->olist->sig = d->swstate;
+	cout << "initial state: " << d->swstate << endl;
   }
 }
 
@@ -171,6 +173,23 @@ void devices::makedtype (name id)
   d->memory = low;
 }
 
+/***********************************************************************
+ *
+ * Used to make new signal generator devices.
+ * No inputs.
+ * Called by makedevice.
+ *
+ */
+void devices::makesiggen (name id, vector <int> &wvvector_var)
+{
+	devlink d;
+	netz->adddevice (siggen, id, d);
+	netz->addoutput (d, blankname);
+	d->wvvector = wvvector_var;
+	d->counter = 0;	// records how far through waveform we are
+}
+
+
 
 /***********************************************************************
  *
@@ -179,7 +198,7 @@ void devices::makedtype (name id)
  * number of inputs. 'ok' returns true if operation succeeds.         
  *
  */
-void devices::makedevice (devicekind dkind, name did, int variant, bool& ok)
+void devices::makedevice (devicekind dkind, name did, int variant, vector <int> wvvector_var, bool& ok)
 {
   ok = true;
   switch (dkind) {
@@ -200,7 +219,9 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok)
       break;
     case dtype:
       makedtype(did);
-      break;
+	  break;
+	case siggen:
+	  makesiggen(did, wvvector_var);
   }
 }
 
@@ -225,6 +246,7 @@ void devices::signalupdate (asignal target, asignal& sig)
       sig = (target == low) ? falling : high;
       break;
   }
+  sig = target;
   if (sig != oldsig)
     steadystate = false;
 }
@@ -249,7 +271,16 @@ asignal devices::inv (asignal s)
  */
 void devices::execswitch (devlink d)
 {
+	cout << "swstate: " << d->swstate << endl;
+  cout << "dolistsig1: " << d->olist->sig << endl;
+
   signalupdate (d->swstate, d->olist->sig);
+  //if (0 == d->olist->sig) {
+//
+  //}
+
+
+  cout << "dolistsig2: " << d->olist->sig << endl;
 }
 
 
@@ -336,6 +367,21 @@ void devices::execclock(devlink d)
   }
 }
 
+/***********************************************************************
+ *
+ * Used to simulate the operation of signal generator devices.
+ * Called by executedevices.
+ *
+ */
+void devices::execsiggen(devlink d)
+{
+  if (d->olist->sig == rising)
+    signalupdate (high, d->olist->sig);
+  else {
+    if (d->olist->sig == falling)
+      signalupdate (low, d->olist->sig);
+  }
+}
 
 /***********************************************************************
  *
@@ -361,6 +407,42 @@ void devices::updateclocks (void)
   }
 }
 
+/***********************************************************************
+ *
+ * Increment the counters in siggen devices and initiate changes
+ * in their outputs every clock cycle according to their given waveform.
+ * Called by executedevices.
+ *
+ */
+void devices::updatesiggens (void)
+{
+  devlink d;
+  for (d = netz->devicelist (); d != NULL; d = d->next) {
+	  if (d->kind == siggen) {
+		if (d->counter == d->wvvector.size()) {
+		d->counter = 0;
+		}
+		if (0 == d->wvvector[d->counter]) {
+			if (low == d->olist->sig || falling == d->olist->sig) {
+				signalupdate (low, d->olist->sig);
+			}
+			else {
+				signalupdate (falling, d->olist->sig);
+			}
+			
+		}
+		if (1 == d->wvvector[d->counter]) {
+			if (high == d->olist->sig || rising == d->olist->sig) {
+				signalupdate (high, d->olist->sig);
+			}
+			else {
+				signalupdate (rising, d->olist->sig);
+			}
+		}
+		(d->counter)++;
+	  }
+  }
+}
 
 /***********************************************************************
  *
@@ -377,6 +459,7 @@ void devices::executedevices (bool& ok)
   if (debugging)
     cout << "Start of execution cycle" << endl;
   updateclocks ();
+  updatesiggens ();
   machinecycle = 0;
   do {
     machinecycle++;
@@ -392,7 +475,8 @@ void devices::executedevices (bool& ok)
         case andgate:  execgate (d, high, high); break;
         case nandgate: execgate (d, high, low);  break;
         case xorgate:  execxorgate (d);          break;
-        case dtype:    execdtype (d);            break;     
+        case dtype:    execdtype (d);            break;
+		case siggen:   execsiggen (d);           break;
       }
       if (debugging)
 	showdevice (d);

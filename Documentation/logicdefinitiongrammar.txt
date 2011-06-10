@@ -13,7 +13,8 @@ device                 = ( `CLOCK' `-period' uint ) |
                          ( `OR' `-numinputs' uint ) |
                          ( `NOR' `-numinputs' uint ) |
                          ( `DTYPE' ) |
-                         ( `XOR' )
+                         ( `XOR' ) |
+                         ( `SIGGEN' `-waveform' uint )
 outname                = `Q' | `QBAR'
 inname                 = `I1' | `I2' | `I3' | `I4' |
                          `I5' | `I6' | `I7' | `I8' |

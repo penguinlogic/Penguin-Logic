@@ -33,7 +33,7 @@ class parser {
     void uint(int &uint_var);	// throws uintex if not given a valid uint
     void inname(name & iname);	// throws innameex if not given a valid inname
     void outname(name & oname);	// throws outnameex if not given a valid outname
-    void device(devicekind & devkind_var, int &variant_var);	// throws deviceex if finds invalid device
+    void device(devicekind & devkind_var, int &variant_var, vector <int> &wvvector_var);	// throws deviceex if finds invalid device
     void uname(name & did_var);	// throws unameex if not given a valid uname
     void monrule(void);		// throws monruleex if finds invalid monrule
     void connrule(void);	// throws connruleex if finds invalid connrule
