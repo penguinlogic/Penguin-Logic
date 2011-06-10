@@ -69,6 +69,15 @@ class uintoutofboundsex:public exception {
     }
 }
 uintoutofboundsex_i;
+
+/***************************************************************************************/
+class siggenwvformnotbinaryex:public exception {
+ public:
+    virtual const char *what() const throw() {
+	return "Exception: This waveform is not binary";
+    }
+}
+siggenwvformnotbinaryex_i;
 /***************************************************************************************/
 void
  parser::uint(int &uint_var)	// throws uintex if not given a valid uint
@@ -384,17 +393,14 @@ void parser::device(devicekind & devkind_var, int &variant_var, vector <int> &wv
 		    if (cursym.get_syntaxvalue() == waveform) {	//i.e. devswitch is '-waveform'
 			smz->getsymbol(cursym);
 			if (cursym.get_type() == Uint) {	// i.e. symbol is a uint
-				// TODO: check each digit is only 1 or 0.
-			    //if (16 < cursym.get_uint() || 1 > cursym.get_uint()) {
-				//errcount++;
-				//throw uintoutofboundsex_i;	// uint not between 1 and 16
-			    //}
-				cout << "got a SIGGEN!" << endl;
+				for (int i = 0; i < cursym.get_wvform().size(); i++) {
+					if (cursym.get_wvform()[i] > 1 || cursym.get_wvform()[i] < 0) {
+						errcount++;
+						throw siggenwvformnotbinaryex_i;
+					}
+				}
 			    devkind_var = siggen;
 				wvvector_var = cursym.get_wvform();
-				cout << "size of wvvector: " << wvvector_var.size() << endl;
-			    //variant_var = cursym.get_uint();
-			//cout << "variant: " << variant_var << endl;
 			    return;	// we have a valid SIGGEN
 			}
 			}
@@ -428,7 +434,7 @@ class unameex:public exception {
  public:
     virtual const char *what() const throw() {
 	return
-	    "Exception: expected a user-defined name, as assigned in DEVICES";
+	    "Exception: expected a user-defined name";
     }
 }
 unameex_i;
@@ -537,13 +543,13 @@ void parser::monrule(void)	// throws monruleex if finds invalid monrule
 	    if (0 == errcount) {
 		mmz->makemonitor(dev, outp, ok);
 		if (ok) {
-		    cout << "Monitor set at ";
-		    nmz->writename(dev);
-		    if (outp != blankname) {
-			cout << ".";
-			nmz->writename(outp);
-		    }
-		    cout << endl;
+		    //cout << "Monitor set at ";
+		    //nmz->writename(dev);
+		    //if (outp != blankname) {
+			//cout << ".";
+			//nmz->writename(outp);
+		    //}
+		    //cout << endl;
 		    return;
 		} else {
 		    errcount++;
@@ -636,17 +642,17 @@ void parser::connrule(void)	// throws connruleex if finds invalid connrule
 			    inp_conn_list.push_back(inp);	// append uname id of input pin once successfully connected
 			    // we can now check that future connections do not connect
 			    // input pins that have already been used
-			    cout << "Connection made between ";
-			    nmz->writename(odev);
-			    if (outp != blankname) {
-				cout << ".";
-				nmz->writename(outp);
-			    }
-			    cout << " and ";
-			    nmz->writename(idev);
-			    cout << ".";
-			    nmz->writename(inp);
-			    cout << endl;
+			    //cout << "Connection made between ";
+			    //nmz->writename(odev);
+			    //if (outp != blankname) {
+				//cout << ".";
+				//nmz->writename(outp);
+			    //}
+			    //cout << " and ";
+			    //nmz->writename(idev);
+			    //cout << ".";
+			    //nmz->writename(inp);
+			    //cout << endl;
 			    return;
 
 			} else {	//connection error
@@ -722,10 +728,10 @@ void parser::devrule(void)	// throws devruleex if finds invalid devrule
 		// for duplicate/undefined unames
 		if (0 == errcount) {
 		    if (ok) {
-			dmz->writedevice(devkind_var);
-			cout << ": ";
-			nmz->writename(did_var);
-			cout << " made" << endl;
+			//dmz->writedevice(devkind_var);
+			//cout << ": ";
+			//nmz->writename(did_var);
+			//cout << " made" << endl;
 			return;
 		    } else {
 			errcount++;

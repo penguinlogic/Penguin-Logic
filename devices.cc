@@ -187,16 +187,6 @@ void devices::makesiggen (name id, vector <int> &wvvector_var)
 	netz->addoutput (d, blankname);
 	d->wvvector = wvvector_var;
 	d->counter = 0;	// records how far through waveform we are
-
-	//symbol s_tmp;
-	//vector<int> digvector;
-	//s_tmp.uintdigits(digvector, wform);
-	//cout << "wform: " << wform << endl;
-	cout << "size of siggen wave: " << wvvector_var.size() << endl;
-	for (int i = 0; i < wvvector_var.size(); i++) {
-		cout << "vector[i]: " << wvvector_var[i] << endl;
-	}
-
 }
 
 
@@ -392,41 +382,6 @@ void devices::execsiggen(devlink d)
       signalupdate (low, d->olist->sig);
   }
 }
-	//vector <int> binarywave;
-	//symbol s_tmp; // make temp symbol so we can call uintdigits()
-
-	//s_tmp.uintdigits(binarywave, d->wvform); // binarywave now contains
-	                                         // the waveform
-	
-//	if (d->wvvector.size() == d->counter) // reset counter when we reach
-//		d->counter = 0;                  // end of given waveform
-//
-//cout << "d->wvvector[i]" << d->wvvector[d->counter] << endl;
-//
-//    if (0 == d->wvvector[d->counter]) {
-//	   if (low == d->olist->sig || falling == d->olist->sig) {
-//			signalupdate (low, d->olist->sig);
-//	   }
-//	   else {
-//			d->olist->sig = falling;
-//			signalupdate (low, d->olist->sig);
-//	   }
-//	}
-//
-//    if (1 == d->wvvector[d->counter]) {
-//	   if (high == d->olist->sig || rising == d->olist->sig) {
-//		   	signalupdate (high, d->olist->sig);
-//	   }
-//   	   else {
-//   		   d->olist->sig = rising;
-//   		   signalupdate (high, d->olist->sig);
-//   	   }
-//	}
-//
-//	(d->counter)++;
-//}
-
-
 
 /***********************************************************************
  *
@@ -529,7 +484,7 @@ void devices::executedevices (bool& ok)
   } while ((! steadystate) && (machinecycle < maxmachinecycles));
   if (debugging)
     cout << "End of execution cycle" << endl;
-  ok = true;//steadystate;
+  ok = steadystate;
 }
 
 
