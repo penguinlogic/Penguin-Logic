@@ -77,7 +77,7 @@ bool MyApp::OnInit()
     return(true); // enter the GUI event loop
 #else
     // Construct the text-based interface
-    userint umz(nmz, dmz, mmz);
+    userint umz(nmz, dmz, mmz, netz);
     umz.userinterface();
 #endif /* USE_GUI */
   }

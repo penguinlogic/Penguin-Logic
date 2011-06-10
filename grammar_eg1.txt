@@ -7,6 +7,8 @@ DEVICES
 	OR -numinputs 2 = or1;
 }
 
+
+
 CONNECTIONS
 {
 	switch1 > and1.I1;
@@ -14,6 +16,10 @@ CONNECTIONS
 	switch2 > or1.I1;
 	switch3 > or1.I2;
 }
+
+
+
+
 
 MONITOR
 {

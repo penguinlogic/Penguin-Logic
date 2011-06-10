@@ -342,8 +342,27 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
   // Callback for the push button
 {
     if(spin->GetValue() <= maxcycles)
-	{
+	{       
+		//srand((unsigned)time(0));
 		cyclescompleted = 0;
+		  devlink d;
+                  for (d = netz->devicelist (); d != NULL; d = d->next) 
+                {
+			if (d->kind==dtype)
+			{
+				int memstate=rand()%2;
+				//cout<<"memstate: "<<memstate<<endl;
+				if (memstate ==0)d->memory=low;
+				else d->memory=high;
+			}	
+			
+			if (d->kind==aclock)
+			{
+				int countpos = rand()%d->frequency;
+				//cout<<countpos<<endl;
+				d->counter = countpos;
+			}	
+  		}
 		mmz->resetmonitor();
 		runnetwork(spin->GetValue());
 		canvas->Render(cyclescompleted);

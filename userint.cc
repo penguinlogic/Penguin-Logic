@@ -219,12 +219,32 @@ void userint::runcmd (void)
 {
   //int n;
   int ncycles;
+ // srand((unsigned)time(0));
   cyclescompleted = 0;
   rdnumber (ncycles, 1, maxcycles);
   if (cmdok) {
-    mmz->resetmonitor ();
-    cout << "Running for " << ncycles << " cycles" << endl;
-    runnetwork(ncycles);
+  cout<<"run command"<<endl;
+  devlink d;
+  for (d = netz->devicelist (); d != NULL; d = d->next) 
+  {
+	if (d->kind==dtype)
+	{
+		int memstate=rand()%2;
+		cout<<"memstate: "<<memstate<<endl;
+		if (memstate ==0)d->memory=low;
+		else d->memory=high;
+	}
+	else if (d->kind==aclock)
+	{
+		int countpos = rand()%d->frequency;
+		cout<<"countpos: "<<countpos<<endl;
+		d->counter = countpos;
+	}	
+  }
+
+  mmz->resetmonitor ();
+  cout << "Running for " << ncycles << " cycles" << endl;
+  runnetwork(ncycles);
   }
 }
 
@@ -369,11 +389,12 @@ void userint::userinterface (void)
  * Remember the names of the other shared modules that we use here.
  *
  */
-userint::userint (names* names_mod, devices* devices_mod, monitor* monitor_mod)
+userint::userint (names* names_mod, devices* devices_mod, monitor* monitor_mod, network * network_mod)
 {
   nmz = names_mod;
   dmz = devices_mod;
   mmz = monitor_mod;
+  netz = network_mod;
 }
 
 

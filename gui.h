@@ -22,6 +22,8 @@
 #include <GL/glut.h>
 #include "wx_icon.xpm"
 #include <iostream>
+#include <ctime>
+#include <cstdlib>
 
 using namespace std;
 

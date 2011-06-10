@@ -6,6 +6,8 @@
 #include "devices.h"
 #include "monitor.h"
 #include <set>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -18,7 +20,7 @@ class userint {
   names* nmz;              // Modules declared elsewhere
   devices* dmz;            // and shared with other parts 
   monitor* mmz;            // of the program.
-
+  network * netz;
   bool cmdok;              // Has the attempt to parse the
                            // current command line failed yet?
   char cmdline[maxline];   // Command line typed in by user.
@@ -49,7 +51,7 @@ class userint {
   void userinterface (void);
   /* Implements the interactive user command interface.                 */
 
-  userint (names* names_mod, devices* devices_mod, monitor* monitor_mod);
+  userint (names* names_mod, devices* devices_mod, monitor* monitor_mod, network* network_mod);
   /* Constructor for the userint module.                                */
 };
 

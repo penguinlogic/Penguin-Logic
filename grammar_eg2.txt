@@ -2,7 +2,7 @@ DEVICES
 {
 	CLOCK -period 5 = clock;
 	SWITCH -initialvalue 0 = switch1;
-	SWITCH -initialvalue 1 = switch2;
+	SWITCH -initialvalue 0 = switch2;
 	SWITCH -initialvalue 0 = switch3;
 	DTYPE = dtype;
 }

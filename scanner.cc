@@ -145,13 +145,13 @@ the getsymbol function sets the parameters of the symbol passed to it. It ignore
 void
 scanner::getsymbol (symbol & s)
 {
-  last = current;
+ 
 	
   s.set_parameters (notype, novalue, -1, -1);
 
   skipspaces ();
   skipcomments ();
-
+ last = current;
   if (inf.eof ())		//End of file reached, endfile symbol returned
     {
       s.set_parameters (Charsym, endfile, -1, -1);
@@ -245,11 +245,11 @@ void
 scanner::print_err (const char *error)
 {
   cout << "Error in line " << last.
-    linenum << ", at character " << last.pos << ":" << endl;
+    linenum << ", at character " << last.pos<< ":" << endl;
 
   cout << last.line << endl;
 
-  for (unsigned int i = 0; i < last.pos; i++)
+  for (unsigned int i = 0; i < last.pos-1; i++)
     {
       if (last.line[i] == '\t')
 	cout << '\t';
