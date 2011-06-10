@@ -11,8 +11,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(wxID_EXIT, MyFrame::OnExit)
 	EVT_MENU(wxID_HELP_CONTENTS, MyFrame::OnHelpContents)
 	EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
-	//EVT_BUTTON(RUN_BUTTON_ID, MyFrame::OnRunButton)
-	//EVT_BUTTON(CONT_BUTTON_ID, MyFrame::OnContButton)
 	EVT_BUTTON(PLAY_BUTTON_ID, MyFrame::OnPlayButton)
 	EVT_BUTTON(CLEAR_BUTTON_ID, MyFrame::OnClearButton)
 	EVT_BUTTON(DEVICE_BUTTON_ID, MyFrame::OnDeviceButton)
@@ -42,8 +40,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
 
 	// Define File menu
 	wxMenu *fileMenu = new wxMenu;
-	//fileMenu->Append(wxID_OPEN, wxT("&Open circuit definition file"));
-	//fileMenu->Append(wxID_SAVE, wxT("&Save waveforms as picture"));
 	fileMenu->Append(wxID_EXIT, wxT("&Exit"));
 
 	// Define Help menu
@@ -86,9 +82,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
 			left_sizer->Add(sw, 1, wxEXPAND | wxALL, 10);
 			// Button panel
 			wxFlexGridSizer *button_sizer = new wxFlexGridSizer(2,0,0,0);
-					// Run button
-				//button_sizer->Add(new wxButton(this, RUN_BUTTON_ID, wxT("Run")), 0,
-												//wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// Play/Pause button
 					play_pause = new wxButton(this, PLAY_BUTTON_ID, wxT("Play / Pause"));
 					timer = new MyTimer();
@@ -106,9 +99,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
 				button_sizer->Add(new wxButton(this, DEVICE_BUTTON_ID,
 									wxT("Change device properties")), 0,
 									wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 10);
-					// Continue button
-				//button_sizer->Add(new wxButton(this, CONT_BUTTON_ID,
-							//wxT("Continue")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 10);
 					// Clear button
 				button_sizer->Add(new wxButton(this, CLEAR_BUTTON_ID,
 							wxT("Reset simulation")), 0, wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 10);
@@ -124,49 +114,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
 								wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 10);
 			left_sizer->Add(button_sizer, 0, wxEXPAND | wxALL, 10);
 	topsizer->Add(left_sizer, 1, wxEXPAND | wxALL, 10);
-	//	//Right panel
-	//	wxBoxSizer *right_sizer = new wxBoxSizer(wxVERTICAL);
-	//	right_sizer->SetMinSize(wxSize(250,-1));
-	//		wxScrolledWindow *sp = new wxScrolledWindow(this, wxID_ANY,
-	//									wxPoint(-1, -1), wxSize(250, -1),
-	//									wxVSCROLL|wxHSCROLL);
-	//			const int p_inc = 40;		// Scroll increment
-	//			const int px_size = 800;	// Canvas size
-	//			const int py_size = 1000;	// Canvas size
-	//			sp->SetScrollbars(p_inc, p_inc, px_size/p_inc, py_size/p_inc);
-	//			//sp->Show();
-	//			// Right hand panel
-	//				wxBoxSizer *info_sizer = new wxBoxSizer(wxVERTICAL);
-	//					// Filename
-	//					wxBoxSizer *deffile_sizer = new wxBoxSizer(wxHORIZONTAL);
-	//					deffile_sizer->Add(new wxStaticText(sp, wxID_ANY,
-	//									wxT("Definition file name:")), 0,
-	//									wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL ,5);
-	//					deffile_sizer->Add(new wxStaticText(sp, wxID_ANY, defname),
-	//									0, wxALIGN_CENTER_VERTICAL ,0);
-	//				info_sizer->Add(deffile_sizer, 0, wxEXPAND|wxALL,0);
-	//					// Devices
-	//					wxBoxSizer *devices_sizer = new wxBoxSizer(wxVERTICAL);
-	//					devices_sizer->Add(new wxStaticText(sp, wxID_ANY,
-	//									wxT("DEVICES")), 0, wxEXPAND|wxALL,5);
-	//						for (devlink d = netz->devicelist(); d != NULL;
-	//									d = d->next)
-	//							devices_sizer->Add(new wxStaticText(sp, wxID_ANY,
-	//											DeviceProps(d)), 0, wxEXPAND|wxLEFT,25);
-	//				info_sizer->Add(devices_sizer, 0, wxEXPAND|wxALL, 0);
-	//					// Connections
-	//					wxBoxSizer *connections_sizer = new wxBoxSizer(wxVERTICAL);
-	//					connections_sizer->Add(new wxStaticText(panel, wxID_ANY,
-	//										wxT("CONNECTIONS")), 0, wxEXPAND|wxALL,5);
-	//				info_sizer->Add(connections_sizer, 0, wxEXPAND|wxALL, 5);
-	//					// Monitors
-	//					wxBoxSizer *monitors_sizer = new wxBoxSizer(wxVERTICAL);
-	//					monitors_sizer->Add(new wxStaticText(panel, wxID_ANY,
-	//									wxT("MONITORS")), 0, wxEXPAND|wxALL,5);
-	//				info_sizer->Add(monitors_sizer, 0, wxEXPAND|wxALL, 5);
-	//			sp->SetSizer(info_sizer);
-	//	right_sizer->Add(sp, 1, wxEXPAND|wxALL, 10);
-	//topsizer->Add(right_sizer, 0, wxEXPAND|wxALL, 10);
 	SetSizeHints(800, 400);
 	SetSizer(topsizer);
 }
@@ -272,8 +219,6 @@ void MyFrame::OnOpen(wxCommandEvent &event)
                     dialog.GetPath().c_str(),
                     dialog.GetDirectory().c_str(),
                     dialog.GetFilename().c_str());
-        //wxMessageDialog dialog2(this, info, _T("Selected file"));
-        //dialog2.ShowModal();
     }
 }
 
@@ -343,45 +288,6 @@ void MyFrame::OnAbout(wxCommandEvent &event)
 	about.ShowModal();                  
 }
 
-/*void MyFrame::OnRunButton(wxCommandEvent &event)
-  // Callback for the push button
-{
-    if(spin->GetValue() <= maxcycles)
-	{
-		cyclescompleted = 0;
-		mmz->resetmonitor();
-		runnetwork(spin->GetValue());
-		sw->canvas->Render(cyclescompleted);
-		SetStatusText(wxT("Run button pressed"), 1);
-	}
-	else
-	{
-		wxMessageDialog *error = new wxMessageDialog(this, wxT("Error: max number of cycles exceeded, please reduce the number of cycles using the spinner"));
-		error->ShowModal();
-	}
-}*/
-
-/*void MyFrame::OnContButton(wxCommandEvent &event)
-  // Callback for the push button
-{
-   int ncycles = spin->GetValue();
-	SetStatusText(wxT("Continue button pressed"), 1);
-	if (cyclescompleted > 0 && cyclescompleted + spin->GetValue()<=maxcycles)
-	{
-		if ((ncycles + cyclescompleted) > maxcycles)
-			ncycles = maxcycles - cyclescompleted;
-		runnetwork (spin->GetValue());
-    }
-	else if(cyclescompleted + spin->GetValue()>maxcycles)
-	{
-		wxMessageDialog *error = new wxMessageDialog(this, wxT("Error: max number of cycles exceeded, please start again by clicking the 'Run' button"));
-		error->ShowModal();
-	}
-	else
-		SetStatusText(wxT("Error: nothing to continue!"), 1);
-	sw->canvas->Render(cyclescompleted);
-}*/
-
 void MyFrame::OnPlayButton(wxCommandEvent &event)
 {
 	if(timer->IsRunning())
@@ -406,12 +312,24 @@ void MyFrame::OnClearButton(wxCommandEvent &event)
 {
 	if(!CanvasClear)
 	{
+		bool running;
 		if(timer->IsRunning())
-			timer->Stop();
+		{
+			running = true;
+			wxCommandEvent refresh_event;
+			OnPlayButton(refresh_event);
+		}
+		else
+			running = false;
 		CanvasClear = true;
 		sw->canvas->Clear();
 		timer->cycles = 0;
 		SetStatusText(wxT("Canvas has been cleared"),1);
+		if(running)
+		{
+			wxCommandEvent refresh_event;
+			OnPlayButton(refresh_event);
+		}
 	}
 	else
 		SetStatusText(wxT("Nothing to clear!"),1);
@@ -675,8 +593,6 @@ void MyFrame::OnMonitorButton(wxCommandEvent &event)
 
 // Event Table
 BEGIN_EVENT_TABLE(MyScrolledWindow, wxScrolledWindow)
-	//EVT_SCROLLWIN(MyScrolledWindow::OnScroll)
-	//wxEVT_SCROLLWIN(wxScrollWinEventFunction)
 END_EVENT_TABLE()
 
 MyScrolledWindow::MyScrolledWindow(wxWindow *parent, wxWindowID winid,
@@ -691,35 +607,6 @@ MyScrolledWindow::MyScrolledWindow(wxWindow *parent, wxWindowID winid,
 	canvas = new MyGLCanvas(this, wxID_ANY, monitor_mod, names_mod, 
 						wxDefaultPosition, wxSize(cx_size,cy_size));
 }
-
-void MyScrolledWindow::OnScroll(wxScrollWinEvent& event)
-{
-	/*cout << "Scroll request detected" << endl;
-	int *Hpix, Vpix;
-	GetScrollPixelsPerUnit(Hpix, Vpix);
-	cout << "Got scroll pixels" << endl;
-	cout << Hpix << Vpix << endl;
-	cout << *Hpix << *Vpix << endl;
-	cout << &Hpix << &Vpix << endl;
-	switch(event.GetOrientation())
-	{
-	case 4:	// Horizontal scrolling
-		Scroll(event.GetPosition()*(*Hpix),-1);
-		break;
-	case 8: // Vertical scrolling
-		Scroll(-1,event.GetPosition()*(*Vpix));
-		break;
-	default:
-		cout << "ERROR: scrolling failed" << endl;
-		break;
-	}
-	cout << "Orientation = " << event.GetOrientation() << endl;;
-	cout << "Position = " << event.GetPosition() << endl;
-
-	// Refresh canvas
-	canvas->OnScroll(event);*/
-}
-
 
 
 // ---------------------------------------------------------------------------//
@@ -897,8 +784,6 @@ void MyGLCanvas::GetImage(unsigned char* &pixels)
 void MyGLCanvas::OnScroll(wxScrollWinEvent& event)
 {
 	cout << "Scroll event detected" << endl;
-	//wxPaintDC dc(this); // required for correct refreshing under MS windows
-	//Render();
 }
 
 void MyGLCanvas::InitGL()	// Function to initialise the GL context
@@ -937,9 +822,6 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
 	// Callback function for mouse events inside the GL canvas
 {
 	Render();
-	//init = false;
-	//Refresh(); // required by some buggy nvidia graphics drivers,
-	//Update();  // harmless on other platforms!
 }
 
 

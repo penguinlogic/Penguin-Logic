@@ -102,10 +102,6 @@ private:
 	void OnHelpContents(wxCommandEvent& event);
 		// callback for [Help | About] menu item
 	void OnAbout(wxCommandEvent& event);
-		// callback for push button (run)
-	//void OnRunButton(wxCommandEvent& event);
-		// callback for push button (cont)
-	//void OnContButton(wxCommandEvent& event);
 		// callback for push button (play)
 	void OnPlayButton(wxCommandEvent& event);
 		// callback for push button (pause)
@@ -134,8 +130,6 @@ public:
 	MyGLCanvas *canvas;			// GL drawing area widget to draw traces
 private:
 // PRIVATE MEMBER FUNCTIONS
-	void OnScroll(wxScrollWinEvent& event);
-	//void HandleOnScroll();
 // EVENT TABLE
 	DECLARE_EVENT_TABLE()
 };
